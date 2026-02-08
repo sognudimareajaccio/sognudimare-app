@@ -299,7 +299,7 @@ export default function BookingScreen() {
                 </>
               )}
 
-              {/* Savings Calculator - NOW WITH PASSENGERS */}
+              {/* Savings Calculator - NOW WITH CLUB CARD COUNT */}
               {savings && (
                 <View style={styles.savingsContainer}>
                   <Text style={styles.savingsTitle}>{t('savingsSimulator')}</Text>
@@ -327,10 +327,10 @@ export default function BookingScreen() {
                   
                   <View style={styles.savingsRow}>
                     <Text style={styles.savingsLabel}>
-                      {t('clubCardCost')} ({selectedCard?.months} {language === 'fr' ? 'mois' : 'months'} x {savings.passengers})
+                      {language === 'fr' ? `Carte Club (${selectedCard?.months} mois x ${savings.clubCardCount})` : `Club Card (${selectedCard?.months} months x ${savings.clubCardCount})`}
                     </Text>
                     <Text style={styles.savingsValue}>
-                      {savings.cardPricePerPerson}€ x {savings.passengers} = {savings.totalCardCost}€
+                      {savings.cardPricePerPerson}€ x {savings.clubCardCount} = {savings.totalCardCost}€
                     </Text>
                   </View>
                   
