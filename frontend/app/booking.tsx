@@ -48,6 +48,7 @@ export default function BookingScreen() {
   const [phone, setPhone] = useState('');
   const [message, setMessage] = useState('');
   const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>('');
+  const [wantsClubCard, setWantsClubCard] = useState(false);
   const [selectedCard, setSelectedCard] = useState<typeof CLUB_CARDS[0] | null>(null);
   const [clubCardCount, setClubCardCount] = useState(1);
   const [showSuccess, setShowSuccess] = useState(false);
