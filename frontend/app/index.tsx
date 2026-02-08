@@ -410,11 +410,11 @@ const styles = StyleSheet.create({
     height: 40,
   },
   logoText: {
-    fontSize: FONT_SIZES.lg,
-    fontWeight: '700',
+    fontSize: FONT_SIZES.md,
+    fontWeight: '600',
     color: COLORS.secondary,
     marginLeft: SPACING.sm,
-    letterSpacing: 1,
+    letterSpacing: 0.5,
   },
   langButton: {
     flexDirection: 'row',
