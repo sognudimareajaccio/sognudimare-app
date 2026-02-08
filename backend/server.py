@@ -461,7 +461,10 @@ async def admin_delete_comment(post_id: str, comment_id: str):
 async def admin_get_all_members():
     """Get all members for moderation"""
     members = await db.members.find().to_list(100)
-    return members
+    return [
+        {**member, "_id": str(member["_id"])} if "_id" in member else member 
+        for member in members
+    ]
 
 @api_router.put("/admin/members/{member_id}/ban")
 async def admin_ban_member(member_id: str):
