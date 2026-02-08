@@ -209,6 +209,18 @@ export default function BookingScreen() {
             </TouchableOpacity>
           </View>
 
+          {/* Private Only Notice */}
+          {selectedCruise && PRIVATE_ONLY_DESTINATIONS.includes(selectedCruise.destination) && (
+            <View style={styles.privateNotice}>
+              <Ionicons name="information-circle" size={20} color={COLORS.secondary} />
+              <Text style={styles.privateNoticeText}>
+                {language === 'fr' 
+                  ? 'Cette croisière est uniquement disponible en privatisation complète du navire (base 8 passagers). Le prix affiché est calculé par personne sur cette base.'
+                  : 'This cruise is only available as full boat charter (base 8 passengers). Price shown is calculated per person on this basis.'}
+              </Text>
+            </View>
+          )}
+
           {/* Club Cards Section */}
           {selectedCruise && getCruisePrice() > 0 && (
             <>
