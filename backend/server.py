@@ -308,6 +308,224 @@ async def delete_post(post_id: str):
         raise HTTPException(status_code=404, detail="Post not found")
     return {"message": "Post deleted successfully"}
 
+# ============= DIRECT MESSAGING =============
+
+class DirectMessage(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    sender_id: str
+    sender_name: str
+    receiver_id: str
+    receiver_name: str
+    content: str
+    is_from_captain: bool = False
+    is_read: bool = False
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class DirectMessageCreate(BaseModel):
+    sender_id: str
+    sender_name: str
+    receiver_id: str
+    receiver_name: str
+    content: str
+    is_from_captain: bool = False
+
+class Conversation(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    participant_ids: List[str]
+    participant_names: List[str]
+    last_message: Optional[str] = None
+    last_message_at: Optional[datetime] = None
+    unread_count: int = 0
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+# Captain account (special account for direct communication)
+CAPTAIN_ID = "captain-sognudimare"
+CAPTAIN_NAME = "Capitaine Sognudimare"
+
+@api_router.get("/messages/conversations/{user_id}")
+async def get_conversations(user_id: str):
+    """Get all conversations for a user"""
+    conversations = await db.conversations.find({
+        "participant_ids": user_id
+    }).sort("last_message_at", -1).to_list(50)
+    return conversations
+
+@api_router.get("/messages/{user_id}/{other_user_id}")
+async def get_messages(user_id: str, other_user_id: str):
+    """Get messages between two users"""
+    messages = await db.messages.find({
+        "$or": [
+            {"sender_id": user_id, "receiver_id": other_user_id},
+            {"sender_id": other_user_id, "receiver_id": user_id}
+        ]
+    }).sort("created_at", 1).to_list(100)
+    
+    # Mark messages as read
+    await db.messages.update_many(
+        {"sender_id": other_user_id, "receiver_id": user_id, "is_read": False},
+        {"$set": {"is_read": True}}
+    )
+    
+    return messages
+
+@api_router.post("/messages")
+async def send_message(message_data: DirectMessageCreate):
+    """Send a direct message"""
+    message = DirectMessage(**message_data.dict())
+    await db.messages.insert_one(message.dict())
+    
+    # Update or create conversation
+    conversation_id = "-".join(sorted([message_data.sender_id, message_data.receiver_id]))
+    existing_conv = await db.conversations.find_one({"id": conversation_id})
+    
+    if existing_conv:
+        await db.conversations.update_one(
+            {"id": conversation_id},
+            {
+                "$set": {
+                    "last_message": message_data.content[:50],
+                    "last_message_at": datetime.utcnow()
+                },
+                "$inc": {"unread_count": 1}
+            }
+        )
+    else:
+        conv = Conversation(
+            id=conversation_id,
+            participant_ids=[message_data.sender_id, message_data.receiver_id],
+            participant_names=[message_data.sender_name, message_data.receiver_name],
+            last_message=message_data.content[:50],
+            last_message_at=datetime.utcnow(),
+            unread_count=1
+        )
+        await db.conversations.insert_one(conv.dict())
+    
+    return message.dict()
+
+@api_router.get("/messages/captain")
+async def get_captain_info():
+    """Get captain info for messaging"""
+    return {
+        "id": CAPTAIN_ID,
+        "name": CAPTAIN_NAME,
+        "avatar": "captain",
+        "is_captain": True
+    }
+
+# ============= ADMIN / MODERATION =============
+
+class AdminCredentials(BaseModel):
+    username: str
+    password: str
+
+# Simple admin password (in production, use proper auth)
+ADMIN_USERNAME = "admin"
+ADMIN_PASSWORD = "sognudimare2024"
+
+@api_router.post("/admin/login")
+async def admin_login(credentials: AdminCredentials):
+    """Admin login"""
+    if credentials.username == ADMIN_USERNAME and credentials.password == ADMIN_PASSWORD:
+        return {"success": True, "token": "admin-token-sognudimare"}
+    raise HTTPException(status_code=401, detail="Invalid credentials")
+
+@api_router.get("/admin/posts")
+async def admin_get_all_posts():
+    """Get all posts for moderation"""
+    posts = await db.posts.find().sort("created_at", -1).to_list(100)
+    return posts
+
+@api_router.delete("/admin/posts/{post_id}")
+async def admin_delete_post(post_id: str):
+    """Admin delete a post"""
+    result = await db.posts.delete_one({"id": post_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Post not found")
+    return {"message": "Post deleted by admin"}
+
+@api_router.delete("/admin/posts/{post_id}/comments/{comment_id}")
+async def admin_delete_comment(post_id: str, comment_id: str):
+    """Admin delete a comment"""
+    result = await db.posts.update_one(
+        {"id": post_id},
+        {"$pull": {"comments": {"id": comment_id}}}
+    )
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Comment not found")
+    return {"message": "Comment deleted by admin"}
+
+@api_router.get("/admin/members")
+async def admin_get_all_members():
+    """Get all members for moderation"""
+    members = await db.members.find().to_list(100)
+    return members
+
+@api_router.put("/admin/members/{member_id}/ban")
+async def admin_ban_member(member_id: str):
+    """Ban a member"""
+    result = await db.members.update_one(
+        {"id": member_id},
+        {"$set": {"is_banned": True, "banned_at": datetime.utcnow()}}
+    )
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Member not found")
+    return {"message": "Member banned"}
+
+@api_router.put("/admin/members/{member_id}/unban")
+async def admin_unban_member(member_id: str):
+    """Unban a member"""
+    result = await db.members.update_one(
+        {"id": member_id},
+        {"$set": {"is_banned": False}, "$unset": {"banned_at": ""}}
+    )
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Member not found")
+    return {"message": "Member unbanned"}
+
+@api_router.get("/admin/messages")
+async def admin_get_all_messages():
+    """Get all messages for moderation"""
+    messages = await db.messages.find().sort("created_at", -1).to_list(200)
+    return messages
+
+@api_router.delete("/admin/messages/{message_id}")
+async def admin_delete_message(message_id: str):
+    """Admin delete a message"""
+    result = await db.messages.delete_one({"id": message_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Message not found")
+    return {"message": "Message deleted by admin"}
+
+# ============= ADMIN CRUISES MANAGEMENT =============
+
+@api_router.get("/admin/cruises")
+async def admin_get_all_cruises():
+    """Get all cruises for admin"""
+    cruises = await db.cruises.find().sort("order", 1).to_list(100)
+    return cruises
+
+@api_router.put("/admin/cruises/{cruise_id}")
+async def admin_update_cruise(cruise_id: str, cruise_data: CruiseUpdate):
+    """Admin update cruise"""
+    existing = await db.cruises.find_one({"id": cruise_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Cruise not found")
+    
+    update_data = {k: v for k, v in cruise_data.dict().items() if v is not None}
+    update_data["updated_at"] = datetime.utcnow()
+    
+    await db.cruises.update_one({"id": cruise_id}, {"$set": update_data})
+    updated = await db.cruises.find_one({"id": cruise_id})
+    return Cruise(**updated)
+
+@api_router.delete("/admin/cruises/{cruise_id}")
+async def admin_delete_cruise(cruise_id: str):
+    """Admin delete cruise"""
+    result = await db.cruises.delete_one({"id": cruise_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Cruise not found")
+    return {"message": "Cruise deleted"}
+
 # ============= SEED DATA =============
 
 @api_router.post("/seed")
