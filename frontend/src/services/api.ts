@@ -1,6 +1,15 @@
 // Simple API service using fetch for better web compatibility
+import Constants from 'expo-constants';
 
-const BASE_URL = '/api';
+// Use environment variable or fallback to relative path
+const getBaseUrl = () => {
+  const backendUrl = Constants.expoConfig?.extra?.backendUrl || 
+                     process.env.EXPO_PUBLIC_BACKEND_URL ||
+                     '';
+  return `${backendUrl}/api`;
+};
+
+const BASE_URL = getBaseUrl();
 
 async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const response = await fetch(`${BASE_URL}${endpoint}`, {
