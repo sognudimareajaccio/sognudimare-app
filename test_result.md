@@ -180,11 +180,51 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Creates new club member"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Successfully creates new club members. Validates email uniqueness, accepts all required fields (username, email, bio_fr) and returns complete member object with generated ID and timestamps. Also tested GET /api/members endpoint which works correctly"
+
+backend:
+  - task: "GET /api/members endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Successfully retrieves club members list. Returns proper member structure with all required fields"
+  
+  - task: "POST /api/posts/{post_id}/like endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Successfully toggles post likes. Accepts member_id as query parameter, properly adds/removes likes, returns updated like count and user like status"
+  
+  - task: "POST /api/posts/{post_id}/comments endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Successfully adds comments to posts. Accepts comment data (author_id, author_name, content), adds comment to post, updates post timestamp, returns updated post with all comments"
 
 frontend:
   - task: "Home screen with hero, destinations, about"
