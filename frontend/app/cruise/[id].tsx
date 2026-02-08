@@ -18,14 +18,14 @@ import { cruiseApi, Cruise } from '../../src/services/api';
 
 const { width } = Dimensions.get('window');
 
-// Boarding card images per destination
+// Boarding card images per destination (original boarding passes)
 const BOARDING_CARDS: { [key: string]: string } = {
   corsica: 'https://customer-assets.emergentagent.com/job_6b4de818-f2a7-4120-8f67-bde1e1f2e2e5/artifacts/nb95cmkj_13.jpg', // Tour de Corse
-  corsica_south: 'https://customer-assets.emergentagent.com/job_6b4de818-f2a7-4120-8f67-bde1e1f2e2e5/artifacts/adys2qh7_corse%20du%20sud.avif',
-  corsica_west: 'https://customer-assets.emergentagent.com/job_6b4de818-f2a7-4120-8f67-bde1e1f2e2e5/artifacts/2pzasnoq_ouest%20corse.avif',
-  sardinia: 'https://customer-assets.emergentagent.com/job_6b4de818-f2a7-4120-8f67-bde1e1f2e2e5/artifacts/gb7s15um_sardaigne%20et%20corse%20du%20sud.avif',
-  greece: 'https://customer-assets.emergentagent.com/job_6b4de818-f2a7-4120-8f67-bde1e1f2e2e5/artifacts/k989cxj7_grece.avif',
-  caribbean: 'https://customer-assets.emergentagent.com/job_6b4de818-f2a7-4120-8f67-bde1e1f2e2e5/artifacts/fjlfxb9e_grenadines.avif',
+  corsica_south: 'https://customer-assets.emergentagent.com/job_b879dc80-6d9d-4bd9-95f6-eb63e0393a89/artifacts/0smxu1vy_11.jpg',
+  corsica_west: 'https://customer-assets.emergentagent.com/job_b879dc80-6d9d-4bd9-95f6-eb63e0393a89/artifacts/fd6dl1bq_12.jpg',
+  sardinia: 'https://customer-assets.emergentagent.com/job_b879dc80-6d9d-4bd9-95f6-eb63e0393a89/artifacts/8wp4j8ba_13.jpg',
+  greece: 'https://customer-assets.emergentagent.com/job_b879dc80-6d9d-4bd9-95f6-eb63e0393a89/artifacts/tqjx4rwx_2.jpg',
+  caribbean: 'https://customer-assets.emergentagent.com/job_b879dc80-6d9d-4bd9-95f6-eb63e0393a89/artifacts/5gq8efu3_14.jpg',
 };
 
 // Destinations that are PRIVATE ONLY (full boat rental, base 8 passengers)
