@@ -502,7 +502,11 @@ async def admin_delete_message(message_id: str):
 async def admin_get_all_cruises():
     """Get all cruises for admin"""
     cruises = await db.cruises.find().sort("order", 1).to_list(100)
-    return cruises
+    # Convert MongoDB documents to proper format
+    return [
+        {**cruise, "_id": str(cruise["_id"])} if "_id" in cruise else cruise 
+        for cruise in cruises
+    ]
 
 @api_router.put("/admin/cruises/{cruise_id}")
 async def admin_update_cruise(cruise_id: str, cruise_data: CruiseUpdate):
