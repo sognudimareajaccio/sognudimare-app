@@ -92,7 +92,10 @@ export default function HomeScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header with Logo */}
         <View style={styles.header}>
-          <Image source={{ uri: LOGO_URL }} style={styles.logo} resizeMode="contain" />
+          <View style={styles.logoContainer}>
+            <Image source={{ uri: LOGO_URL }} style={styles.logo} resizeMode="contain" />
+            <Text style={styles.logoText}>SOGNUDIMARE</Text>
+          </View>
           <TouchableOpacity onPress={toggleLanguage} style={styles.langButton}>
             <Text style={styles.langText}>{language.toUpperCase()}</Text>
             <Ionicons name="globe-outline" size={18} color={COLORS.secondary} />
