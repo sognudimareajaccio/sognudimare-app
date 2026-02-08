@@ -532,6 +532,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
     backgroundColor: COLORS.white,
+    flexDirection: 'row',
   },
   categoryButton: {
     paddingHorizontal: SPACING.md,
@@ -539,6 +540,7 @@ const styles = StyleSheet.create({
     borderRadius: BORDER_RADIUS.full,
     backgroundColor: COLORS.surfaceLight,
     marginRight: SPACING.sm,
+    alignSelf: 'flex-start',
   },
   categoryButtonActive: {
     backgroundColor: COLORS.primary,
