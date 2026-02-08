@@ -165,11 +165,14 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Creates new community post"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Successfully creates new community posts. Accepts all required fields (author_id, author_name, title, content, category) and returns complete post object with generated ID and timestamps"
   
   - task: "POST /api/members endpoint"
     implemented: true
