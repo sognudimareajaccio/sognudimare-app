@@ -87,16 +87,19 @@ export default function BookingScreen() {
     return selectedCruise.pricing.cabin_price || selectedCruise.pricing.private_price || 0;
   };
 
-  // FIXED: Now takes into account number of passengers for both cruise AND club card
+  // FIXED: Now uses clubCardCount for card cost calculation
   const calculateSavings = () => {
     const basePricePerPerson = getCruisePrice();
     if (!selectedCard || basePricePerPerson === 0) return null;
 
+    // For private only cruises, use total price divided by 8 as base
+    const isPrivateOnly = selectedCruise && PRIVATE_ONLY_DESTINATIONS.includes(selectedCruise.destination);
+    
     const totalBasePrice = basePricePerPerson * passengers;
     const discountAmount = (totalBasePrice * selectedCard.discount) / 100;
     const priceAfterDiscount = totalBasePrice - discountAmount;
-    // Club card cost is PER PASSENGER
-    const totalCardCost = selectedCard.price * passengers;
+    // Club card cost is based on clubCardCount
+    const totalCardCost = selectedCard.price * clubCardCount;
     const totalWithClub = priceAfterDiscount + totalCardCost;
     const savings = totalBasePrice - totalWithClub;
 
@@ -108,9 +111,11 @@ export default function BookingScreen() {
       discountAmount,
       priceAfterDiscount,
       cardPricePerPerson: selectedCard.price,
+      clubCardCount,
       totalCardCost,
       totalWithClub,
       savings,
+      isPrivateOnly,
     };
   };
 
