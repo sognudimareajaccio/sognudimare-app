@@ -20,7 +20,8 @@ import { cruiseApi, Cruise, seedDatabase } from '../src/services/api';
 
 const { width } = Dimensions.get('window');
 
-const HERO_IMAGE = 'https://images.unsplash.com/photo-1599580792927-de3b03c5dc20?w=1200';
+const HERO_IMAGE = 'https://static.wixstatic.com/media/ac2dc0_44e4ce464e8a4820b7f34f4b3dc5fe3c~mv2.jpg/v1/fill/w_1903,h_770,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/ac2dc0_44e4ce464e8a4820b7f34f4b3dc5fe3c~mv2.jpg';
+const LOGO_URL = 'https://static.wixstatic.com/media/ac2dc0_cf6b3b4e0ae345acbeb00d34a8fdc9d6~mv2.png/v1/fill/w_77,h_77,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/ac2dc0_cf6b3b4e0ae345acbeb00d34a8fdc9d6~mv2.png';
 
 export default function HomeScreen() {
   const { t, language } = useTranslation();
@@ -69,14 +70,11 @@ export default function HomeScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <Image
-            source={{ uri: 'https://images.unsplash.com/photo-1599580792927-de3b03c5dc20?w=100' }}
-            style={styles.logo}
-          />
+          <Image source={{ uri: LOGO_URL }} style={styles.logo} />
           <Text style={styles.logoText}>SOGNUDIMARE</Text>
           <TouchableOpacity onPress={toggleLanguage} style={styles.langButton}>
             <Text style={styles.langText}>{language.toUpperCase()}</Text>
-            <Ionicons name="globe-outline" size={20} color={COLORS.primary} />
+            <Ionicons name="globe-outline" size={20} color={COLORS.secondary} />
           </TouchableOpacity>
         </View>
 
@@ -84,6 +82,7 @@ export default function HomeScreen() {
         <View style={styles.heroContainer}>
           <Image source={{ uri: HERO_IMAGE }} style={styles.heroImage} />
           <View style={styles.heroOverlay}>
+            <Image source={{ uri: LOGO_URL }} style={styles.heroLogo} />
             <Text style={styles.heroTitle}>{t('heroTitle')}</Text>
             <Text style={styles.heroSubtitle}>{t('heroSubtitle')}</Text>
             <TouchableOpacity
@@ -91,7 +90,7 @@ export default function HomeScreen() {
               onPress={() => router.push('/cruises')}
             >
               <Text style={styles.heroButtonText}>{t('discoverCruises')}</Text>
-              <Ionicons name="arrow-forward" size={20} color={COLORS.white} />
+              <Ionicons name="arrow-forward" size={20} color={COLORS.primary} />
             </TouchableOpacity>
           </View>
         </View>
@@ -103,7 +102,7 @@ export default function HomeScreen() {
             {differenceItems.map((item, index) => (
               <View key={index} style={styles.differenceItem}>
                 <View style={styles.differenceIconContainer}>
-                  <Ionicons name={item.icon as any} size={24} color={COLORS.primary} />
+                  <Ionicons name={item.icon as any} size={24} color={COLORS.accent} />
                 </View>
                 <Text style={styles.differenceLabel}>{item.label}</Text>
               </View>
@@ -115,7 +114,7 @@ export default function HomeScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{t('ourDestinations')}</Text>
           {loading ? (
-            <ActivityIndicator size="large" color={COLORS.primary} />
+            <ActivityIndicator size="large" color={COLORS.accent} />
           ) : (
             <ScrollView
               horizontal
@@ -146,6 +145,39 @@ export default function HomeScreen() {
               ))}
             </ScrollView>
           )}
+        </View>
+
+        {/* Club Section */}
+        <View style={styles.clubSection}>
+          <Text style={styles.clubTitle}>{t('clubTitle')}</Text>
+          <Text style={styles.clubSubtitle}>
+            {language === 'fr' 
+              ? 'Économisez jusqu\'à 20% sur vos croisières en rejoignant le Club des Voyageurs !'
+              : 'Save up to 20% on your cruises by joining the Travelers Club!'}
+          </Text>
+          <View style={styles.clubCardsPreview}>
+            <View style={styles.clubCardPreview}>
+              <Text style={styles.clubCardDuration}>12 {language === 'fr' ? 'mois' : 'months'}</Text>
+              <Text style={styles.clubCardPrice}>90€</Text>
+              <Text style={styles.clubCardDiscount}>-10%</Text>
+            </View>
+            <View style={[styles.clubCardPreview, styles.clubCardHighlight]}>
+              <Text style={[styles.clubCardDuration, styles.clubCardTextLight]}>24 {language === 'fr' ? 'mois' : 'months'}</Text>
+              <Text style={[styles.clubCardPrice, styles.clubCardTextLight]}>150€</Text>
+              <Text style={styles.clubCardDiscountHighlight}>-15%</Text>
+            </View>
+            <View style={styles.clubCardPreview}>
+              <Text style={styles.clubCardDuration}>36 {language === 'fr' ? 'mois' : 'months'}</Text>
+              <Text style={styles.clubCardPrice}>140€</Text>
+              <Text style={styles.clubCardDiscount}>-20%</Text>
+            </View>
+          </View>
+          <TouchableOpacity
+            style={styles.clubButton}
+            onPress={() => router.push('/club')}
+          >
+            <Text style={styles.clubButtonText}>{t('joinClub')}</Text>
+          </TouchableOpacity>
         </View>
 
         {/* About Section */}
@@ -185,9 +217,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.sm,
-    backgroundColor: COLORS.white,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    backgroundColor: COLORS.primary,
   },
   logo: {
     width: 40,
@@ -198,9 +228,9 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: FONT_SIZES.lg,
     fontWeight: '700',
-    color: COLORS.primary,
+    color: COLORS.secondary,
     marginLeft: SPACING.sm,
-    letterSpacing: 1,
+    letterSpacing: 2,
   },
   langButton: {
     flexDirection: 'row',
@@ -208,16 +238,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.sm,
     paddingVertical: SPACING.xs,
     borderRadius: BORDER_RADIUS.md,
-    backgroundColor: COLORS.surfaceLight,
+    backgroundColor: COLORS.primaryLight,
   },
   langText: {
     fontSize: FONT_SIZES.sm,
     fontWeight: '600',
-    color: COLORS.primary,
+    color: COLORS.secondary,
     marginRight: SPACING.xs,
   },
   heroContainer: {
-    height: 400,
+    height: 450,
     position: 'relative',
   },
   heroImage: {
@@ -231,37 +261,37 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: SPACING.lg,
   },
+  heroLogo: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginBottom: SPACING.md,
+  },
   heroTitle: {
     fontSize: FONT_SIZES.xxxl,
     fontWeight: '700',
     color: COLORS.white,
     textAlign: 'center',
     marginBottom: SPACING.sm,
-    textShadowColor: COLORS.shadowDark,
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 4,
   },
   heroSubtitle: {
     fontSize: FONT_SIZES.lg,
-    color: COLORS.white,
+    color: COLORS.secondary,
     textAlign: 'center',
     marginBottom: SPACING.lg,
-    textShadowColor: COLORS.shadowDark,
-    textShadowOffset: { width: 0, height: 1 },
-    textShadowRadius: 2,
   },
   heroButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.secondary,
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
     borderRadius: BORDER_RADIUS.full,
   },
   heroButtonText: {
-    color: COLORS.white,
+    color: COLORS.primary,
     fontSize: FONT_SIZES.md,
-    fontWeight: '600',
+    fontWeight: '700',
     marginRight: SPACING.sm,
   },
   section: {
@@ -270,7 +300,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: FONT_SIZES.xxl,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.primary,
     marginBottom: SPACING.lg,
   },
   differenceGrid: {
@@ -286,7 +316,8 @@ const styles = StyleSheet.create({
     padding: SPACING.md,
     borderRadius: BORDER_RADIUS.lg,
     marginBottom: SPACING.sm,
-    ...SHADOWS.sm,
+    borderLeftWidth: 4,
+    borderLeftColor: COLORS.accent,
   },
   differenceIconContainer: {
     width: 44,
@@ -300,7 +331,7 @@ const styles = StyleSheet.create({
   differenceLabel: {
     flex: 1,
     fontSize: FONT_SIZES.sm,
-    color: COLORS.text,
+    color: COLORS.primary,
     fontWeight: '500',
   },
   cruisesScroll: {
@@ -312,7 +343,8 @@ const styles = StyleSheet.create({
     borderRadius: BORDER_RADIUS.xl,
     backgroundColor: COLORS.white,
     overflow: 'hidden',
-    ...SHADOWS.md,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
   cruiseImage: {
     width: '100%',
@@ -323,7 +355,7 @@ const styles = StyleSheet.create({
   },
   cruiseSubtitle: {
     fontSize: FONT_SIZES.sm,
-    color: COLORS.secondary,
+    color: COLORS.accent,
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 1,
@@ -331,7 +363,7 @@ const styles = StyleSheet.create({
   cruiseName: {
     fontSize: FONT_SIZES.xl,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.primary,
     marginTop: SPACING.xs,
   },
   cruisePriceRow: {
@@ -341,26 +373,107 @@ const styles = StyleSheet.create({
   },
   cruisePrice: {
     fontSize: FONT_SIZES.md,
-    color: COLORS.primary,
-    fontWeight: '600',
+    color: COLORS.secondary,
+    fontWeight: '700',
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.xs,
+    borderRadius: BORDER_RADIUS.md,
   },
-  aboutSection: {
+  clubSection: {
     backgroundColor: COLORS.primary,
     padding: SPACING.xl,
     marginHorizontal: SPACING.lg,
     borderRadius: BORDER_RADIUS.xl,
+    marginBottom: SPACING.lg,
+  },
+  clubTitle: {
+    fontSize: FONT_SIZES.xxl,
+    fontWeight: '700',
+    color: COLORS.secondary,
+    textAlign: 'center',
+    marginBottom: SPACING.sm,
+  },
+  clubSubtitle: {
+    fontSize: FONT_SIZES.md,
+    color: COLORS.white,
+    textAlign: 'center',
+    opacity: 0.9,
+    marginBottom: SPACING.lg,
+  },
+  clubCardsPreview: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: SPACING.lg,
+  },
+  clubCardPreview: {
+    backgroundColor: COLORS.white,
+    padding: SPACING.md,
+    borderRadius: BORDER_RADIUS.lg,
+    alignItems: 'center',
+    width: '30%',
+  },
+  clubCardHighlight: {
+    backgroundColor: COLORS.accent,
+    transform: [{ scale: 1.05 }],
+  },
+  clubCardDuration: {
+    fontSize: FONT_SIZES.sm,
+    fontWeight: '600',
+    color: COLORS.primary,
+  },
+  clubCardTextLight: {
+    color: COLORS.primary,
+  },
+  clubCardPrice: {
+    fontSize: FONT_SIZES.lg,
+    fontWeight: '700',
+    color: COLORS.primary,
+    marginVertical: SPACING.xs,
+  },
+  clubCardDiscount: {
+    fontSize: FONT_SIZES.md,
+    fontWeight: '700',
+    color: COLORS.accent,
+  },
+  clubCardDiscountHighlight: {
+    fontSize: FONT_SIZES.md,
+    fontWeight: '700',
+    color: COLORS.primary,
+    backgroundColor: COLORS.secondary,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 2,
+    borderRadius: BORDER_RADIUS.full,
+  },
+  clubButton: {
+    backgroundColor: COLORS.secondary,
+    paddingVertical: SPACING.md,
+    borderRadius: BORDER_RADIUS.full,
+    alignItems: 'center',
+  },
+  clubButtonText: {
+    color: COLORS.primary,
+    fontSize: FONT_SIZES.md,
+    fontWeight: '700',
+  },
+  aboutSection: {
+    backgroundColor: COLORS.surfaceLight,
+    padding: SPACING.xl,
+    marginHorizontal: SPACING.lg,
+    borderRadius: BORDER_RADIUS.xl,
+    borderWidth: 2,
+    borderColor: COLORS.secondary,
   },
   aboutTitle: {
     fontSize: FONT_SIZES.xxl,
     fontWeight: '700',
-    color: COLORS.white,
+    color: COLORS.primary,
     marginBottom: SPACING.md,
   },
   aboutText: {
     fontSize: FONT_SIZES.md,
-    color: COLORS.white,
+    color: COLORS.textSecondary,
     lineHeight: 24,
-    opacity: 0.9,
   },
   statsRow: {
     flexDirection: 'row',
@@ -368,7 +481,7 @@ const styles = StyleSheet.create({
     marginTop: SPACING.xl,
     paddingTop: SPACING.lg,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.2)',
+    borderTopColor: COLORS.border,
   },
   statItem: {
     alignItems: 'center',
@@ -376,12 +489,11 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: FONT_SIZES.xxl,
     fontWeight: '700',
-    color: COLORS.secondary,
+    color: COLORS.accent,
   },
   statLabel: {
     fontSize: FONT_SIZES.xs,
-    color: COLORS.white,
-    opacity: 0.8,
+    color: COLORS.textSecondary,
     marginTop: SPACING.xs,
     textAlign: 'center',
   },
