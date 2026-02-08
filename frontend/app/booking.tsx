@@ -274,8 +274,12 @@ export default function BookingScreen() {
                   <View style={styles.savingsDivider} />
                   
                   <View style={styles.savingsRow}>
-                    <Text style={styles.savingsLabel}>{t('clubCardCost')} ({selectedCard?.months} mois)</Text>
-                    <Text style={styles.savingsValue}>{savings.cardPrice}€</Text>
+                    <Text style={styles.savingsLabel}>
+                      {t('clubCardCost')} ({selectedCard?.months} {language === 'fr' ? 'mois' : 'months'} x {savings.passengers})
+                    </Text>
+                    <Text style={styles.savingsValue}>
+                      {savings.cardPricePerPerson}€ x {savings.passengers} = {savings.totalCardCost}€
+                    </Text>
                   </View>
                   
                   <View style={styles.savingsRow}>
