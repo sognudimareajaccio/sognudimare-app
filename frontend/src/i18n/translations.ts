@@ -38,10 +38,26 @@ export const translations = {
     cabinReservation: "Réservation cabine",
     fullPrivatization: "Privatisation complète",
     
+    // Booking Form
+    bookingTitle: "Demande de réservation",
+    selectDestination: "Destination",
+    selectDate: "Date de départ",
+    numberOfPassengers: "Nombre de passagers",
+    passengers: "passagers",
+    yourName: "Votre nom",
+    yourEmail: "Votre email",
+    yourPhone: "Votre téléphone",
+    yourMessage: "Message (optionnel)",
+    sendRequest: "Envoyer ma demande",
+    requestSent: "Demande envoyée !",
+    requestSentMessage: "Nous vous recontacterons très rapidement.",
+    
     // Club
     clubTitle: "Club des Voyageurs",
     clubSubtitle: "Rejoignez notre communauté de passionnés",
     joinClub: "Rejoindre le club",
+    clubMembership: "Adhésion Club",
+    clubCards: "Cartes Club",
     newPost: "Nouvelle publication",
     tripReports: "Récits de voyage",
     tips: "Conseils",
@@ -61,6 +77,27 @@ export const translations = {
     email: "Email",
     bio: "Biographie",
     register: "S'inscrire",
+    
+    // Club Cards
+    card12Months: "Carte 12 mois",
+    card24Months: "Carte 24 mois",
+    card36Months: "Carte 36 mois",
+    perYear: "/an",
+    discount: "de remise",
+    calculateSavings: "Calculer mes économies",
+    savingsSimulator: "Simulateur d'économies",
+    cruisePrice: "Prix de la croisière",
+    initialPrice: "Prix initial",
+    clubDiscount: "Remise Club",
+    priceAfterDiscount: "Prix après remise",
+    clubCardCost: "Coût carte Club",
+    totalPaid: "Total payé",
+    totalSavings: "Économie réalisée",
+    immediateSavings: "Économie immédiate",
+    selectCard: "Choisir cette carte",
+    withClubPrice: "Avec le Club",
+    withoutClubPrice: "Sans le Club",
+    benefitDescription: "L'adhésion est non seulement amortie instantanément, mais vous continuez à bénéficier de la remise sur tous vos voyages.",
     
     // Contact
     contactTitle: "Contactez-nous",
@@ -84,6 +121,7 @@ export const translations = {
     language: "Langue",
     french: "Français",
     english: "Anglais",
+    back: "Retour",
     
     // About
     aboutTitle: "À propos de Sognudimare",
@@ -132,10 +170,26 @@ export const translations = {
     cabinReservation: "Cabin reservation",
     fullPrivatization: "Full privatization",
     
+    // Booking Form
+    bookingTitle: "Booking request",
+    selectDestination: "Destination",
+    selectDate: "Departure date",
+    numberOfPassengers: "Number of passengers",
+    passengers: "passengers",
+    yourName: "Your name",
+    yourEmail: "Your email",
+    yourPhone: "Your phone",
+    yourMessage: "Message (optional)",
+    sendRequest: "Send my request",
+    requestSent: "Request sent!",
+    requestSentMessage: "We will contact you very soon.",
+    
     // Club
     clubTitle: "Travelers Club",
     clubSubtitle: "Join our community of enthusiasts",
     joinClub: "Join the club",
+    clubMembership: "Club Membership",
+    clubCards: "Club Cards",
     newPost: "New post",
     tripReports: "Trip reports",
     tips: "Tips",
@@ -155,6 +209,27 @@ export const translations = {
     email: "Email",
     bio: "Biography",
     register: "Register",
+    
+    // Club Cards
+    card12Months: "12 months card",
+    card24Months: "24 months card",
+    card36Months: "36 months card",
+    perYear: "/year",
+    discount: "discount",
+    calculateSavings: "Calculate my savings",
+    savingsSimulator: "Savings simulator",
+    cruisePrice: "Cruise price",
+    initialPrice: "Initial price",
+    clubDiscount: "Club discount",
+    priceAfterDiscount: "Price after discount",
+    clubCardCost: "Club card cost",
+    totalPaid: "Total paid",
+    totalSavings: "Total savings",
+    immediateSavings: "Immediate savings",
+    selectCard: "Choose this card",
+    withClubPrice: "With Club",
+    withoutClubPrice: "Without Club",
+    benefitDescription: "The membership is not only immediately paid off, but you continue to benefit from the discount on all your trips.",
     
     // Contact
     contactTitle: "Contact us",
@@ -178,6 +253,7 @@ export const translations = {
     language: "Language",
     french: "French",
     english: "English",
+    back: "Back",
     
     // About
     aboutTitle: "About Sognudimare",
