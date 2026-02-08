@@ -83,7 +83,7 @@ export default function BookingScreen() {
     return selectedCruise.pricing.cabin_price || selectedCruise.pricing.private_price || 0;
   };
 
-  // FIXED: Now takes into account number of passengers
+  // FIXED: Now takes into account number of passengers for both cruise AND club card
   const calculateSavings = () => {
     const basePricePerPerson = getCruisePrice();
     if (!selectedCard || basePricePerPerson === 0) return null;
@@ -91,7 +91,9 @@ export default function BookingScreen() {
     const totalBasePrice = basePricePerPerson * passengers;
     const discountAmount = (totalBasePrice * selectedCard.discount) / 100;
     const priceAfterDiscount = totalBasePrice - discountAmount;
-    const totalWithClub = priceAfterDiscount + selectedCard.price;
+    // Club card cost is PER PASSENGER
+    const totalCardCost = selectedCard.price * passengers;
+    const totalWithClub = priceAfterDiscount + totalCardCost;
     const savings = totalBasePrice - totalWithClub;
 
     return {
@@ -101,7 +103,8 @@ export default function BookingScreen() {
       discountPercent: selectedCard.discount,
       discountAmount,
       priceAfterDiscount,
-      cardPrice: selectedCard.price,
+      cardPricePerPerson: selectedCard.price,
+      totalCardCost,
       totalWithClub,
       savings,
     };
