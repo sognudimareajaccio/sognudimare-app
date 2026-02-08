@@ -731,6 +731,102 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: SPACING.md,
   },
+  clubToggleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: COLORS.white,
+    padding: SPACING.md,
+    borderRadius: BORDER_RADIUS.lg,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    marginBottom: SPACING.md,
+  },
+  clubToggleInfo: {
+    flex: 1,
+    marginRight: SPACING.md,
+  },
+  clubToggleQuestion: {
+    fontSize: FONT_SIZES.md,
+    fontWeight: '600',
+    color: COLORS.primary,
+  },
+  clubToggleHint: {
+    fontSize: FONT_SIZES.xs,
+    color: COLORS.secondary,
+    marginTop: 2,
+  },
+  clubToggleButtons: {
+    flexDirection: 'row',
+    gap: SPACING.xs,
+  },
+  toggleButton: {
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    borderRadius: BORDER_RADIUS.full,
+    backgroundColor: COLORS.surfaceLight,
+    minWidth: 50,
+    alignItems: 'center',
+  },
+  toggleButtonActive: {
+    backgroundColor: COLORS.gray,
+  },
+  toggleButtonActiveYes: {
+    backgroundColor: COLORS.success,
+  },
+  toggleButtonText: {
+    fontSize: FONT_SIZES.sm,
+    fontWeight: '600',
+    color: COLORS.textSecondary,
+  },
+  toggleButtonTextActive: {
+    color: COLORS.white,
+  },
+  priceWithoutClubContainer: {
+    backgroundColor: COLORS.white,
+    padding: SPACING.lg,
+    borderRadius: BORDER_RADIUS.xl,
+    borderWidth: 2,
+    borderColor: COLORS.primary,
+    marginBottom: SPACING.lg,
+  },
+  priceWithoutClubTitle: {
+    fontSize: FONT_SIZES.lg,
+    fontWeight: '700',
+    color: COLORS.primary,
+    marginBottom: SPACING.md,
+    textAlign: 'center',
+  },
+  priceWithoutClubRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: SPACING.xs,
+  },
+  priceWithoutClubLabel: {
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.textSecondary,
+  },
+  priceWithoutClubValue: {
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.text,
+    fontWeight: '500',
+  },
+  priceWithoutClubDivider: {
+    height: 1,
+    backgroundColor: COLORS.border,
+    marginVertical: SPACING.sm,
+  },
+  priceWithoutClubTotalLabel: {
+    fontSize: FONT_SIZES.lg,
+    fontWeight: '700',
+    color: COLORS.primary,
+  },
+  priceWithoutClubTotalValue: {
+    fontSize: FONT_SIZES.xl,
+    fontWeight: '700',
+    color: COLORS.primary,
+  },
   cardsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
