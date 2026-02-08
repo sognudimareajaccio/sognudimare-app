@@ -369,57 +369,57 @@ export default function BookingScreen() {
                     </>
                   )}
 
-              {/* Savings Calculator - NOW WITH CLUB CARD COUNT */}
-              {savings && (
-                <View style={styles.savingsContainer}>
-                  <Text style={styles.savingsTitle}>{t('savingsSimulator')}</Text>
-                  
-                  <View style={styles.savingsRow}>
-                    <Text style={styles.savingsLabel}>
-                      {t('cruisePrice')} ({savings.passengers} {t('passengers')})
-                    </Text>
-                    <Text style={styles.savingsValue}>
-                      {savings.basePricePerPerson}€ x {savings.passengers} = {savings.totalBasePrice}€
-                    </Text>
-                  </View>
-                  
-                  <View style={styles.savingsRow}>
-                    <Text style={styles.savingsLabel}>{t('clubDiscount')} ({savings.discountPercent}%)</Text>
-                    <Text style={[styles.savingsValue, styles.discountValue]}>-{savings.discountAmount.toFixed(0)}€</Text>
-                  </View>
-                  
-                  <View style={styles.savingsRow}>
-                    <Text style={styles.savingsLabel}>{t('priceAfterDiscount')}</Text>
-                    <Text style={styles.savingsValue}>{savings.priceAfterDiscount.toFixed(0)}€</Text>
-                  </View>
-                  
-                  <View style={styles.savingsDivider} />
-                  
-                  <View style={styles.savingsRow}>
-                    <Text style={styles.savingsLabel}>
-                      {language === 'fr' ? `Carte Club (${selectedCard?.months} mois x ${savings.clubCardCount})` : `Club Card (${selectedCard?.months} months x ${savings.clubCardCount})`}
-                    </Text>
-                    <Text style={styles.savingsValue}>
-                      {savings.cardPricePerPerson}€ x {savings.clubCardCount} = {savings.totalCardCost}€
-                    </Text>
-                  </View>
-                  
-                  <View style={styles.savingsRow}>
-                    <Text style={styles.savingsLabelBold}>{t('totalPaid')}</Text>
-                    <Text style={styles.savingsValueBold}>{savings.totalWithClub.toFixed(0)}€</Text>
-                  </View>
-                  
-                  <View style={styles.totalSavingsBox}>
-                    <Ionicons name="star" size={24} color={COLORS.secondary} />
-                    <View style={styles.totalSavingsContent}>
-                      <Text style={styles.totalSavingsLabel}>{t('immediateSavings')}</Text>
-                      <Text style={styles.totalSavingsValue}>{savings.savings.toFixed(0)}€</Text>
+                  {/* Savings Calculator - NOW WITH CLUB CARD COUNT */}
+                  {savings && (
+                    <View style={styles.savingsContainer}>
+                      <Text style={styles.savingsTitle}>{t('savingsSimulator')}</Text>
+                      
+                      <View style={styles.savingsRow}>
+                        <Text style={styles.savingsLabel}>
+                          {t('cruisePrice')} ({savings.passengers} {t('passengers')})
+                        </Text>
+                        <Text style={styles.savingsValue}>
+                          {savings.basePricePerPerson}€ x {savings.passengers} = {savings.totalBasePrice}€
+                        </Text>
+                      </View>
+                      
+                      <View style={styles.savingsRow}>
+                        <Text style={styles.savingsLabel}>{t('clubDiscount')} ({savings.discountPercent}%)</Text>
+                        <Text style={[styles.savingsValue, styles.discountValue]}>-{savings.discountAmount.toFixed(0)}€</Text>
+                      </View>
+                      
+                      <View style={styles.savingsRow}>
+                        <Text style={styles.savingsLabel}>{t('priceAfterDiscount')}</Text>
+                        <Text style={styles.savingsValue}>{savings.priceAfterDiscount.toFixed(0)}€</Text>
+                      </View>
+                      
+                      <View style={styles.savingsDivider} />
+                      
+                      <View style={styles.savingsRow}>
+                        <Text style={styles.savingsLabel}>
+                          {language === 'fr' ? `Carte Club (${selectedCard?.months} mois x ${savings.clubCardCount})` : `Club Card (${selectedCard?.months} months x ${savings.clubCardCount})`}
+                        </Text>
+                        <Text style={styles.savingsValue}>
+                          {savings.cardPricePerPerson}€ x {savings.clubCardCount} = {savings.totalCardCost}€
+                        </Text>
+                      </View>
+                      
+                      <View style={styles.savingsRow}>
+                        <Text style={styles.savingsLabelBold}>{t('totalPaid')}</Text>
+                        <Text style={styles.savingsValueBold}>{savings.totalWithClub.toFixed(0)}€</Text>
+                      </View>
+                      
+                      <View style={styles.totalSavingsBox}>
+                        <Ionicons name="star" size={24} color={COLORS.secondary} />
+                        <View style={styles.totalSavingsContent}>
+                          <Text style={styles.totalSavingsLabel}>{t('immediateSavings')}</Text>
+                          <Text style={styles.totalSavingsValue}>{savings.savings.toFixed(0)}€</Text>
+                        </View>
+                      </View>
+                      
+                      <Text style={styles.benefitText}>{t('benefitDescription')}</Text>
                     </View>
-                  </View>
-                  
-                  <Text style={styles.benefitText}>{t('benefitDescription')}</Text>
-                </View>
-              )}
+                  )}
             </>
           )}
 
