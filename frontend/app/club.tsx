@@ -19,7 +19,53 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { postApi, memberApi, messageApi, CommunityPost, DirectMessage, CaptainInfo } from '../src/services/api';
 import { useAppStore } from '../src/store/appStore';
-import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../src/theme/theme';
+
+// Theme constants inline to avoid import issues
+const COLORS = {
+  primary: '#0e1c40',
+  secondary: '#ebd0a9',
+  accent: '#7ad2d4',
+  background: '#F8F9FA',
+  surface: '#FFFFFF',
+  surfaceLight: '#F1F5F9',
+  text: '#1F2937',
+  textSecondary: '#6B7280',
+  white: '#FFFFFF',
+  black: '#000000',
+  error: '#EF4444',
+  success: '#10B981',
+  warning: '#F59E0B',
+  info: '#3B82F6',
+  gray: '#919191',
+  border: '#E5E7EB',
+};
+
+const SPACING = {
+  xs: 4,
+  sm: 8,
+  md: 16,
+  lg: 24,
+  xl: 32,
+  xxl: 48,
+};
+
+const FONT_SIZES = {
+  xs: 10,
+  sm: 12,
+  md: 14,
+  lg: 18,
+  xl: 24,
+  xxl: 32,
+};
+
+const BORDER_RADIUS = {
+  sm: 4,
+  md: 8,
+  lg: 12,
+  xl: 16,
+  xxl: 24,
+  full: 9999,
+};
 
 // Club Card formulas from website
 const CLUB_FORMULAS = [
