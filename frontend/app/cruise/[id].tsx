@@ -20,13 +20,16 @@ const { width } = Dimensions.get('window');
 
 // Boarding card images per destination
 const BOARDING_CARDS: { [key: string]: string } = {
-  corsica: 'https://customer-assets.emergentagent.com/job_b879dc80-6d9d-4bd9-95f6-eb63e0393a89/artifacts/su7vi6in_10.jpg', // Tour de Corse
+  corsica: 'https://customer-assets.emergentagent.com/job_6b4de818-f2a7-4120-8f67-bde1e1f2e2e5/artifacts/nb95cmkj_13.jpg', // Tour de Corse - NEW IMAGE
   corsica_south: 'https://customer-assets.emergentagent.com/job_b879dc80-6d9d-4bd9-95f6-eb63e0393a89/artifacts/0smxu1vy_11.jpg',
   corsica_west: 'https://customer-assets.emergentagent.com/job_b879dc80-6d9d-4bd9-95f6-eb63e0393a89/artifacts/fd6dl1bq_12.jpg',
   sardinia: 'https://customer-assets.emergentagent.com/job_b879dc80-6d9d-4bd9-95f6-eb63e0393a89/artifacts/8wp4j8ba_13.jpg',
   greece: 'https://customer-assets.emergentagent.com/job_b879dc80-6d9d-4bd9-95f6-eb63e0393a89/artifacts/tqjx4rwx_2.jpg',
   caribbean: 'https://customer-assets.emergentagent.com/job_b879dc80-6d9d-4bd9-95f6-eb63e0393a89/artifacts/5gq8efu3_14.jpg',
 };
+
+// Destinations that are PRIVATE ONLY (full boat rental, base 8 passengers)
+const PRIVATE_ONLY_DESTINATIONS = ['greece', 'caribbean'];
 
 // What's included - base items (cruise duration is added dynamically)
 const getIncludedFR = (duration: string) => [
