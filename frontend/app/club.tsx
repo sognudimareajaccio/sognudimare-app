@@ -8,184 +8,222 @@ import {
   TextInput,
   ActivityIndicator,
   RefreshControl,
-  Modal,
-  Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
+  Modal,
+  FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS, SHADOWS } from '../src/constants/theme';
-import { useTranslation } from '../src/hooks/useTranslation';
+import { useRouter } from 'expo-router';
+import { postApi, memberApi, messageApi, CommunityPost, DirectMessage, CaptainInfo } from '../src/services/api';
 import { useAppStore } from '../src/store/appStore';
-import { postApi, memberApi, CommunityPost } from '../src/services/api';
+import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../src/theme/theme';
 
-const CATEGORIES = ['all', 'general', 'trip_report', 'tips', 'meetup'];
+// Club Card formulas from website
+const CLUB_FORMULAS = [
+  { id: '12', months: 12, price: 90, discount: 10, name_fr: 'Carte 12 mois', name_en: '12 months card' },
+  { id: '24', months: 24, price: 150, discount: 15, name_fr: 'Carte 24 mois', name_en: '24 months card' },
+  { id: '36', months: 36, price: 140, discount: 20, name_fr: 'Carte 36 mois', name_en: '36 months card' },
+];
+
+// Club advantages from website
+const CLUB_ADVANTAGES_FR = [
+  'Jusqu\'à 20% de réduction sur toutes les croisières',
+  'Priorité de réservation sur les dates les plus demandées',
+  'Accès exclusif aux offres de dernière minute',
+  'Newsletter mensuelle avec conseils de voyage',
+  'Invitations aux événements exclusifs Sognudimare',
+  'Communauté de passionnés pour échanger et se retrouver',
+  'Contact direct avec le Capitaine',
+];
+
+const CLUB_ADVANTAGES_EN = [
+  'Up to 20% discount on all cruises',
+  'Priority booking on the most requested dates',
+  'Exclusive access to last-minute offers',
+  'Monthly newsletter with travel tips',
+  'Invitations to exclusive Sognudimare events',
+  'Community of enthusiasts to exchange and meet',
+  'Direct contact with the Captain',
+];
+
+// Categories
+const CATEGORIES = [
+  { id: 'all', name_fr: 'Tout', name_en: 'All', icon: 'apps' },
+  { id: 'general', name_fr: 'Général', name_en: 'General', icon: 'chatbubbles' },
+  { id: 'trip_report', name_fr: 'Récits', name_en: 'Trip Reports', icon: 'boat' },
+  { id: 'tips', name_fr: 'Conseils', name_en: 'Tips', icon: 'bulb' },
+  { id: 'meetup', name_fr: 'Rencontres', name_en: 'Meetups', icon: 'people' },
+];
+
+// Tabs
+type TabType = 'info' | 'community' | 'messages';
 
 export default function ClubScreen() {
-  const { t, language } = useTranslation();
-  const { currentMember, setCurrentMember } = useAppStore();
+  const router = useRouter();
+  const { language } = useAppStore();
+  
+  const [activeTab, setActiveTab] = useState<TabType>('info');
   const [posts, setPosts] = useState<CommunityPost[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [showNewPostModal, setShowNewPostModal] = useState(false);
-  const [showJoinModal, setShowJoinModal] = useState(false);
-  const [showCommentsModal, setShowCommentsModal] = useState(false);
-  const [selectedPost, setSelectedPost] = useState<CommunityPost | null>(null);
-  const [newComment, setNewComment] = useState('');
-
-  // Form states
+  
+  // User simulation (in production, use real auth)
+  const [currentUser] = useState({
+    id: 'user-' + Math.random().toString(36).substr(2, 9),
+    name: 'Voyageur',
+  });
+  
+  // New post
+  const [showNewPost, setShowNewPost] = useState(false);
   const [newPostTitle, setNewPostTitle] = useState('');
   const [newPostContent, setNewPostContent] = useState('');
   const [newPostCategory, setNewPostCategory] = useState('general');
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [bio, setBio] = useState('');
+  
+  // Messaging
+  const [captainInfo, setCaptainInfo] = useState<CaptainInfo | null>(null);
+  const [messages, setMessages] = useState<DirectMessage[]>([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [chatWith, setChatWith] = useState<'captain' | 'community'>('captain');
+  
+  const t = (key: string) => {
+    const translations: { [key: string]: { fr: string; en: string } } = {
+      clubTitle: { fr: 'Club des Voyageurs', en: 'Travelers Club' },
+      info: { fr: 'Infos', en: 'Info' },
+      community: { fr: 'Communauté', en: 'Community' },
+      messages: { fr: 'Messages', en: 'Messages' },
+      joinClub: { fr: 'Rejoindre le Club', en: 'Join the Club' },
+      clubDescription: { 
+        fr: 'Le Club des Voyageurs Sognudimare vous offre des avantages exclusifs et une communauté de passionnés de la mer.',
+        en: 'The Sognudimare Travelers Club offers you exclusive benefits and a community of sea enthusiasts.'
+      },
+      howItWorks: { fr: 'Comment ça marche ?', en: 'How does it work?' },
+      howItWorksDesc: {
+        fr: 'Choisissez votre formule, réglez votre carte et profitez immédiatement des réductions sur votre prochaine croisière !',
+        en: 'Choose your plan, pay for your card and immediately enjoy discounts on your next cruise!'
+      },
+      ourFormulas: { fr: 'Nos formules', en: 'Our plans' },
+      advantages: { fr: 'Vos avantages', en: 'Your benefits' },
+      discount: { fr: 'de réduction', en: 'discount' },
+      perYear: { fr: '/an', en: '/year' },
+      newPost: { fr: 'Nouveau post', en: 'New Post' },
+      title: { fr: 'Titre', en: 'Title' },
+      content: { fr: 'Contenu', en: 'Content' },
+      publish: { fr: 'Publier', en: 'Publish' },
+      cancel: { fr: 'Annuler', en: 'Cancel' },
+      captain: { fr: 'Capitaine', en: 'Captain' },
+      talkToCaptain: { fr: 'Parler au Capitaine', en: 'Talk to Captain' },
+      communityChat: { fr: 'Discussion Voyageurs', en: 'Travelers Chat' },
+      sendMessage: { fr: 'Envoyer', en: 'Send' },
+      typeMessage: { fr: 'Votre message...', en: 'Your message...' },
+      noMessages: { fr: 'Aucun message. Commencez la conversation !', en: 'No messages. Start the conversation!' },
+      noPosts: { fr: 'Aucun post dans cette catégorie.', en: 'No posts in this category.' },
+      likes: { fr: 'J\'aime', en: 'Likes' },
+      comments: { fr: 'Commentaires', en: 'Comments' },
+    };
+    return translations[key]?.[language] || key;
+  };
 
-  useEffect(() => {
-    loadPosts();
-  }, [selectedCategory]);
-
-  const loadPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     try {
-      const category = selectedCategory === 'all' ? undefined : selectedCategory;
-      const data = await postApi.getAll(category);
+      setLoading(true);
+      const data = await postApi.getAll(selectedCategory === 'all' ? undefined : selectedCategory);
       setPosts(data);
     } catch (error) {
-      console.error('Error loading posts:', error);
+      console.error('Error fetching posts:', error);
     } finally {
       setLoading(false);
-      setRefreshing(false);
     }
-  };
+  }, [selectedCategory]);
 
-  const onRefresh = () => {
-    setRefreshing(true);
-    loadPosts();
-  };
-
-  const getCategoryLabel = (category: string) => {
-    switch (category) {
-      case 'all':
-        return t('allPosts');
-      case 'general':
-        return t('general');
-      case 'trip_report':
-        return t('tripReports');
-      case 'tips':
-        return t('tips');
-      case 'meetup':
-        return t('meetups');
-      default:
-        return category;
-    }
-  };
-
-  const handleJoinClub = async () => {
-    if (!username.trim() || !email.trim()) {
-      Alert.alert('Erreur', 'Veuillez remplir tous les champs obligatoires');
-      return;
-    }
-
+  const fetchCaptainInfo = useCallback(async () => {
     try {
-      const member = await memberApi.create({
-        username: username.trim(),
-        email: email.trim(),
-        bio_fr: bio.trim(),
-        bio_en: bio.trim(),
-      });
-      setCurrentMember(member);
-      setShowJoinModal(false);
-      setUsername('');
-      setEmail('');
-      setBio('');
-      Alert.alert('Bienvenue!', 'Vous faites maintenant partie du Club des Voyageurs!');
-    } catch (error: any) {
-      if (error.response?.data?.detail === 'Email already registered') {
-        // Try to get existing member
-        try {
-          const existingMember = await memberApi.getByEmail(email.trim());
-          setCurrentMember(existingMember);
-          setShowJoinModal(false);
-          Alert.alert('Content de vous revoir!', 'Vous êtes reconnecté au club.');
-        } catch (e) {
-          Alert.alert('Erreur', 'Cet email est déjà utilisé');
-        }
-      } else {
-        Alert.alert('Erreur', 'Impossible de créer votre compte');
-      }
+      const info = await messageApi.getCaptainInfo();
+      setCaptainInfo(info);
+    } catch (error) {
+      console.error('Error fetching captain info:', error);
     }
-  };
+  }, []);
+
+  const fetchMessages = useCallback(async () => {
+    if (!captainInfo) return;
+    try {
+      const data = await messageApi.getMessages(currentUser.id, captainInfo.id);
+      setMessages(data);
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+    }
+  }, [currentUser.id, captainInfo]);
+
+  useEffect(() => {
+    fetchPosts();
+    fetchCaptainInfo();
+  }, [fetchPosts, fetchCaptainInfo]);
+
+  useEffect(() => {
+    if (activeTab === 'messages' && captainInfo) {
+      fetchMessages();
+    }
+  }, [activeTab, captainInfo, fetchMessages]);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchPosts();
+    setRefreshing(false);
+  }, [fetchPosts]);
 
   const handleCreatePost = async () => {
-    if (!currentMember) {
-      setShowJoinModal(true);
-      return;
-    }
-
-    if (!newPostTitle.trim() || !newPostContent.trim()) {
-      Alert.alert('Erreur', 'Veuillez remplir le titre et le contenu');
-      return;
-    }
-
+    if (!newPostTitle.trim() || !newPostContent.trim()) return;
+    
     try {
       await postApi.create({
-        author_id: currentMember.id,
-        author_name: currentMember.username,
-        title: newPostTitle.trim(),
-        content: newPostContent.trim(),
+        author_id: currentUser.id,
+        author_name: currentUser.name,
+        title: newPostTitle,
+        content: newPostContent,
         category: newPostCategory,
       });
-      setShowNewPostModal(false);
+      setShowNewPost(false);
       setNewPostTitle('');
       setNewPostContent('');
-      setNewPostCategory('general');
-      loadPosts();
+      fetchPosts();
     } catch (error) {
-      Alert.alert('Erreur', 'Impossible de créer la publication');
+      console.error('Error creating post:', error);
     }
   };
 
-  const handleToggleLike = async (postId: string) => {
-    if (!currentMember) {
-      setShowJoinModal(true);
-      return;
-    }
-
+  const handleLikePost = async (postId: string) => {
     try {
-      await postApi.toggleLike(postId, currentMember.id);
-      loadPosts();
+      await postApi.toggleLike(postId, currentUser.id);
+      fetchPosts();
     } catch (error) {
-      console.error('Error toggling like:', error);
+      console.error('Error liking post:', error);
     }
   };
 
-  const handleAddComment = async () => {
-    if (!currentMember || !selectedPost || !newComment.trim()) return;
-
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() || !captainInfo) return;
+    
     try {
-      await postApi.addComment(selectedPost.id, {
-        author_id: currentMember.id,
-        author_name: currentMember.username,
-        content: newComment.trim(),
+      await messageApi.sendMessage({
+        sender_id: currentUser.id,
+        sender_name: currentUser.name,
+        receiver_id: captainInfo.id,
+        receiver_name: captainInfo.name,
+        content: newMessage,
       });
-      setNewComment('');
-      const updatedPost = await postApi.getById(selectedPost.id);
-      setSelectedPost(updatedPost);
-      loadPosts();
+      setNewMessage('');
+      fetchMessages();
     } catch (error) {
-      Alert.alert('Erreur', 'Impossible d\'ajouter le commentaire');
+      console.error('Error sending message:', error);
     }
   };
 
-  const openComments = (post: CommunityPost) => {
-    setSelectedPost(post);
-    setShowCommentsModal(true);
-  };
-
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
     return date.toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', {
       day: 'numeric',
       month: 'short',
@@ -193,48 +231,112 @@ export default function ClubScreen() {
     });
   };
 
-  return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      {/* Header */}
-      <View style={styles.header}>
-        <View>
-          <Text style={styles.headerTitle}>{t('clubTitle')}</Text>
-          <Text style={styles.headerSubtitle}>{t('clubSubtitle')}</Text>
+  // Info Tab Content
+  const renderInfoTab = () => (
+    <ScrollView style={styles.tabContent} showsVerticalScrollIndicator={false}>
+      {/* Hero Section */}
+      <View style={styles.heroSection}>
+        <View style={styles.heroIcon}>
+          <Ionicons name="people-circle" size={60} color={COLORS.secondary} />
         </View>
-        {currentMember ? (
-          <View style={styles.memberBadge}>
-            <Ionicons name="person-circle" size={24} color={COLORS.primary} />
-            <Text style={styles.memberName}>{currentMember.username}</Text>
-          </View>
-        ) : (
-          <TouchableOpacity style={styles.joinButton} onPress={() => setShowJoinModal(true)}>
-            <Text style={styles.joinButtonText}>{t('joinClub')}</Text>
-          </TouchableOpacity>
-        )}
+        <Text style={styles.heroTitle}>{t('clubTitle')}</Text>
+        <Text style={styles.heroDescription}>{t('clubDescription')}</Text>
       </View>
 
-      {/* Category Filter */}
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.categoryContainer}
+      {/* How it works */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{t('howItWorks')}</Text>
+        <View style={styles.howItWorksCard}>
+          <View style={styles.stepRow}>
+            <View style={styles.stepNumber}><Text style={styles.stepNumberText}>1</Text></View>
+            <Text style={styles.stepText}>
+              {language === 'fr' ? 'Choisissez votre formule (12, 24 ou 36 mois)' : 'Choose your plan (12, 24 or 36 months)'}
+            </Text>
+          </View>
+          <View style={styles.stepRow}>
+            <View style={styles.stepNumber}><Text style={styles.stepNumberText}>2</Text></View>
+            <Text style={styles.stepText}>
+              {language === 'fr' ? 'Réglez votre carte Club' : 'Pay for your Club card'}
+            </Text>
+          </View>
+          <View style={styles.stepRow}>
+            <View style={styles.stepNumber}><Text style={styles.stepNumberText}>3</Text></View>
+            <Text style={styles.stepText}>
+              {language === 'fr' ? 'Profitez immédiatement des réductions !' : 'Immediately enjoy discounts!'}
+            </Text>
+          </View>
+        </View>
+      </View>
+
+      {/* Formulas */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{t('ourFormulas')}</Text>
+        <View style={styles.formulasContainer}>
+          {CLUB_FORMULAS.map((formula) => (
+            <View key={formula.id} style={styles.formulaCard}>
+              <View style={styles.formulaHeader}>
+                <Text style={styles.formulaMonths}>{formula.months}</Text>
+                <Text style={styles.formulaMonthsLabel}>{language === 'fr' ? 'mois' : 'months'}</Text>
+              </View>
+              <View style={styles.formulaDiscount}>
+                <Text style={styles.formulaDiscountText}>-{formula.discount}%</Text>
+              </View>
+              <Text style={styles.formulaPrice}>{formula.price}€{t('perYear')}</Text>
+            </View>
+          ))}
+        </View>
+      </View>
+
+      {/* Advantages */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>{t('advantages')}</Text>
+        <View style={styles.advantagesContainer}>
+          {(language === 'fr' ? CLUB_ADVANTAGES_FR : CLUB_ADVANTAGES_EN).map((advantage, index) => (
+            <View key={index} style={styles.advantageRow}>
+              <Ionicons name="checkmark-circle" size={20} color={COLORS.success} />
+              <Text style={styles.advantageText}>{advantage}</Text>
+            </View>
+          ))}
+        </View>
+      </View>
+
+      {/* Join Button */}
+      <TouchableOpacity 
+        style={styles.joinButton}
+        onPress={() => router.push('/booking')}
       >
+        <Text style={styles.joinButtonText}>{t('joinClub')}</Text>
+        <Ionicons name="arrow-forward" size={20} color={COLORS.white} />
+      </TouchableOpacity>
+
+      <View style={{ height: 40 }} />
+    </ScrollView>
+  );
+
+  // Community Tab Content
+  const renderCommunityTab = () => (
+    <View style={styles.tabContent}>
+      {/* Categories */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesScroll}>
         {CATEGORIES.map((cat) => (
           <TouchableOpacity
-            key={cat}
+            key={cat.id}
             style={[
-              styles.categoryButton,
-              selectedCategory === cat && styles.categoryButtonActive,
+              styles.categoryChip,
+              selectedCategory === cat.id && styles.categoryChipActive,
             ]}
-            onPress={() => setSelectedCategory(cat)}
+            onPress={() => setSelectedCategory(cat.id)}
           >
-            <Text
-              style={[
-                styles.categoryButtonText,
-                selectedCategory === cat && styles.categoryButtonTextActive,
-              ]}
-            >
-              {getCategoryLabel(cat)}
+            <Ionicons
+              name={cat.icon as any}
+              size={16}
+              color={selectedCategory === cat.id ? COLORS.white : COLORS.primary}
+            />
+            <Text style={[
+              styles.categoryChipText,
+              selectedCategory === cat.id && styles.categoryChipTextActive,
+            ]}>
+              {language === 'fr' ? cat.name_fr : cat.name_en}
             </Text>
           </TouchableOpacity>
         ))}
@@ -242,134 +344,67 @@ export default function ClubScreen() {
 
       {/* Posts List */}
       {loading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={COLORS.primary} />
+        <ActivityIndicator size="large" color={COLORS.primary} style={{ marginTop: 40 }} />
+      ) : posts.length === 0 ? (
+        <View style={styles.emptyState}>
+          <Ionicons name="chatbubbles-outline" size={60} color={COLORS.gray} />
+          <Text style={styles.emptyStateText}>{t('noPosts')}</Text>
         </View>
       ) : (
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />
-          }
-          contentContainerStyle={styles.postsContainer}
-        >
-          {posts.length === 0 ? (
-            <View style={styles.emptyContainer}>
-              <Ionicons name="chatbubbles-outline" size={64} color={COLORS.textLight} />
-              <Text style={styles.emptyText}>Aucune publication pour le moment</Text>
-            </View>
-          ) : (
-            posts.map((post) => (
-              <View key={post.id} style={styles.postCard}>
-                <View style={styles.postHeader}>
-                  <View style={styles.authorInfo}>
-                    <View style={styles.authorAvatar}>
-                      <Ionicons name="person" size={20} color={COLORS.white} />
-                    </View>
-                    <View>
-                      <Text style={styles.authorName}>{post.author_name}</Text>
-                      <Text style={styles.postDate}>{formatDate(post.created_at)}</Text>
-                    </View>
-                  </View>
-                  <View style={styles.categoryTag}>
-                    <Text style={styles.categoryTagText}>{getCategoryLabel(post.category)}</Text>
-                  </View>
+        <FlatList
+          data={posts}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <View style={styles.postCard}>
+              <View style={styles.postHeader}>
+                <View style={styles.postAvatar}>
+                  <Text style={styles.postAvatarText}>
+                    {item.author_name.charAt(0).toUpperCase()}
+                  </Text>
                 </View>
-
-                <Text style={styles.postTitle}>{post.title}</Text>
-                <Text style={styles.postContent}>{post.content}</Text>
-
-                <View style={styles.postActions}>
-                  <TouchableOpacity
-                    style={styles.actionButton}
-                    onPress={() => handleToggleLike(post.id)}
-                  >
-                    <Ionicons
-                      name={currentMember && post.likes.includes(currentMember.id) ? 'heart' : 'heart-outline'}
-                      size={20}
-                      color={
-                        currentMember && post.likes.includes(currentMember.id)
-                          ? COLORS.error
-                          : COLORS.textSecondary
-                      }
-                    />
-                    <Text style={styles.actionText}>{post.likes.length}</Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity
-                    style={styles.actionButton}
-                    onPress={() => openComments(post)}
-                  >
-                    <Ionicons name="chatbubble-outline" size={20} color={COLORS.textSecondary} />
-                    <Text style={styles.actionText}>
-                      {post.comments.length} {t('comments')}
-                    </Text>
-                  </TouchableOpacity>
+                <View style={styles.postAuthorInfo}>
+                  <Text style={styles.postAuthorName}>{item.author_name}</Text>
+                  <Text style={styles.postDate}>{formatDate(item.created_at)}</Text>
                 </View>
               </View>
-            ))
+              <Text style={styles.postTitle}>{item.title}</Text>
+              <Text style={styles.postContent}>{item.content}</Text>
+              <View style={styles.postActions}>
+                <TouchableOpacity 
+                  style={styles.postAction}
+                  onPress={() => handleLikePost(item.id)}
+                >
+                  <Ionicons 
+                    name={item.likes.includes(currentUser.id) ? "heart" : "heart-outline"} 
+                    size={20} 
+                    color={item.likes.includes(currentUser.id) ? COLORS.error : COLORS.textSecondary} 
+                  />
+                  <Text style={styles.postActionText}>{item.likes.length}</Text>
+                </TouchableOpacity>
+                <View style={styles.postAction}>
+                  <Ionicons name="chatbubble-outline" size={20} color={COLORS.textSecondary} />
+                  <Text style={styles.postActionText}>{item.comments.length}</Text>
+                </View>
+              </View>
+            </View>
           )}
-          <View style={{ height: SPACING.xxl }} />
-        </ScrollView>
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          contentContainerStyle={{ paddingBottom: 100 }}
+        />
       )}
 
-      {/* FAB for new post */}
+      {/* New Post Button */}
       <TouchableOpacity
-        style={styles.fab}
-        onPress={() => (currentMember ? setShowNewPostModal(true) : setShowJoinModal(true))}
+        style={styles.fabButton}
+        onPress={() => setShowNewPost(true)}
       >
         <Ionicons name="add" size={28} color={COLORS.white} />
       </TouchableOpacity>
 
-      {/* Join Modal */}
-      <Modal visible={showJoinModal} animationType="slide" transparent>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.modalOverlay}
-        >
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>{t('joinClub')}</Text>
-              <TouchableOpacity onPress={() => setShowJoinModal(false)}>
-                <Ionicons name="close" size={24} color={COLORS.text} />
-              </TouchableOpacity>
-            </View>
-
-            <TextInput
-              style={styles.input}
-              placeholder={t('username')}
-              value={username}
-              onChangeText={setUsername}
-              placeholderTextColor={COLORS.textLight}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder={t('email')}
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              placeholderTextColor={COLORS.textLight}
-            />
-            <TextInput
-              style={[styles.input, styles.textArea]}
-              placeholder={t('bio')}
-              value={bio}
-              onChangeText={setBio}
-              multiline
-              numberOfLines={3}
-              placeholderTextColor={COLORS.textLight}
-            />
-
-            <TouchableOpacity style={styles.submitButton} onPress={handleJoinClub}>
-              <Text style={styles.submitButtonText}>{t('register')}</Text>
-            </TouchableOpacity>
-          </View>
-        </KeyboardAvoidingView>
-      </Modal>
-
       {/* New Post Modal */}
-      <Modal visible={showNewPostModal} animationType="slide" transparent>
+      <Modal visible={showNewPost} animationType="slide" transparent>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.modalOverlay}
@@ -377,103 +412,226 @@ export default function ClubScreen() {
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>{t('newPost')}</Text>
-              <TouchableOpacity onPress={() => setShowNewPostModal(false)}>
+              <TouchableOpacity onPress={() => setShowNewPost(false)}>
                 <Ionicons name="close" size={24} color={COLORS.text} />
               </TouchableOpacity>
             </View>
 
             <TextInput
               style={styles.input}
-              placeholder={t('postTitle')}
+              placeholder={t('title')}
               value={newPostTitle}
               onChangeText={setNewPostTitle}
-              placeholderTextColor={COLORS.textLight}
+              placeholderTextColor={COLORS.textSecondary}
             />
+
             <TextInput
               style={[styles.input, styles.textArea]}
-              placeholder={t('postContent')}
+              placeholder={t('content')}
               value={newPostContent}
               onChangeText={setNewPostContent}
               multiline
-              numberOfLines={5}
-              placeholderTextColor={COLORS.textLight}
+              numberOfLines={4}
+              placeholderTextColor={COLORS.textSecondary}
             />
 
-            <Text style={styles.inputLabel}>{t('selectCategory')}</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categorySelect}>
-              {CATEGORIES.filter((c) => c !== 'all').map((cat) => (
+              {CATEGORIES.filter(c => c.id !== 'all').map((cat) => (
                 <TouchableOpacity
-                  key={cat}
+                  key={cat.id}
                   style={[
-                    styles.categoryOption,
-                    newPostCategory === cat && styles.categoryOptionActive,
+                    styles.categoryChip,
+                    newPostCategory === cat.id && styles.categoryChipActive,
                   ]}
-                  onPress={() => setNewPostCategory(cat)}
+                  onPress={() => setNewPostCategory(cat.id)}
                 >
-                  <Text
-                    style={[
-                      styles.categoryOptionText,
-                      newPostCategory === cat && styles.categoryOptionTextActive,
-                    ]}
-                  >
-                    {getCategoryLabel(cat)}
+                  <Text style={[
+                    styles.categoryChipText,
+                    newPostCategory === cat.id && styles.categoryChipTextActive,
+                  ]}>
+                    {language === 'fr' ? cat.name_fr : cat.name_en}
                   </Text>
                 </TouchableOpacity>
               ))}
             </ScrollView>
 
-            <TouchableOpacity style={styles.submitButton} onPress={handleCreatePost}>
-              <Text style={styles.submitButtonText}>{t('publish')}</Text>
-            </TouchableOpacity>
-          </View>
-        </KeyboardAvoidingView>
-      </Modal>
-
-      {/* Comments Modal */}
-      <Modal visible={showCommentsModal} animationType="slide" transparent>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.modalOverlay}
-        >
-          <View style={[styles.modalContent, styles.commentsModal]}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>{t('comments')}</Text>
-              <TouchableOpacity onPress={() => setShowCommentsModal(false)}>
-                <Ionicons name="close" size={24} color={COLORS.text} />
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setShowNewPost(false)}
+              >
+                <Text style={styles.cancelButtonText}>{t('cancel')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.publishButton}
+                onPress={handleCreatePost}
+              >
+                <Text style={styles.publishButtonText}>{t('publish')}</Text>
               </TouchableOpacity>
             </View>
-
-            <ScrollView style={styles.commentsList}>
-              {selectedPost?.comments.length === 0 ? (
-                <Text style={styles.noComments}>Aucun commentaire pour le moment</Text>
-              ) : (
-                selectedPost?.comments.map((comment) => (
-                  <View key={comment.id} style={styles.commentItem}>
-                    <Text style={styles.commentAuthor}>{comment.author_name}</Text>
-                    <Text style={styles.commentContent}>{comment.content}</Text>
-                    <Text style={styles.commentDate}>{formatDate(comment.created_at)}</Text>
-                  </View>
-                ))
-              )}
-            </ScrollView>
-
-            {currentMember && (
-              <View style={styles.commentInputContainer}>
-                <TextInput
-                  style={styles.commentInput}
-                  placeholder={t('writeComment')}
-                  value={newComment}
-                  onChangeText={setNewComment}
-                  placeholderTextColor={COLORS.textLight}
-                />
-                <TouchableOpacity style={styles.sendButton} onPress={handleAddComment}>
-                  <Ionicons name="send" size={20} color={COLORS.white} />
-                </TouchableOpacity>
-              </View>
-            )}
           </View>
         </KeyboardAvoidingView>
       </Modal>
+    </View>
+  );
+
+  // Messages Tab Content
+  const renderMessagesTab = () => (
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.tabContent}
+    >
+      {/* Chat Type Selector */}
+      <View style={styles.chatTypeSelector}>
+        <TouchableOpacity
+          style={[styles.chatTypeButton, chatWith === 'captain' && styles.chatTypeButtonActive]}
+          onPress={() => setChatWith('captain')}
+        >
+          <Ionicons 
+            name="boat" 
+            size={20} 
+            color={chatWith === 'captain' ? COLORS.white : COLORS.primary} 
+          />
+          <Text style={[
+            styles.chatTypeButtonText,
+            chatWith === 'captain' && styles.chatTypeButtonTextActive
+          ]}>
+            {t('talkToCaptain')}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.chatTypeButton, chatWith === 'community' && styles.chatTypeButtonActive]}
+          onPress={() => setChatWith('community')}
+        >
+          <Ionicons 
+            name="people" 
+            size={20} 
+            color={chatWith === 'community' ? COLORS.white : COLORS.primary} 
+          />
+          <Text style={[
+            styles.chatTypeButtonText,
+            chatWith === 'community' && styles.chatTypeButtonTextActive
+          ]}>
+            {t('communityChat')}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Messages List */}
+      <FlatList
+        data={messages}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={[
+            styles.messageBubble,
+            item.sender_id === currentUser.id ? styles.messageBubbleSent : styles.messageBubbleReceived,
+          ]}>
+            {item.sender_id !== currentUser.id && (
+              <Text style={styles.messageSender}>{item.sender_name}</Text>
+            )}
+            <Text style={[
+              styles.messageText,
+              item.sender_id === currentUser.id && styles.messageTextSent,
+            ]}>
+              {item.content}
+            </Text>
+            <Text style={[
+              styles.messageTime,
+              item.sender_id === currentUser.id && styles.messageTimeSent,
+            ]}>
+              {formatDate(item.created_at)}
+            </Text>
+          </View>
+        )}
+        ListEmptyComponent={
+          <View style={styles.emptyState}>
+            <Ionicons name="chatbubbles-outline" size={60} color={COLORS.gray} />
+            <Text style={styles.emptyStateText}>{t('noMessages')}</Text>
+          </View>
+        }
+        contentContainerStyle={{ padding: SPACING.md, flexGrow: 1 }}
+        inverted={messages.length > 0}
+      />
+
+      {/* Message Input */}
+      <View style={styles.messageInputContainer}>
+        <TextInput
+          style={styles.messageInput}
+          placeholder={t('typeMessage')}
+          value={newMessage}
+          onChangeText={setNewMessage}
+          placeholderTextColor={COLORS.textSecondary}
+          multiline
+        />
+        <TouchableOpacity
+          style={styles.sendButton}
+          onPress={handleSendMessage}
+          disabled={!newMessage.trim()}
+        >
+          <Ionicons name="send" size={20} color={COLORS.white} />
+        </TouchableOpacity>
+      </View>
+    </KeyboardAvoidingView>
+  );
+
+  return (
+    <SafeAreaView style={styles.container} edges={['top']}>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>{t('clubTitle')}</Text>
+        <View style={{ width: 40 }} />
+      </View>
+
+      {/* Tabs */}
+      <View style={styles.tabsContainer}>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'info' && styles.tabActive]}
+          onPress={() => setActiveTab('info')}
+        >
+          <Ionicons 
+            name="information-circle" 
+            size={20} 
+            color={activeTab === 'info' ? COLORS.primary : COLORS.textSecondary} 
+          />
+          <Text style={[styles.tabText, activeTab === 'info' && styles.tabTextActive]}>
+            {t('info')}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'community' && styles.tabActive]}
+          onPress={() => setActiveTab('community')}
+        >
+          <Ionicons 
+            name="people" 
+            size={20} 
+            color={activeTab === 'community' ? COLORS.primary : COLORS.textSecondary} 
+          />
+          <Text style={[styles.tabText, activeTab === 'community' && styles.tabTextActive]}>
+            {t('community')}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'messages' && styles.tabActive]}
+          onPress={() => setActiveTab('messages')}
+        >
+          <Ionicons 
+            name="chatbubbles" 
+            size={20} 
+            color={activeTab === 'messages' ? COLORS.primary : COLORS.textSecondary} 
+          />
+          <Text style={[styles.tabText, activeTab === 'messages' && styles.tabTextActive]}>
+            {t('messages')}
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Tab Content */}
+      {activeTab === 'info' && renderInfoTab()}
+      {activeTab === 'community' && renderCommunityTab()}
+      {activeTab === 'messages' && renderMessagesTab()}
     </SafeAreaView>
   );
 }
@@ -485,118 +643,254 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
+    justifyContent: 'space-between',
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
     backgroundColor: COLORS.white,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
   },
+  backButton: {
+    padding: SPACING.xs,
+  },
   headerTitle: {
-    fontSize: FONT_SIZES.xxl,
+    fontSize: FONT_SIZES.lg,
     fontWeight: '700',
-    color: COLORS.text,
-  },
-  headerSubtitle: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.textSecondary,
-    marginTop: 2,
-  },
-  memberBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.surfaceLight,
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: SPACING.xs,
-    borderRadius: BORDER_RADIUS.full,
-  },
-  memberName: {
-    marginLeft: SPACING.xs,
-    fontSize: FONT_SIZES.sm,
-    fontWeight: '600',
     color: COLORS.primary,
   },
-  joinButton: {
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
-    borderRadius: BORDER_RADIUS.full,
+  tabsContainer: {
+    flexDirection: 'row',
+    backgroundColor: COLORS.white,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
   },
-  joinButtonText: {
-    color: COLORS.white,
+  tab: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACING.md,
+    gap: SPACING.xs,
+  },
+  tabActive: {
+    borderBottomWidth: 2,
+    borderBottomColor: COLORS.primary,
+  },
+  tabText: {
     fontSize: FONT_SIZES.sm,
+    color: COLORS.textSecondary,
+  },
+  tabTextActive: {
+    color: COLORS.primary,
     fontWeight: '600',
   },
-  categoryContainer: {
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
-    backgroundColor: COLORS.white,
-    flexDirection: 'row',
+  tabContent: {
+    flex: 1,
   },
-  categoryButton: {
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
-    borderRadius: BORDER_RADIUS.full,
-    backgroundColor: COLORS.surfaceLight,
-    marginRight: SPACING.sm,
-    alignSelf: 'flex-start',
-  },
-  categoryButtonActive: {
+  // Hero Section
+  heroSection: {
+    alignItems: 'center',
+    padding: SPACING.xl,
     backgroundColor: COLORS.primary,
   },
-  categoryButtonText: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.textSecondary,
-    fontWeight: '500',
-  },
-  categoryButtonTextActive: {
-    color: COLORS.white,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
+  heroIcon: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: COLORS.white,
     alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: SPACING.md,
   },
-  postsContainer: {
+  heroTitle: {
+    fontSize: FONT_SIZES.xxl,
+    fontWeight: '700',
+    color: COLORS.white,
+    marginBottom: SPACING.sm,
+  },
+  heroDescription: {
+    fontSize: FONT_SIZES.md,
+    color: COLORS.white,
+    textAlign: 'center',
+    opacity: 0.9,
+  },
+  // Sections
+  section: {
     padding: SPACING.lg,
   },
-  emptyContainer: {
-    alignItems: 'center',
-    paddingVertical: SPACING.xxl,
+  sectionTitle: {
+    fontSize: FONT_SIZES.lg,
+    fontWeight: '700',
+    color: COLORS.primary,
+    marginBottom: SPACING.md,
   },
-  emptyText: {
-    marginTop: SPACING.md,
-    fontSize: FONT_SIZES.md,
-    color: COLORS.textSecondary,
-  },
-  postCard: {
+  // How it works
+  howItWorksCard: {
     backgroundColor: COLORS.white,
     borderRadius: BORDER_RADIUS.xl,
     padding: SPACING.lg,
-    marginBottom: SPACING.md,
-    ...SHADOWS.sm,
+    gap: SPACING.md,
+  },
+  stepRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.md,
+  },
+  stepNumber: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: COLORS.secondary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stepNumberText: {
+    fontSize: FONT_SIZES.md,
+    fontWeight: '700',
+    color: COLORS.primary,
+  },
+  stepText: {
+    flex: 1,
+    fontSize: FONT_SIZES.md,
+    color: COLORS.text,
+  },
+  // Formulas
+  formulasContainer: {
+    flexDirection: 'row',
+    gap: SPACING.sm,
+  },
+  formulaCard: {
+    flex: 1,
+    backgroundColor: COLORS.white,
+    borderRadius: BORDER_RADIUS.xl,
+    padding: SPACING.md,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: COLORS.border,
+  },
+  formulaHeader: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    marginBottom: SPACING.xs,
+  },
+  formulaMonths: {
+    fontSize: FONT_SIZES.xxl,
+    fontWeight: '700',
+    color: COLORS.primary,
+  },
+  formulaMonthsLabel: {
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.textSecondary,
+    marginLeft: 2,
+  },
+  formulaDiscount: {
+    backgroundColor: COLORS.success,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.xs,
+    borderRadius: BORDER_RADIUS.full,
+    marginBottom: SPACING.xs,
+  },
+  formulaDiscountText: {
+    fontSize: FONT_SIZES.sm,
+    fontWeight: '700',
+    color: COLORS.white,
+  },
+  formulaPrice: {
+    fontSize: FONT_SIZES.md,
+    fontWeight: '600',
+    color: COLORS.secondary,
+  },
+  // Advantages
+  advantagesContainer: {
+    backgroundColor: COLORS.white,
+    borderRadius: BORDER_RADIUS.xl,
+    padding: SPACING.lg,
+    gap: SPACING.md,
+  },
+  advantageRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: SPACING.sm,
+  },
+  advantageText: {
+    flex: 1,
+    fontSize: FONT_SIZES.md,
+    color: COLORS.text,
+    lineHeight: 22,
+  },
+  // Join Button
+  joinButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.secondary,
+    marginHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
+    borderRadius: BORDER_RADIUS.full,
+    gap: SPACING.sm,
+  },
+  joinButtonText: {
+    fontSize: FONT_SIZES.lg,
+    fontWeight: '700',
+    color: COLORS.white,
+  },
+  // Categories
+  categoriesScroll: {
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    backgroundColor: COLORS.white,
+  },
+  categoryChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    backgroundColor: COLORS.surfaceLight,
+    borderRadius: BORDER_RADIUS.full,
+    marginRight: SPACING.sm,
+    gap: SPACING.xs,
+  },
+  categoryChipActive: {
+    backgroundColor: COLORS.primary,
+  },
+  categoryChipText: {
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.primary,
+  },
+  categoryChipTextActive: {
+    color: COLORS.white,
+  },
+  // Posts
+  postCard: {
+    backgroundColor: COLORS.white,
+    marginHorizontal: SPACING.md,
+    marginTop: SPACING.md,
+    borderRadius: BORDER_RADIUS.xl,
+    padding: SPACING.md,
   },
   postHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: SPACING.md,
-  },
-  authorInfo: {
-    flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: SPACING.sm,
   },
-  authorAvatar: {
+  postAvatar: {
     width: 40,
     height: 40,
     borderRadius: 20,
     backgroundColor: COLORS.primary,
-    justifyContent: 'center',
     alignItems: 'center',
-    marginRight: SPACING.sm,
+    justifyContent: 'center',
   },
-  authorName: {
+  postAvatarText: {
+    fontSize: FONT_SIZES.lg,
+    fontWeight: '700',
+    color: COLORS.white,
+  },
+  postAuthorInfo: {
+    marginLeft: SPACING.sm,
+  },
+  postAuthorName: {
     fontSize: FONT_SIZES.md,
     fontWeight: '600',
     color: COLORS.text,
@@ -604,182 +898,223 @@ const styles = StyleSheet.create({
   postDate: {
     fontSize: FONT_SIZES.xs,
     color: COLORS.textSecondary,
-    marginTop: 2,
-  },
-  categoryTag: {
-    backgroundColor: COLORS.surfaceLight,
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: SPACING.xs,
-    borderRadius: BORDER_RADIUS.md,
-  },
-  categoryTagText: {
-    fontSize: FONT_SIZES.xs,
-    color: COLORS.textSecondary,
-    fontWeight: '500',
   },
   postTitle: {
-    fontSize: FONT_SIZES.lg,
+    fontSize: FONT_SIZES.md,
     fontWeight: '700',
-    color: COLORS.text,
-    marginBottom: SPACING.sm,
+    color: COLORS.primary,
+    marginBottom: SPACING.xs,
   },
   postContent: {
     fontSize: FONT_SIZES.md,
-    color: COLORS.textSecondary,
+    color: COLORS.text,
     lineHeight: 22,
   },
   postActions: {
     flexDirection: 'row',
     marginTop: SPACING.md,
-    paddingTop: SPACING.md,
+    paddingTop: SPACING.sm,
     borderTopWidth: 1,
     borderTopColor: COLORS.border,
     gap: SPACING.lg,
   },
-  actionButton: {
+  postAction: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: SPACING.xs,
   },
-  actionText: {
-    marginLeft: SPACING.xs,
+  postActionText: {
     fontSize: FONT_SIZES.sm,
     color: COLORS.textSecondary,
   },
-  fab: {
+  // Empty State
+  emptyState: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: SPACING.xl,
+  },
+  emptyStateText: {
+    fontSize: FONT_SIZES.md,
+    color: COLORS.textSecondary,
+    marginTop: SPACING.md,
+    textAlign: 'center',
+  },
+  // FAB
+  fabButton: {
     position: 'absolute',
-    bottom: SPACING.xl,
-    right: SPACING.lg,
+    bottom: 20,
+    right: 20,
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: COLORS.primary,
-    justifyContent: 'center',
+    backgroundColor: COLORS.secondary,
     alignItems: 'center',
-    ...SHADOWS.lg,
+    justifyContent: 'center',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
   },
+  // Modal
   modalOverlay: {
     flex: 1,
-    backgroundColor: COLORS.overlay,
+    backgroundColor: 'rgba(0,0,0,0.5)',
     justifyContent: 'flex-end',
   },
   modalContent: {
     backgroundColor: COLORS.white,
-    borderTopLeftRadius: BORDER_RADIUS.xxl,
-    borderTopRightRadius: BORDER_RADIUS.xxl,
-    padding: SPACING.xl,
+    borderTopLeftRadius: BORDER_RADIUS.xl,
+    borderTopRightRadius: BORDER_RADIUS.xl,
+    padding: SPACING.lg,
     maxHeight: '80%',
-  },
-  commentsModal: {
-    maxHeight: '90%',
   },
   modalHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: SPACING.lg,
   },
   modalTitle: {
-    fontSize: FONT_SIZES.xl,
+    fontSize: FONT_SIZES.lg,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.primary,
   },
   input: {
     backgroundColor: COLORS.surfaceLight,
     borderRadius: BORDER_RADIUS.lg,
-    padding: SPACING.md,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.md,
     fontSize: FONT_SIZES.md,
     color: COLORS.text,
     marginBottom: SPACING.md,
   },
   textArea: {
-    height: 100,
+    height: 120,
     textAlignVertical: 'top',
   },
-  inputLabel: {
-    fontSize: FONT_SIZES.sm,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: SPACING.sm,
-  },
   categorySelect: {
-    marginBottom: SPACING.lg,
+    marginBottom: SPACING.md,
   },
-  categoryOption: {
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
-    borderRadius: BORDER_RADIUS.full,
-    backgroundColor: COLORS.surfaceLight,
-    marginRight: SPACING.sm,
+  modalActions: {
+    flexDirection: 'row',
+    gap: SPACING.md,
   },
-  categoryOptionActive: {
-    backgroundColor: COLORS.primary,
-  },
-  categoryOptionText: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.textSecondary,
-  },
-  categoryOptionTextActive: {
-    color: COLORS.white,
-  },
-  submitButton: {
-    backgroundColor: COLORS.primary,
+  cancelButton: {
+    flex: 1,
+    paddingVertical: SPACING.md,
     borderRadius: BORDER_RADIUS.lg,
-    padding: SPACING.md,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     alignItems: 'center',
   },
-  submitButtonText: {
-    color: COLORS.white,
+  cancelButtonText: {
+    fontSize: FONT_SIZES.md,
+    color: COLORS.textSecondary,
+  },
+  publishButton: {
+    flex: 1,
+    paddingVertical: SPACING.md,
+    borderRadius: BORDER_RADIUS.lg,
+    backgroundColor: COLORS.primary,
+    alignItems: 'center',
+  },
+  publishButtonText: {
     fontSize: FONT_SIZES.md,
     fontWeight: '600',
+    color: COLORS.white,
   },
-  commentsList: {
-    maxHeight: 300,
-  },
-  noComments: {
-    textAlign: 'center',
-    color: COLORS.textSecondary,
-    paddingVertical: SPACING.xl,
-  },
-  commentItem: {
-    backgroundColor: COLORS.surfaceLight,
-    borderRadius: BORDER_RADIUS.lg,
+  // Chat Type Selector
+  chatTypeSelector: {
+    flexDirection: 'row',
     padding: SPACING.md,
+    gap: SPACING.sm,
+    backgroundColor: COLORS.white,
+  },
+  chatTypeButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: SPACING.sm,
+    borderRadius: BORDER_RADIUS.lg,
+    backgroundColor: COLORS.surfaceLight,
+    gap: SPACING.xs,
+  },
+  chatTypeButtonActive: {
+    backgroundColor: COLORS.primary,
+  },
+  chatTypeButtonText: {
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.primary,
+  },
+  chatTypeButtonTextActive: {
+    color: COLORS.white,
+    fontWeight: '600',
+  },
+  // Messages
+  messageBubble: {
+    maxWidth: '80%',
+    padding: SPACING.md,
+    borderRadius: BORDER_RADIUS.lg,
     marginBottom: SPACING.sm,
   },
-  commentAuthor: {
-    fontSize: FONT_SIZES.sm,
+  messageBubbleSent: {
+    backgroundColor: COLORS.primary,
+    alignSelf: 'flex-end',
+    borderBottomRightRadius: 4,
+  },
+  messageBubbleReceived: {
+    backgroundColor: COLORS.white,
+    alignSelf: 'flex-start',
+    borderBottomLeftRadius: 4,
+  },
+  messageSender: {
+    fontSize: FONT_SIZES.xs,
     fontWeight: '600',
+    color: COLORS.secondary,
+    marginBottom: 4,
+  },
+  messageText: {
+    fontSize: FONT_SIZES.md,
     color: COLORS.text,
   },
-  commentContent: {
-    fontSize: FONT_SIZES.md,
-    color: COLORS.textSecondary,
-    marginTop: SPACING.xs,
+  messageTextSent: {
+    color: COLORS.white,
   },
-  commentDate: {
+  messageTime: {
     fontSize: FONT_SIZES.xs,
-    color: COLORS.textLight,
-    marginTop: SPACING.xs,
+    color: COLORS.textSecondary,
+    marginTop: 4,
+    alignSelf: 'flex-end',
   },
-  commentInputContainer: {
+  messageTimeSent: {
+    color: 'rgba(255,255,255,0.7)',
+  },
+  messageInputContainer: {
     flexDirection: 'row',
-    marginTop: SPACING.md,
+    padding: SPACING.md,
+    backgroundColor: COLORS.white,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
     gap: SPACING.sm,
   },
-  commentInput: {
+  messageInput: {
     flex: 1,
     backgroundColor: COLORS.surfaceLight,
     borderRadius: BORDER_RADIUS.lg,
-    padding: SPACING.md,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
     fontSize: FONT_SIZES.md,
-    color: COLORS.text,
+    maxHeight: 100,
   },
   sendButton: {
     width: 44,
     height: 44,
     borderRadius: 22,
     backgroundColor: COLORS.primary,
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
   },
 });
