@@ -96,9 +96,16 @@ export default function BookingScreen() {
     // For private only cruises, use total price divided by 8 as base
     const isPrivateOnly = selectedCruise && PRIVATE_ONLY_DESTINATIONS.includes(selectedCruise.destination);
     
+    // Total price for ALL passengers (without discount)
     const totalBasePrice = basePricePerPerson * passengers;
-    const discountAmount = (totalBasePrice * selectedCard.discount) / 100;
-    const priceAfterDiscount = totalBasePrice - discountAmount;
+    
+    // CORRECTED: Discount applies ONLY to passengers with a club card
+    // If 5 passengers and 2 cards, discount applies only to 2 passengers
+    const priceForCardHolders = basePricePerPerson * clubCardCount;
+    const priceForNonCardHolders = basePricePerPerson * (passengers - clubCardCount);
+    const discountAmount = (priceForCardHolders * selectedCard.discount) / 100;
+    const priceAfterDiscount = (priceForCardHolders - discountAmount) + priceForNonCardHolders;
+    
     // Club card cost is based on clubCardCount
     const totalCardCost = selectedCard.price * clubCardCount;
     const totalWithClub = priceAfterDiscount + totalCardCost;
@@ -113,6 +120,8 @@ export default function BookingScreen() {
       priceAfterDiscount,
       cardPricePerPerson: selectedCard.price,
       clubCardCount,
+      priceForCardHolders,
+      priceForNonCardHolders,
       totalCardCost,
       totalWithClub,
       savings,
