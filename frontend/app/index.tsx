@@ -248,32 +248,41 @@ export default function HomeScreen() {
         </View>
 
         {/* All Inclusive Section */}
-        <View style={styles.allInclusiveSection}>
-          <Text style={styles.allInclusiveTitle}>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>
             {language === 'fr' 
               ? 'DES VACANCES TOUT INCLUS' 
               : 'ALL-INCLUSIVE VACATION'}
           </Text>
           <Text style={styles.allInclusiveSubtitle}>
             {language === 'fr' 
-              ? 'Formule tout compris & respectueuse de l\'environnement' 
-              : 'All-inclusive & eco-friendly formula'}
+              ? 'Formule tout compris & respectueuse de l\'environnement\nLES PETITS +++ DE SOGNUDIMARE' 
+              : 'All-inclusive & eco-friendly formula\nSOGNUDIMARE EXTRAS'}
           </Text>
-          <View style={styles.includedGrid}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.inclusiveScroll}>
             {ALL_INCLUSIVE_FEATURES.map((feature, index) => (
-              <View key={index} style={styles.includedItem}>
-                <Ionicons name={feature.icon as any} size={24} color={COLORS.secondary} />
-                <Text style={styles.includedText}>
-                  {language === 'fr' ? feature.label_fr : feature.label_en}
+              <View key={index} style={styles.inclusiveCard}>
+                <View style={styles.inclusiveHeader}>
+                  <Ionicons name={feature.icon as any} size={32} color={COLORS.accent} />
+                  <Text style={styles.inclusiveTitle}>
+                    {language === 'fr' ? feature.title_fr : feature.title_en}
+                  </Text>
+                  <View style={styles.inclusiveBadge}>
+                    <Text style={styles.inclusiveBadgeText}>INCLUS</Text>
+                  </View>
+                </View>
+                <Text style={styles.inclusiveDesc}>
+                  {language === 'fr' ? feature.desc_fr : feature.desc_en}
                 </Text>
+                <View style={styles.petitPlusBox}>
+                  <Text style={styles.petitPlusLabel}>PETIT + SOGNUDIMARE</Text>
+                  <Text style={styles.petitPlusText}>
+                    {language === 'fr' ? feature.petit_plus_fr : feature.petit_plus_en}
+                  </Text>
+                </View>
               </View>
             ))}
-          </View>
-          <Text style={styles.allInclusiveNote}>
-            {language === 'fr' 
-              ? 'Tous les repas préparés avec des produits locaux issus de producteurs passionnés qui partagent nos valeurs.' 
-              : 'All meals prepared with local products from passionate producers who share our values.'}
-          </Text>
+          </ScrollView>
         </View>
 
         {/* Local Partners Section */}
