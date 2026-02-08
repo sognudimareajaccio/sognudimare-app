@@ -6,12 +6,14 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
   const response = await fetch(`${BASE_URL}${endpoint}`, {
     headers: {
       'Content-Type': 'application/json',
+      ...options?.headers,
     },
     ...options,
   });
   
   if (!response.ok) {
-    throw new Error(`API Error: ${response.status}`);
+    const errorData = await response.json().catch(() => ({}));
+    throw { response: { status: response.status, data: errorData } };
   }
   
   return response.json();
@@ -93,48 +95,43 @@ export interface CommunityPost {
 // API functions
 export const cruiseApi = {
   getAll: async (): Promise<Cruise[]> => {
-    const response = await api.get('/cruises');
-    return response.data;
+    return fetchApi<Cruise[]>('/cruises');
   },
   
   getById: async (id: string): Promise<Cruise> => {
-    const response = await api.get(`/cruises/${id}`);
-    return response.data;
+    return fetchApi<Cruise>(`/cruises/${id}`);
   },
 };
 
 export const memberApi = {
   getAll: async (): Promise<Member[]> => {
-    const response = await api.get('/members');
-    return response.data;
+    return fetchApi<Member[]>('/members');
   },
   
   getById: async (id: string): Promise<Member> => {
-    const response = await api.get(`/members/${id}`);
-    return response.data;
+    return fetchApi<Member>(`/members/${id}`);
   },
   
   getByEmail: async (email: string): Promise<Member> => {
-    const response = await api.get(`/members/email/${email}`);
-    return response.data;
+    return fetchApi<Member>(`/members/email/${email}`);
   },
   
   create: async (data: { username: string; email: string; bio_fr?: string; bio_en?: string }): Promise<Member> => {
-    const response = await api.post('/members', data);
-    return response.data;
+    return fetchApi<Member>('/members', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
   },
 };
 
 export const postApi = {
   getAll: async (category?: string): Promise<CommunityPost[]> => {
-    const params = category ? { category } : {};
-    const response = await api.get('/posts', { params });
-    return response.data;
+    const endpoint = category ? `/posts?category=${category}` : '/posts';
+    return fetchApi<CommunityPost[]>(endpoint);
   },
   
   getById: async (id: string): Promise<CommunityPost> => {
-    const response = await api.get(`/posts/${id}`);
-    return response.data;
+    return fetchApi<CommunityPost>(`/posts/${id}`);
   },
   
   create: async (data: {
@@ -145,27 +142,34 @@ export const postApi = {
     content: string;
     category: string;
   }): Promise<CommunityPost> => {
-    const response = await api.post('/posts', data);
-    return response.data;
+    return fetchApi<CommunityPost>('/posts', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
   },
   
   toggleLike: async (postId: string, memberId: string): Promise<{ likes_count: number; liked: boolean }> => {
-    const response = await api.post(`/posts/${postId}/like?member_id=${memberId}`);
-    return response.data;
+    return fetchApi<{ likes_count: number; liked: boolean }>(`/posts/${postId}/like?member_id=${memberId}`, {
+      method: 'POST',
+    });
   },
   
   addComment: async (postId: string, data: { author_id: string; author_name: string; content: string }): Promise<CommunityPost> => {
-    const response = await api.post(`/posts/${postId}/comments`, data);
-    return response.data;
+    return fetchApi<CommunityPost>(`/posts/${postId}/comments`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
   },
   
   delete: async (postId: string): Promise<void> => {
-    await api.delete(`/posts/${postId}`);
+    await fetchApi<void>(`/posts/${postId}`, {
+      method: 'DELETE',
+    });
   },
 };
 
-export const seedDatabase = async (): Promise<void> => {
-  await api.post('/seed');
+export const seedDatabase = async (): Promise<{ message: string }> => {
+  return fetchApi<{ message: string }>('/seed', {
+    method: 'POST',
+  });
 };
-
-export default api;
