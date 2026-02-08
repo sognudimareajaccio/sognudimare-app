@@ -28,9 +28,9 @@ const BOARDING_CARDS: { [key: string]: string } = {
   caribbean: 'https://customer-assets.emergentagent.com/job_b879dc80-6d9d-4bd9-95f6-eb63e0393a89/artifacts/5gq8efu3_14.jpg',
 };
 
-// What's included
-const INCLUDED_FR = [
-  'La croisière de 8 jours / 7 nuits',
+// What's included - base items (cruise duration is added dynamically)
+const getIncludedFR = (duration: string) => [
+  `La croisière de ${duration}`,
   'Le logement en cabine double',
   'Les 3 repas par jour (pas de repas le midi les jours d\'arrivée et départ)',
   'Les boissons à volonté* toute la journée (*hors champagnes)',
@@ -40,8 +40,8 @@ const INCLUDED_FR = [
   'Les sports nautiques à bord : paddle, snorkeling, pêche...',
 ];
 
-const INCLUDED_EN = [
-  'The 8-day / 7-night cruise',
+const getIncludedEN = (duration: string) => [
+  `The ${duration} cruise`,
   'Double cabin accommodation',
   '3 meals a day (no lunch on arrival and departure days)',
   'Unlimited drinks* all day (*except champagne)',
