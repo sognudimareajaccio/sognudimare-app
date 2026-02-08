@@ -953,6 +953,12 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     flex: 1,
   },
+  savingsLabelSmall: {
+    fontSize: FONT_SIZES.xs,
+    color: COLORS.textSecondary,
+    flex: 1,
+    paddingLeft: SPACING.sm,
+  },
   savingsLabelBold: {
     fontSize: FONT_SIZES.md,
     fontWeight: '700',
@@ -962,6 +968,10 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.sm,
     color: COLORS.text,
     fontWeight: '500',
+  },
+  savingsValueSmall: {
+    fontSize: FONT_SIZES.xs,
+    color: COLORS.textSecondary,
   },
   savingsValueBold: {
     fontSize: FONT_SIZES.lg,
