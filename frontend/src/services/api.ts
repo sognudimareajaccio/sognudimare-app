@@ -1,13 +1,21 @@
-import axios from 'axios';
+// Simple API service using fetch for better web compatibility
 
-// Use relative URL for API calls - works on all platforms
-const api = axios.create({
-  baseURL: '/api',
-  timeout: 15000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+const BASE_URL = '/api';
+
+async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> {
+  const response = await fetch(`${BASE_URL}${endpoint}`, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    ...options,
+  });
+  
+  if (!response.ok) {
+    throw new Error(`API Error: ${response.status}`);
+  }
+  
+  return response.json();
+}
 
 // Cruise types
 export interface CruiseDate {
