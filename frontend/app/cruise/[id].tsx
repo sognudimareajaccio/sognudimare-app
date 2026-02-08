@@ -18,8 +18,63 @@ import { cruiseApi, Cruise } from '../../src/services/api';
 
 const { width } = Dimensions.get('window');
 
-// Logo URL from website
-const LOGO_URL = 'https://static.wixstatic.com/media/ac2dc0_cf6b3b4e0ae345acbeb00d34a8fdc9d6~mv2.png/v1/fill/w_77,h_77,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/ac2dc0_cf6b3b4e0ae345acbeb00d34a8fdc9d6~mv2.png';
+// Boarding card images per destination
+const BOARDING_CARDS: { [key: string]: string } = {
+  corsica: 'https://customer-assets.emergentagent.com/job_b879dc80-6d9d-4bd9-95f6-eb63e0393a89/artifacts/su7vi6in_10.jpg',
+  corsica_south: 'https://customer-assets.emergentagent.com/job_b879dc80-6d9d-4bd9-95f6-eb63e0393a89/artifacts/0smxu1vy_11.jpg',
+  corsica_west: 'https://customer-assets.emergentagent.com/job_b879dc80-6d9d-4bd9-95f6-eb63e0393a89/artifacts/fd6dl1bq_12.jpg',
+  sardinia: 'https://customer-assets.emergentagent.com/job_b879dc80-6d9d-4bd9-95f6-eb63e0393a89/artifacts/8wp4j8ba_13.jpg',
+  greece: 'https://customer-assets.emergentagent.com/job_b879dc80-6d9d-4bd9-95f6-eb63e0393a89/artifacts/tqjx4rwx_2.jpg',
+  caribbean: 'https://customer-assets.emergentagent.com/job_b879dc80-6d9d-4bd9-95f6-eb63e0393a89/artifacts/5gq8efu3_14.jpg',
+};
+
+// What's included
+const INCLUDED_FR = [
+  'La croisière de 8 jours / 7 nuits',
+  'Le logement en cabine double',
+  'Les 3 repas par jour (pas de repas le midi les jours d\'arrivée et départ)',
+  'Les boissons à volonté* toute la journée (*hors champagnes)',
+  'Les services du Capitaine, et de l\'hôtesse',
+  'Les assurances RC Armateur',
+  'Le transport ALLER / RETOUR de l\'aéroport jusqu\'aux ports (Uniquement Ajaccio)',
+  'Les sports nautiques à bord : paddle, snorkeling, pêche...',
+];
+
+const INCLUDED_EN = [
+  'The 8-day / 7-night cruise',
+  'Double cabin accommodation',
+  '3 meals a day (no lunch on arrival and departure days)',
+  'Unlimited drinks* all day (*except champagne)',
+  'Captain and hostess services',
+  'Shipowner liability insurance',
+  'Round trip transport from airport to ports (Ajaccio only)',
+  'On-board water sports: paddle, snorkeling, fishing...',
+];
+
+// What's not included
+const NOT_INCLUDED_FR = [
+  'Les taxes éventuelles de séjour et de sortie du territoire',
+  'Le petit déjeuner du jour 1 ainsi que le diner du jour du débarquement',
+  'Les repas et les boissons non inclus dans la formule (ex : champagne)',
+  'La caisse de bord : 240 €/ passager / semaine',
+  'Les dépenses d\'ordre personnel',
+  'Les excursions facultatives, et les activités non mentionnées au programme',
+  'Les repas éventuels aux escales',
+  'Les garanties assistance, rapatriement, frais médicaux et d\'hospitalisation, assistance juridique et pénale',
+  'Les garanties annulation, bagages, retard aérien',
+];
+
+const NOT_INCLUDED_EN = [
+  'Any tourist and exit taxes',
+  'Breakfast on day 1 and dinner on disembarkation day',
+  'Meals and drinks not included in the package (e.g., champagne)',
+  'Ship\'s fund: €240/passenger/week',
+  'Personal expenses',
+  'Optional excursions and activities not mentioned in the program',
+  'Possible meals at stopovers',
+  'Assistance, repatriation, medical and hospitalization costs, legal and criminal assistance guarantees',
+  'Cancellation, baggage, flight delay guarantees',
+];
 
 export default function CruiseDetailScreen() {
   const { t, language } = useTranslation();
@@ -38,7 +93,6 @@ export default function CruiseDetailScreen() {
     try {
       const data = await cruiseApi.getById(id);
       setCruise(data);
-      // Set first available date as default
       const firstAvailable = data.available_dates.find(d => d.status !== 'full');
       if (firstAvailable) {
         setSelectedDate(firstAvailable.date);
@@ -61,27 +115,19 @@ export default function CruiseDetailScreen() {
 
   const getAvailabilityColor = (status: string) => {
     switch (status) {
-      case 'available':
-        return COLORS.available;
-      case 'limited':
-        return COLORS.limited;
-      case 'full':
-        return COLORS.full;
-      default:
-        return COLORS.textSecondary;
+      case 'available': return COLORS.available;
+      case 'limited': return COLORS.limited;
+      case 'full': return COLORS.full;
+      default: return COLORS.textSecondary;
     }
   };
 
   const getAvailabilityLabel = (status: string) => {
     switch (status) {
-      case 'available':
-        return t('available');
-      case 'limited':
-        return t('limited');
-      case 'full':
-        return t('full');
-      default:
-        return status;
+      case 'available': return t('available');
+      case 'limited': return t('limited');
+      case 'full': return t('full');
+      default: return status;
     }
   };
 
@@ -93,6 +139,10 @@ export default function CruiseDetailScreen() {
       month: 'long',
       year: 'numeric',
     });
+  };
+
+  const getBoardingCardImage = (destination: string) => {
+    return BOARDING_CARDS[destination] || BOARDING_CARDS['corsica'];
   };
 
   if (loading) {
@@ -123,17 +173,17 @@ export default function CruiseDetailScreen() {
   const description = language === 'fr' ? cruise.description_fr : cruise.description_en;
   const highlights = language === 'fr' ? cruise.highlights_fr : cruise.highlights_en;
   const program = language === 'fr' ? cruise.program_fr : cruise.program_en;
+  const included = language === 'fr' ? INCLUDED_FR : INCLUDED_EN;
+  const notIncluded = language === 'fr' ? NOT_INCLUDED_FR : NOT_INCLUDED_EN;
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color={COLORS.text} />
+          <Ionicons name="arrow-back" size={24} color={COLORS.white} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle} numberOfLines={1}>
-          {name}
-        </Text>
+        <Text style={styles.headerTitle} numberOfLines={1}>{name}</Text>
         <View style={{ width: 40 }} />
       </View>
 
@@ -148,15 +198,24 @@ export default function CruiseDetailScreen() {
         </View>
 
         <View style={styles.content}>
+          {/* Boarding Card Image */}
+          <View style={styles.boardingCardContainer}>
+            <Image 
+              source={{ uri: getBoardingCardImage(cruise.destination) }} 
+              style={styles.boardingCardImage} 
+              resizeMode="contain"
+            />
+          </View>
+
           {/* Quick Info */}
           <View style={styles.quickInfo}>
             <View style={styles.quickInfoItem}>
-              <Ionicons name="time-outline" size={20} color={COLORS.primary} />
+              <Ionicons name="time-outline" size={20} color={COLORS.accent} />
               <Text style={styles.quickInfoLabel}>{t('duration')}</Text>
               <Text style={styles.quickInfoValue}>{cruise.duration}</Text>
             </View>
             <View style={styles.quickInfoItem}>
-              <Ionicons name="location-outline" size={20} color={COLORS.primary} />
+              <Ionicons name="location-outline" size={20} color={COLORS.accent} />
               <Text style={styles.quickInfoLabel}>{t('departure')}</Text>
               <Text style={styles.quickInfoValue}>{cruise.departure_port}</Text>
             </View>
@@ -196,13 +255,43 @@ export default function CruiseDetailScreen() {
             )}
           </View>
 
+          {/* Ce tarif comprend */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>
+              {language === 'fr' ? 'Ce tarif comprend :' : 'This rate includes:'}
+            </Text>
+            <View style={styles.includedList}>
+              {included.map((item, index) => (
+                <View key={index} style={styles.includedItem}>
+                  <Ionicons name="checkmark-circle" size={18} color={COLORS.success} />
+                  <Text style={styles.includedText}>{item}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+
+          {/* Le tarif ne comprend pas */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitleRed}>
+              {language === 'fr' ? 'Le tarif ne comprend pas :' : 'This rate does not include:'}
+            </Text>
+            <View style={styles.notIncludedList}>
+              {notIncluded.map((item, index) => (
+                <View key={index} style={styles.notIncludedItem}>
+                  <Ionicons name="close-circle" size={18} color={COLORS.error} />
+                  <Text style={styles.notIncludedText}>{item}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+
           {/* Highlights */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>{t('highlights')}</Text>
             <View style={styles.highlightsList}>
               {highlights.map((highlight, index) => (
                 <View key={index} style={styles.highlightItem}>
-                  <Ionicons name="checkmark-circle" size={20} color={COLORS.success} />
+                  <Ionicons name="star" size={18} color={COLORS.secondary} />
                   <Text style={styles.highlightText}>{highlight}</Text>
                 </View>
               ))}
@@ -224,7 +313,14 @@ export default function CruiseDetailScreen() {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>{t('availableDates')}</Text>
             {cruise.available_dates.map((dateInfo, index) => (
-              <View key={index} style={styles.dateItem}>
+              <TouchableOpacity 
+                key={index} 
+                style={[
+                  styles.dateItem,
+                  selectedDate === dateInfo.date && styles.dateItemSelected
+                ]}
+                onPress={() => dateInfo.status !== 'full' && setSelectedDate(dateInfo.date)}
+              >
                 <View
                   style={[
                     styles.dateStatus,
@@ -232,7 +328,12 @@ export default function CruiseDetailScreen() {
                   ]}
                 />
                 <View style={styles.dateInfo}>
-                  <Text style={styles.dateText}>{formatDate(dateInfo.date)}</Text>
+                  <Text style={[
+                    styles.dateText,
+                    selectedDate === dateInfo.date && styles.dateTextSelected
+                  ]}>
+                    {formatDate(dateInfo.date)}
+                  </Text>
                   <Text style={styles.dateStatusText}>
                     {getAvailabilityLabel(dateInfo.status)}
                     {dateInfo.status === 'limited' &&
@@ -240,7 +341,10 @@ export default function CruiseDetailScreen() {
                       ` - ${dateInfo.remaining_places} ${t('remainingPlaces')}`}
                   </Text>
                 </View>
-              </View>
+                {selectedDate === dateInfo.date && (
+                  <Ionicons name="checkmark-circle" size={24} color={COLORS.accent} />
+                )}
+              </TouchableOpacity>
             ))}
           </View>
 
@@ -252,7 +356,7 @@ export default function CruiseDetailScreen() {
       <View style={styles.bookButtonContainer}>
         <TouchableOpacity style={styles.bookButton} onPress={handleBooking}>
           <Text style={styles.bookButtonText}>{t('bookNow')}</Text>
-          <Ionicons name="arrow-forward" size={20} color={COLORS.white} />
+          <Ionicons name="arrow-forward" size={20} color={COLORS.primary} />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -270,9 +374,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.sm,
-    backgroundColor: COLORS.white,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    backgroundColor: COLORS.primary,
   },
   backButton: {
     width: 40,
@@ -284,7 +386,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: FONT_SIZES.lg,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.secondary,
     textAlign: 'center',
   },
   loadingContainer: {
@@ -314,7 +416,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   heroContainer: {
-    height: 280,
+    height: 250,
     position: 'relative',
   },
   heroImage: {
@@ -343,13 +445,22 @@ const styles = StyleSheet.create({
   content: {
     padding: SPACING.lg,
   },
+  boardingCardContainer: {
+    marginBottom: SPACING.lg,
+    alignItems: 'center',
+  },
+  boardingCardImage: {
+    width: width - SPACING.lg * 2,
+    height: 180,
+    borderRadius: BORDER_RADIUS.lg,
+  },
   quickInfo: {
     flexDirection: 'row',
     backgroundColor: COLORS.white,
     borderRadius: BORDER_RADIUS.xl,
     padding: SPACING.lg,
-    marginTop: -SPACING.xl,
-    ...SHADOWS.md,
+    borderWidth: 2,
+    borderColor: COLORS.secondary,
   },
   quickInfoItem: {
     flex: 1,
@@ -363,7 +474,7 @@ const styles = StyleSheet.create({
   quickInfoValue: {
     fontSize: FONT_SIZES.sm,
     fontWeight: '600',
-    color: COLORS.text,
+    color: COLORS.primary,
     marginTop: 2,
     textAlign: 'center',
   },
@@ -371,9 +482,15 @@ const styles = StyleSheet.create({
     marginTop: SPACING.xl,
   },
   sectionTitle: {
-    fontSize: FONT_SIZES.xl,
+    fontSize: FONT_SIZES.lg,
     fontWeight: '700',
-    color: COLORS.text,
+    color: COLORS.primary,
+    marginBottom: SPACING.md,
+  },
+  sectionTitleRed: {
+    fontSize: FONT_SIZES.lg,
+    fontWeight: '700',
+    color: COLORS.error,
     marginBottom: SPACING.md,
   },
   descriptionText: {
@@ -396,6 +513,7 @@ const styles = StyleSheet.create({
   },
   priceCardPrivate: {
     borderColor: COLORS.secondary,
+    backgroundColor: COLORS.primary,
   },
   priceHeader: {
     flexDirection: 'row',
@@ -418,17 +536,59 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.sm,
     fontWeight: '400',
   },
+  includedList: {
+    backgroundColor: COLORS.white,
+    borderRadius: BORDER_RADIUS.lg,
+    padding: SPACING.md,
+    borderLeftWidth: 4,
+    borderLeftColor: COLORS.success,
+  },
+  includedItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: SPACING.sm,
+  },
+  includedText: {
+    flex: 1,
+    marginLeft: SPACING.sm,
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.text,
+    lineHeight: 20,
+  },
+  notIncludedList: {
+    backgroundColor: COLORS.white,
+    borderRadius: BORDER_RADIUS.lg,
+    padding: SPACING.md,
+    borderLeftWidth: 4,
+    borderLeftColor: COLORS.error,
+  },
+  notIncludedItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: SPACING.sm,
+  },
+  notIncludedText: {
+    flex: 1,
+    marginLeft: SPACING.sm,
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.text,
+    lineHeight: 20,
+  },
   highlightsList: {
     gap: SPACING.sm,
   },
   highlightItem: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: COLORS.white,
+    padding: SPACING.md,
+    borderRadius: BORDER_RADIUS.lg,
   },
   highlightText: {
     marginLeft: SPACING.sm,
     fontSize: FONT_SIZES.md,
-    color: COLORS.text,
+    color: COLORS.primary,
+    fontWeight: '500',
   },
   programItem: {
     flexDirection: 'row',
@@ -439,7 +599,7 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.accent,
     marginTop: 6,
     marginRight: SPACING.md,
   },
@@ -456,7 +616,12 @@ const styles = StyleSheet.create({
     padding: SPACING.md,
     borderRadius: BORDER_RADIUS.lg,
     marginBottom: SPACING.sm,
-    ...SHADOWS.sm,
+    borderWidth: 2,
+    borderColor: COLORS.border,
+  },
+  dateItemSelected: {
+    borderColor: COLORS.accent,
+    backgroundColor: COLORS.surfaceLight,
   },
   dateStatus: {
     width: 12,
@@ -471,6 +636,10 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.md,
     fontWeight: '500',
     color: COLORS.text,
+  },
+  dateTextSelected: {
+    color: COLORS.primary,
+    fontWeight: '700',
   },
   dateStatusText: {
     fontSize: FONT_SIZES.sm,
@@ -491,12 +660,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.secondary,
     padding: SPACING.md,
     borderRadius: BORDER_RADIUS.xl,
   },
   bookButtonText: {
-    color: COLORS.white,
+    color: COLORS.primary,
     fontSize: FONT_SIZES.lg,
     fontWeight: '700',
     marginRight: SPACING.sm,
