@@ -17,7 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS, SHADOWS } from '../src/constants/theme';
 import { useTranslation } from '../src/hooks/useTranslation';
-import { cruiseApi, Cruise, CruiseDate } from '../src/services/api';
+import { cruiseApi, Cruise } from '../src/services/api';
 
 const CLUB_CARDS = [
   { id: '12', months: 12, price: 90, discount: 10 },
@@ -25,10 +25,15 @@ const CLUB_CARDS = [
   { id: '36', months: 36, price: 140, discount: 20 },
 ];
 
+const TIME_SLOTS = [
+  '9h - 10h', '10h - 11h', '11h - 12h', '12h - 13h',
+  '14h - 15h', '15h - 16h', '16h - 17h', '17h - 18h', '18h - 19h'
+];
+
 export default function BookingScreen() {
   const { t, language } = useTranslation();
   const router = useRouter();
-  const params = useLocalSearchParams<{ cruiseId?: string; date?: string }>;
+  const params = useLocalSearchParams<{ cruiseId?: string; date?: string }>();
   
   const [cruises, setCruises] = useState<Cruise[]>([]);
   const [loading, setLoading] = useState(true);
@@ -39,10 +44,12 @@ export default function BookingScreen() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [message, setMessage] = useState('');
+  const [selectedTimeSlot, setSelectedTimeSlot] = useState<string>('');
   const [selectedCard, setSelectedCard] = useState<typeof CLUB_CARDS[0] | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
   const [showCruiseSelect, setShowCruiseSelect] = useState(false);
   const [showDateSelect, setShowDateSelect] = useState(false);
+  const [showTimeSlotSelect, setShowTimeSlotSelect] = useState(false);
 
   useEffect(() => {
     loadCruises();
@@ -76,17 +83,21 @@ export default function BookingScreen() {
     return selectedCruise.pricing.cabin_price || selectedCruise.pricing.private_price || 0;
   };
 
+  // FIXED: Now takes into account number of passengers
   const calculateSavings = () => {
-    const basePrice = getCruisePrice();
-    if (!selectedCard || basePrice === 0) return null;
+    const basePricePerPerson = getCruisePrice();
+    if (!selectedCard || basePricePerPerson === 0) return null;
 
-    const discountAmount = (basePrice * selectedCard.discount) / 100;
-    const priceAfterDiscount = basePrice - discountAmount;
+    const totalBasePrice = basePricePerPerson * passengers;
+    const discountAmount = (totalBasePrice * selectedCard.discount) / 100;
+    const priceAfterDiscount = totalBasePrice - discountAmount;
     const totalWithClub = priceAfterDiscount + selectedCard.price;
-    const savings = basePrice - totalWithClub;
+    const savings = totalBasePrice - totalWithClub;
 
     return {
-      basePrice,
+      basePricePerPerson,
+      passengers,
+      totalBasePrice,
       discountPercent: selectedCard.discount,
       discountAmount,
       priceAfterDiscount,
@@ -108,7 +119,10 @@ export default function BookingScreen() {
 
   const handleSubmit = () => {
     if (!selectedCruise || !selectedDate || !name || !email || !phone) {
-      Alert.alert('Erreur', 'Veuillez remplir tous les champs obligatoires');
+      Alert.alert(
+        language === 'fr' ? 'Erreur' : 'Error', 
+        language === 'fr' ? 'Veuillez remplir tous les champs obligatoires' : 'Please fill in all required fields'
+      );
       return;
     }
     setShowSuccess(true);
@@ -131,23 +145,17 @@ export default function BookingScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
+          <Ionicons name="arrow-back" size={24} color={COLORS.white} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('bookingTitle')}</Text>
         <View style={{ width: 40 }} />
       </View>
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={{ flex: 1 }}
-      >
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
           {/* Cruise Selection */}
           <Text style={styles.sectionTitle}>{t('selectDestination')}</Text>
-          <TouchableOpacity
-            style={styles.selectButton}
-            onPress={() => setShowCruiseSelect(true)}
-          >
+          <TouchableOpacity style={styles.selectButton} onPress={() => setShowCruiseSelect(true)}>
             <Ionicons name="boat-outline" size={24} color={COLORS.primary} />
             <Text style={styles.selectButtonText}>
               {selectedCruise
@@ -161,10 +169,7 @@ export default function BookingScreen() {
           {selectedCruise && (
             <>
               <Text style={styles.sectionTitle}>{t('selectDate')}</Text>
-              <TouchableOpacity
-                style={styles.selectButton}
-                onPress={() => setShowDateSelect(true)}
-              >
+              <TouchableOpacity style={styles.selectButton} onPress={() => setShowDateSelect(true)}>
                 <Ionicons name="calendar-outline" size={24} color={COLORS.primary} />
                 <Text style={styles.selectButtonText}>
                   {selectedDate ? formatDate(selectedDate) : t('selectDate')}
@@ -239,14 +244,18 @@ export default function BookingScreen() {
                 ))}
               </View>
 
-              {/* Savings Calculator */}
+              {/* Savings Calculator - NOW WITH PASSENGERS */}
               {savings && (
                 <View style={styles.savingsContainer}>
                   <Text style={styles.savingsTitle}>{t('savingsSimulator')}</Text>
                   
                   <View style={styles.savingsRow}>
-                    <Text style={styles.savingsLabel}>{t('initialPrice')}</Text>
-                    <Text style={styles.savingsValue}>{savings.basePrice}€</Text>
+                    <Text style={styles.savingsLabel}>
+                      {t('cruisePrice')} ({savings.passengers} {t('passengers')})
+                    </Text>
+                    <Text style={styles.savingsValue}>
+                      {savings.basePricePerPerson}€ x {savings.passengers} = {savings.totalBasePrice}€
+                    </Text>
                   </View>
                   
                   <View style={styles.savingsRow}>
@@ -314,6 +323,18 @@ export default function BookingScreen() {
             keyboardType="phone-pad"
             placeholderTextColor={COLORS.gray}
           />
+
+          {/* Time Slot Selection */}
+          <Text style={styles.sectionTitle}>
+            {language === 'fr' ? 'Créneau pour être rappelé' : 'Preferred call time'}
+          </Text>
+          <TouchableOpacity style={styles.selectButton} onPress={() => setShowTimeSlotSelect(true)}>
+            <Ionicons name="time-outline" size={24} color={COLORS.primary} />
+            <Text style={styles.selectButtonText}>
+              {selectedTimeSlot || (language === 'fr' ? 'Choisir un créneau (9h-19h)' : 'Choose a time slot (9am-7pm)')}
+            </Text>
+            <Ionicons name="chevron-down" size={20} color={COLORS.gray} />
+          </TouchableOpacity>
           
           <TextInput
             style={[styles.input, styles.textArea]}
@@ -328,7 +349,7 @@ export default function BookingScreen() {
           {/* Submit Button */}
           <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
             <Text style={styles.submitButtonText}>{t('sendRequest')}</Text>
-            <Ionicons name="send" size={20} color={COLORS.white} />
+            <Ionicons name="send" size={20} color={COLORS.primary} />
           </TouchableOpacity>
 
           <View style={{ height: SPACING.xxl }} />
@@ -359,7 +380,7 @@ export default function BookingScreen() {
                     setShowCruiseSelect(false);
                   }}
                 >
-                  <Text style={styles.optionTitle}>
+                  <Text style={[styles.optionTitle, selectedCruise?.id === cruise.id && styles.optionTitleSelected]}>
                     {language === 'fr' ? cruise.name_fr : cruise.name_en}
                   </Text>
                   <Text style={styles.optionSubtitle}>
@@ -397,7 +418,9 @@ export default function BookingScreen() {
                       setShowDateSelect(false);
                     }}
                   >
-                    <Text style={styles.optionTitle}>{formatDate(dateInfo.date)}</Text>
+                    <Text style={[styles.optionTitle, selectedDate === dateInfo.date && styles.optionTitleSelected]}>
+                      {formatDate(dateInfo.date)}
+                    </Text>
                     <Text style={[
                       styles.optionStatus,
                       { color: dateInfo.status === 'available' ? COLORS.available : COLORS.limited }
@@ -406,6 +429,41 @@ export default function BookingScreen() {
                     </Text>
                   </TouchableOpacity>
                 ))}
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Time Slot Selection Modal */}
+      <Modal visible={showTimeSlotSelect} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>
+                {language === 'fr' ? 'Créneau horaire' : 'Time slot'}
+              </Text>
+              <TouchableOpacity onPress={() => setShowTimeSlotSelect(false)}>
+                <Ionicons name="close" size={24} color={COLORS.primary} />
+              </TouchableOpacity>
+            </View>
+            <ScrollView>
+              {TIME_SLOTS.map((slot, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[
+                    styles.optionItem,
+                    selectedTimeSlot === slot && styles.optionItemSelected,
+                  ]}
+                  onPress={() => {
+                    setSelectedTimeSlot(slot);
+                    setShowTimeSlotSelect(false);
+                  }}
+                >
+                  <Text style={[styles.optionTitle, selectedTimeSlot === slot && styles.optionTitleSelected]}>
+                    {slot}
+                  </Text>
+                </TouchableOpacity>
+              ))}
             </ScrollView>
           </View>
         </View>
@@ -447,9 +505,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.sm,
-    backgroundColor: COLORS.white,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    backgroundColor: COLORS.primary,
   },
   backButton: {
     width: 40,
@@ -460,7 +516,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: FONT_SIZES.xl,
     fontWeight: '700',
-    color: COLORS.primary,
+    color: COLORS.secondary,
   },
   loadingContainer: {
     flex: 1,
@@ -600,8 +656,9 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.xs,
   },
   savingsLabel: {
-    fontSize: FONT_SIZES.md,
+    fontSize: FONT_SIZES.sm,
     color: COLORS.textSecondary,
+    flex: 1,
   },
   savingsLabelBold: {
     fontSize: FONT_SIZES.md,
@@ -609,8 +666,9 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
   },
   savingsValue: {
-    fontSize: FONT_SIZES.md,
+    fontSize: FONT_SIZES.sm,
     color: COLORS.text,
+    fontWeight: '500',
   },
   savingsValueBold: {
     fontSize: FONT_SIZES.lg,
@@ -671,13 +729,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.secondary,
     padding: SPACING.md,
     borderRadius: BORDER_RADIUS.xl,
     marginTop: SPACING.lg,
   },
   submitButtonText: {
-    color: COLORS.white,
+    color: COLORS.primary,
     fontSize: FONT_SIZES.lg,
     fontWeight: '700',
     marginRight: SPACING.sm,
@@ -718,6 +776,9 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.md,
     fontWeight: '600',
     color: COLORS.text,
+  },
+  optionTitleSelected: {
+    color: COLORS.white,
   },
   optionSubtitle: {
     fontSize: FONT_SIZES.sm,
@@ -763,7 +824,7 @@ const styles = StyleSheet.create({
     borderRadius: BORDER_RADIUS.full,
   },
   successButtonText: {
-    color: COLORS.white,
+    color: COLORS.secondary,
     fontSize: FONT_SIZES.md,
     fontWeight: '600',
   },

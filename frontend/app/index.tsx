@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   Dimensions,
   ActivityIndicator,
-  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,8 +19,35 @@ import { cruiseApi, Cruise, seedDatabase } from '../src/services/api';
 
 const { width } = Dimensions.get('window');
 
-const HERO_IMAGE = 'https://static.wixstatic.com/media/ac2dc0_44e4ce464e8a4820b7f34f4b3dc5fe3c~mv2.jpg/v1/fill/w_1903,h_770,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/ac2dc0_44e4ce464e8a4820b7f34f4b3dc5fe3c~mv2.jpg';
-const LOGO_URL = 'https://static.wixstatic.com/media/ac2dc0_cf6b3b4e0ae345acbeb00d34a8fdc9d6~mv2.png/v1/fill/w_77,h_77,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/ac2dc0_cf6b3b4e0ae345acbeb00d34a8fdc9d6~mv2.png';
+// Images from sognudimare website
+const HERO_IMAGE = 'https://static.wixstatic.com/media/ce6ce7_d0178804b62b4c56802db975ade4e29ff000.jpg/v1/fill/w_1904,h_1008,al_c,q_85,usm_0.33_1.00_0.00,enc_avif,quality_auto/ce6ce7_d0178804b62b4c56802db975ade4e29ff000.jpg';
+const LOGO_URL = 'https://static.wixstatic.com/media/ce6ce7_a82e3e86741143d6ab7acd99c121af7b~mv2.png/v1/fill/w_317,h_161,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/croisieres%20catamaran%20corse%20sognudimare.png';
+const BOARDING_CARDS_IMAGE = 'https://static.wixstatic.com/media/ce6ce7_ab228aee4c1841158b75f736dd159af7~mv2.png/v1/fill/w_815,h_533,al_c,q_90,usm_0.66_1.00_0.01,enc_avif,quality_auto/cartes%20embarquement%20croisi%C3%A8res%20catamarans%20sognudimare.png';
+
+// Local partners
+const LOCAL_PARTNERS = [
+  { name: 'ANAREDA', type: 'Epicerie Vrac' },
+  { name: 'A STRADA CAMPAGNOLA', type: 'Producteur' },
+  { name: 'Boucherie J.J DE PERETTI', type: 'Boucherie' },
+  { name: 'GRAZIA DOLCE AMORE', type: 'Glaces' },
+  { name: 'CORSICA BEAUTY', type: 'Cosmétiques' },
+  { name: 'FROMAGERIE CHEZ BERNARD', type: 'Fromagerie' },
+  { name: 'BOULANGERIE PIERRE', type: 'Boulangerie' },
+  { name: 'PRIMEUR EMILIE & CHARLY', type: 'Fruits & Légumes' },
+  { name: 'LE CHEMIN DES VIGNOBLES', type: 'Vins' },
+  { name: 'A MOGLIA DI U PESCADORE', type: 'Poissonnerie' },
+  { name: 'CARPEDIEM AJACCIO', type: 'Restaurant' },
+];
+
+// What's included
+const ALL_INCLUSIVE_FEATURES = [
+  { icon: 'restaurant', label_fr: 'Petit-déjeuner', label_en: 'Breakfast' },
+  { icon: 'fast-food', label_fr: 'Déjeuner', label_en: 'Lunch' },
+  { icon: 'wine', label_fr: 'Dîner', label_en: 'Dinner' },
+  { icon: 'boat', label_fr: 'Équipage dédié', label_en: 'Dedicated crew' },
+  { icon: 'water', label_fr: 'Matériel nautique', label_en: 'Water sports gear' },
+  { icon: 'bed', label_fr: 'Linge de maison', label_en: 'Bed linen' },
+];
 
 export default function HomeScreen() {
   const { t, language } = useTranslation();
@@ -36,13 +62,9 @@ export default function HomeScreen() {
 
   const loadData = async () => {
     try {
-      // First try to seed the database
       try {
         await seedDatabase();
-      } catch (e) {
-        // Database might already be seeded
-      }
-      
+      } catch (e) {}
       const data = await cruiseApi.getAll();
       setCruises(data);
     } catch (error) {
@@ -57,24 +79,23 @@ export default function HomeScreen() {
   };
 
   const differenceItems = [
-    { icon: 'heart', label: t('authenticCruises') },
-    { icon: 'leaf', label: t('slowTourism') },
-    { icon: 'boat', label: t('recentCatamarans') },
-    { icon: 'people', label: t('dedicatedCrew') },
-    { icon: 'restaurant', label: t('localFood') },
-    { icon: 'earth', label: t('ecoCommitment') },
+    { icon: 'heart', label_fr: "L'authenticité de nos croisières", label_en: 'Authentic cruises', desc_fr: 'Des expériences uniques loin du tourisme de masse', desc_en: 'Unique experiences away from mass tourism' },
+    { icon: 'leaf', label_fr: 'Le concept Slow Tourisme', label_en: 'Slow Tourism concept', desc_fr: 'Voyagez plus lentement, plus sainement', desc_en: 'Travel slower, healthier' },
+    { icon: 'boat', label_fr: 'Des catamarans récents', label_en: 'Recent catamarans', desc_fr: 'Navires spacieux et confortables', desc_en: 'Spacious and comfortable vessels' },
+    { icon: 'people', label_fr: "L'équipage aux petits soins", label_en: 'Dedicated crew', desc_fr: 'Maud & Nicolas à votre service', desc_en: 'Maud & Nicolas at your service' },
+    { icon: 'restaurant', label_fr: 'Produits frais et locaux', label_en: 'Fresh local products', desc_fr: '11 partenaires locaux', desc_en: '11 local partners' },
+    { icon: 'earth', label_fr: 'Engagement environnemental', label_en: 'Environmental commitment', desc_fr: '1% reversé aux associations', desc_en: '1% donated to associations' },
   ];
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Header */}
+        {/* Header with Logo */}
         <View style={styles.header}>
-          <Image source={{ uri: LOGO_URL }} style={styles.logo} />
-          <Text style={styles.logoText}>SOGNUDIMARE</Text>
+          <Image source={{ uri: LOGO_URL }} style={styles.logo} resizeMode="contain" />
           <TouchableOpacity onPress={toggleLanguage} style={styles.langButton}>
             <Text style={styles.langText}>{language.toUpperCase()}</Text>
-            <Ionicons name="globe-outline" size={20} color={COLORS.secondary} />
+            <Ionicons name="globe-outline" size={18} color={COLORS.secondary} />
           </TouchableOpacity>
         </View>
 
@@ -82,32 +103,124 @@ export default function HomeScreen() {
         <View style={styles.heroContainer}>
           <Image source={{ uri: HERO_IMAGE }} style={styles.heroImage} />
           <View style={styles.heroOverlay}>
-            <Image source={{ uri: LOGO_URL }} style={styles.heroLogo} />
             <Text style={styles.heroTitle}>{t('heroTitle')}</Text>
             <Text style={styles.heroSubtitle}>{t('heroSubtitle')}</Text>
-            <TouchableOpacity
-              style={styles.heroButton}
-              onPress={() => router.push('/cruises')}
-            >
+            <TouchableOpacity style={styles.heroButton} onPress={() => router.push('/cruises')}>
               <Text style={styles.heroButtonText}>{t('discoverCruises')}</Text>
               <Ionicons name="arrow-forward" size={20} color={COLORS.primary} />
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* Our Difference Section */}
+        {/* Boarding Cards Section */}
+        <View style={styles.boardingSection}>
+          <Text style={styles.sectionTitle}>
+            {language === 'fr' ? 'Choisissez votre aventure' : 'Choose your adventure'}
+          </Text>
+          <TouchableOpacity onPress={() => router.push('/cruises')}>
+            <Image source={{ uri: BOARDING_CARDS_IMAGE }} style={styles.boardingCardsImage} resizeMode="contain" />
+          </TouchableOpacity>
+          <Text style={styles.boardingText}>
+            {language === 'fr' 
+              ? '8 jours / 7 nuits ou 2 semaines (selon la destination)\nen pension complète avec équipage aux petits soins.'
+              : '8 days / 7 nights or 2 weeks (depending on destination)\nfull board with dedicated crew.'}
+          </Text>
+        </View>
+
+        {/* Stats Section */}
+        <View style={styles.statsSection}>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>2021</Text>
+            <Text style={styles.statLabel}>{language === 'fr' ? 'Création' : 'Created'}</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>6</Text>
+            <Text style={styles.statLabel}>{language === 'fr' ? 'Destinations' : 'Destinations'}</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>13-26</Text>
+            <Text style={styles.statLabel}>{language === 'fr' ? 'Repas frais' : 'Fresh meals'}</Text>
+          </View>
+          <View style={styles.statItem}>
+            <Text style={styles.statNumber}>11</Text>
+            <Text style={styles.statLabel}>{language === 'fr' ? 'Partenaires' : 'Partners'}</Text>
+          </View>
+        </View>
+
+        {/* CE QUI FAIT VRAIMENT NOTRE DIFFÉRENCE */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('ourDifference')}</Text>
+          <Text style={styles.sectionTitle}>
+            {language === 'fr' ? 'Ce qui fait vraiment notre différence...' : 'What really makes us different...'}
+          </Text>
           <View style={styles.differenceGrid}>
             {differenceItems.map((item, index) => (
-              <View key={index} style={styles.differenceItem}>
+              <View key={index} style={styles.differenceCard}>
                 <View style={styles.differenceIconContainer}>
-                  <Ionicons name={item.icon as any} size={24} color={COLORS.accent} />
+                  <Ionicons name={item.icon as any} size={28} color={COLORS.accent} />
                 </View>
-                <Text style={styles.differenceLabel}>{item.label}</Text>
+                <Text style={styles.differenceLabel}>
+                  {language === 'fr' ? item.label_fr : item.label_en}
+                </Text>
+                <Text style={styles.differenceDesc}>
+                  {language === 'fr' ? item.desc_fr : item.desc_en}
+                </Text>
               </View>
             ))}
           </View>
+        </View>
+
+        {/* All Inclusive Section */}
+        <View style={styles.allInclusiveSection}>
+          <Text style={styles.allInclusiveTitle}>
+            {language === 'fr' 
+              ? 'DES VACANCES TOUT INCLUS' 
+              : 'ALL-INCLUSIVE VACATION'}
+          </Text>
+          <Text style={styles.allInclusiveSubtitle}>
+            {language === 'fr' 
+              ? 'Formule tout compris & respectueuse de l\'environnement' 
+              : 'All-inclusive & eco-friendly formula'}
+          </Text>
+          <View style={styles.includedGrid}>
+            {ALL_INCLUSIVE_FEATURES.map((feature, index) => (
+              <View key={index} style={styles.includedItem}>
+                <Ionicons name={feature.icon as any} size={24} color={COLORS.secondary} />
+                <Text style={styles.includedText}>
+                  {language === 'fr' ? feature.label_fr : feature.label_en}
+                </Text>
+              </View>
+            ))}
+          </View>
+          <Text style={styles.allInclusiveNote}>
+            {language === 'fr' 
+              ? 'Tous les repas préparés avec des produits locaux issus de producteurs passionnés qui partagent nos valeurs.' 
+              : 'All meals prepared with local products from passionate producers who share our values.'}
+          </Text>
+        </View>
+
+        {/* Local Partners Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>
+            {language === 'fr' 
+              ? 'Une collaboration responsable et engagée' 
+              : 'Responsible and committed collaboration'}
+          </Text>
+          <Text style={styles.partnersSubtitle}>
+            {language === 'fr' 
+              ? 'Nous travaillons uniquement avec des acteurs locaux' 
+              : 'We work exclusively with local partners'}
+          </Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.partnersScroll}>
+            {LOCAL_PARTNERS.map((partner, index) => (
+              <View key={index} style={styles.partnerCard}>
+                <View style={styles.partnerIcon}>
+                  <Ionicons name="storefront" size={24} color={COLORS.accent} />
+                </View>
+                <Text style={styles.partnerName}>{partner.name}</Text>
+                <Text style={styles.partnerType}>{partner.type}</Text>
+              </View>
+            ))}
+          </ScrollView>
         </View>
 
         {/* Featured Cruises */}
@@ -116,11 +229,7 @@ export default function HomeScreen() {
           {loading ? (
             <ActivityIndicator size="large" color={COLORS.accent} />
           ) : (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.cruisesScroll}
-            >
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.cruisesScroll}>
               {cruises.slice(0, 4).map((cruise) => (
                 <TouchableOpacity
                   key={cruise.id}
@@ -135,11 +244,9 @@ export default function HomeScreen() {
                     <Text style={styles.cruiseName}>
                       {language === 'fr' ? cruise.name_fr : cruise.name_en}
                     </Text>
-                    <View style={styles.cruisePriceRow}>
-                      <Text style={styles.cruisePrice}>
-                        {t('from')} {cruise.pricing.cabin_price || cruise.pricing.private_price}€
-                      </Text>
-                    </View>
+                    <Text style={styles.cruisePrice}>
+                      {t('from')} {cruise.pricing.cabin_price || cruise.pricing.private_price}€
+                    </Text>
                   </View>
                 </TouchableOpacity>
               ))}
@@ -152,30 +259,27 @@ export default function HomeScreen() {
           <Text style={styles.clubTitle}>{t('clubTitle')}</Text>
           <Text style={styles.clubSubtitle}>
             {language === 'fr' 
-              ? 'Économisez jusqu\'à 20% sur vos croisières en rejoignant le Club des Voyageurs !'
-              : 'Save up to 20% on your cruises by joining the Travelers Club!'}
+              ? 'Économisez jusqu\'à 20% sur vos croisières !' 
+              : 'Save up to 20% on your cruises!'}
           </Text>
           <View style={styles.clubCardsPreview}>
             <View style={styles.clubCardPreview}>
-              <Text style={styles.clubCardDuration}>12 {language === 'fr' ? 'mois' : 'months'}</Text>
+              <Text style={styles.clubCardDuration}>12 mois</Text>
               <Text style={styles.clubCardPrice}>90€</Text>
-              <Text style={styles.clubCardDiscount}>-10%</Text>
+              <View style={styles.clubDiscountBadge}><Text style={styles.clubDiscountText}>-10%</Text></View>
             </View>
             <View style={[styles.clubCardPreview, styles.clubCardHighlight]}>
-              <Text style={[styles.clubCardDuration, styles.clubCardTextLight]}>24 {language === 'fr' ? 'mois' : 'months'}</Text>
+              <Text style={[styles.clubCardDuration, styles.clubCardTextLight]}>24 mois</Text>
               <Text style={[styles.clubCardPrice, styles.clubCardTextLight]}>150€</Text>
-              <Text style={styles.clubCardDiscountHighlight}>-15%</Text>
+              <View style={styles.clubDiscountBadgeHighlight}><Text style={styles.clubDiscountTextDark}>-15%</Text></View>
             </View>
             <View style={styles.clubCardPreview}>
-              <Text style={styles.clubCardDuration}>36 {language === 'fr' ? 'mois' : 'months'}</Text>
+              <Text style={styles.clubCardDuration}>36 mois</Text>
               <Text style={styles.clubCardPrice}>140€</Text>
-              <Text style={styles.clubCardDiscount}>-20%</Text>
+              <View style={styles.clubDiscountBadge}><Text style={styles.clubDiscountText}>-20%</Text></View>
             </View>
           </View>
-          <TouchableOpacity
-            style={styles.clubButton}
-            onPress={() => router.push('/club')}
-          >
+          <TouchableOpacity style={styles.clubButton} onPress={() => router.push('/club')}>
             <Text style={styles.clubButtonText}>{t('joinClub')}</Text>
           </TouchableOpacity>
         </View>
@@ -184,23 +288,13 @@ export default function HomeScreen() {
         <View style={styles.aboutSection}>
           <Text style={styles.aboutTitle}>{t('aboutTitle')}</Text>
           <Text style={styles.aboutText}>{t('aboutText')}</Text>
-          <View style={styles.statsRow}>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>2021</Text>
-              <Text style={styles.statLabel}>{t('createdIn')}</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>6</Text>
-              <Text style={styles.statLabel}>{t('destinations')}</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={styles.statNumber}>11</Text>
-              <Text style={styles.statLabel}>{t('localPartners')}</Text>
-            </View>
-          </View>
+          <Text style={styles.aboutHighlight}>
+            {language === 'fr' 
+              ? 'En septembre 2025, la Corse a été labellisée GREEN DESTINATION, confirmant son rôle de référence méditerranéenne en matière de tourisme durable.' 
+              : 'In September 2025, Corsica was labeled GREEN DESTINATION, confirming its role as a Mediterranean reference in sustainable tourism.'}
+          </Text>
         </View>
 
-        {/* Bottom spacing */}
         <View style={{ height: SPACING.xxl }} />
       </ScrollView>
     </SafeAreaView>
@@ -215,22 +309,14 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.sm,
     backgroundColor: COLORS.primary,
   },
   logo: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-  },
-  logoText: {
-    flex: 1,
-    fontSize: FONT_SIZES.lg,
-    fontWeight: '700',
-    color: COLORS.secondary,
-    marginLeft: SPACING.sm,
-    letterSpacing: 2,
+    width: 150,
+    height: 50,
   },
   langButton: {
     flexDirection: 'row',
@@ -247,7 +333,7 @@ const styles = StyleSheet.create({
     marginRight: SPACING.xs,
   },
   heroContainer: {
-    height: 450,
+    height: 400,
     position: 'relative',
   },
   heroImage: {
@@ -260,12 +346,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: SPACING.lg,
-  },
-  heroLogo: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    marginBottom: SPACING.md,
   },
   heroTitle: {
     fontSize: FONT_SIZES.xxxl,
@@ -294,45 +374,172 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginRight: SPACING.sm,
   },
+  boardingSection: {
+    padding: SPACING.lg,
+    backgroundColor: COLORS.white,
+    alignItems: 'center',
+  },
+  boardingCardsImage: {
+    width: width - SPACING.lg * 2,
+    height: 200,
+    borderRadius: BORDER_RADIUS.lg,
+  },
+  boardingText: {
+    fontSize: FONT_SIZES.md,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    marginTop: SPACING.md,
+    lineHeight: 22,
+  },
+  statsSection: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    backgroundColor: COLORS.primary,
+    paddingVertical: SPACING.lg,
+  },
+  statItem: {
+    alignItems: 'center',
+  },
+  statNumber: {
+    fontSize: FONT_SIZES.xxl,
+    fontWeight: '700',
+    color: COLORS.secondary,
+  },
+  statLabel: {
+    fontSize: FONT_SIZES.xs,
+    color: COLORS.white,
+    opacity: 0.8,
+    marginTop: 2,
+  },
   section: {
     padding: SPACING.lg,
   },
   sectionTitle: {
-    fontSize: FONT_SIZES.xxl,
+    fontSize: FONT_SIZES.xl,
     fontWeight: '700',
     color: COLORS.primary,
-    marginBottom: SPACING.lg,
+    marginBottom: SPACING.md,
+    textAlign: 'center',
   },
   differenceGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
-  differenceItem: {
+  differenceCard: {
     width: '48%',
-    flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: COLORS.white,
     padding: SPACING.md,
     borderRadius: BORDER_RADIUS.lg,
-    marginBottom: SPACING.sm,
+    marginBottom: SPACING.md,
     borderLeftWidth: 4,
     borderLeftColor: COLORS.accent,
   },
   differenceIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: COLORS.surfaceLight,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: SPACING.sm,
+  },
+  differenceLabel: {
+    fontSize: FONT_SIZES.sm,
+    fontWeight: '700',
+    color: COLORS.primary,
+    marginBottom: SPACING.xs,
+  },
+  differenceDesc: {
+    fontSize: FONT_SIZES.xs,
+    color: COLORS.textSecondary,
+  },
+  allInclusiveSection: {
+    backgroundColor: COLORS.primary,
+    padding: SPACING.xl,
+    margin: SPACING.lg,
+    borderRadius: BORDER_RADIUS.xl,
+  },
+  allInclusiveTitle: {
+    fontSize: FONT_SIZES.xl,
+    fontWeight: '700',
+    color: COLORS.secondary,
+    textAlign: 'center',
+    marginBottom: SPACING.xs,
+  },
+  allInclusiveSubtitle: {
+    fontSize: FONT_SIZES.md,
+    color: COLORS.white,
+    textAlign: 'center',
+    opacity: 0.9,
+    marginBottom: SPACING.lg,
+  },
+  includedGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  includedItem: {
+    width: '30%',
+    alignItems: 'center',
+    marginBottom: SPACING.md,
+  },
+  includedText: {
+    fontSize: FONT_SIZES.xs,
+    color: COLORS.white,
+    textAlign: 'center',
+    marginTop: SPACING.xs,
+  },
+  allInclusiveNote: {
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.white,
+    textAlign: 'center',
+    fontStyle: 'italic',
+    opacity: 0.9,
+    marginTop: SPACING.md,
+    paddingTop: SPACING.md,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.2)',
+  },
+  partnersSubtitle: {
+    fontSize: FONT_SIZES.md,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    marginBottom: SPACING.lg,
+  },
+  partnersScroll: {
+    paddingRight: SPACING.lg,
+  },
+  partnerCard: {
+    width: 120,
+    backgroundColor: COLORS.white,
+    padding: SPACING.md,
+    borderRadius: BORDER_RADIUS.lg,
+    marginRight: SPACING.sm,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  partnerIcon: {
     width: 44,
     height: 44,
     borderRadius: 22,
     backgroundColor: COLORS.surfaceLight,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: SPACING.sm,
+    marginBottom: SPACING.sm,
   },
-  differenceLabel: {
-    flex: 1,
-    fontSize: FONT_SIZES.sm,
+  partnerName: {
+    fontSize: FONT_SIZES.xs,
+    fontWeight: '600',
     color: COLORS.primary,
-    fontWeight: '500',
+    textAlign: 'center',
+  },
+  partnerType: {
+    fontSize: 10,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    marginTop: 2,
   },
   cruisesScroll: {
     paddingRight: SPACING.lg,
@@ -348,7 +555,7 @@ const styles = StyleSheet.create({
   },
   cruiseImage: {
     width: '100%',
-    height: 180,
+    height: 160,
   },
   cruiseCardContent: {
     padding: SPACING.md,
@@ -361,27 +568,24 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   cruiseName: {
-    fontSize: FONT_SIZES.xl,
+    fontSize: FONT_SIZES.lg,
     fontWeight: '700',
     color: COLORS.primary,
     marginTop: SPACING.xs,
   },
-  cruisePriceRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: SPACING.sm,
-  },
   cruisePrice: {
     fontSize: FONT_SIZES.md,
-    color: COLORS.secondary,
+    color: COLORS.white,
     fontWeight: '700',
     backgroundColor: COLORS.primary,
     paddingHorizontal: SPACING.sm,
     paddingVertical: SPACING.xs,
     borderRadius: BORDER_RADIUS.md,
+    marginTop: SPACING.sm,
+    alignSelf: 'flex-start',
   },
   clubSection: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.accent,
     padding: SPACING.xl,
     marginHorizontal: SPACING.lg,
     borderRadius: BORDER_RADIUS.xl,
@@ -390,15 +594,14 @@ const styles = StyleSheet.create({
   clubTitle: {
     fontSize: FONT_SIZES.xxl,
     fontWeight: '700',
-    color: COLORS.secondary,
+    color: COLORS.primary,
     textAlign: 'center',
     marginBottom: SPACING.sm,
   },
   clubSubtitle: {
     fontSize: FONT_SIZES.md,
-    color: COLORS.white,
+    color: COLORS.primary,
     textAlign: 'center',
-    opacity: 0.9,
     marginBottom: SPACING.lg,
   },
   clubCardsPreview: {
@@ -414,7 +617,7 @@ const styles = StyleSheet.create({
     width: '30%',
   },
   clubCardHighlight: {
-    backgroundColor: COLORS.accent,
+    backgroundColor: COLORS.primary,
     transform: [{ scale: 1.05 }],
   },
   clubCardDuration: {
@@ -423,7 +626,7 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
   },
   clubCardTextLight: {
-    color: COLORS.primary,
+    color: COLORS.white,
   },
   clubCardPrice: {
     fontSize: FONT_SIZES.lg,
@@ -431,28 +634,36 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     marginVertical: SPACING.xs,
   },
-  clubCardDiscount: {
-    fontSize: FONT_SIZES.md,
-    fontWeight: '700',
-    color: COLORS.accent,
-  },
-  clubCardDiscountHighlight: {
-    fontSize: FONT_SIZES.md,
-    fontWeight: '700',
-    color: COLORS.primary,
+  clubDiscountBadge: {
     backgroundColor: COLORS.secondary,
     paddingHorizontal: SPACING.sm,
     paddingVertical: 2,
     borderRadius: BORDER_RADIUS.full,
   },
-  clubButton: {
+  clubDiscountText: {
+    fontSize: FONT_SIZES.sm,
+    fontWeight: '700',
+    color: COLORS.primary,
+  },
+  clubDiscountBadgeHighlight: {
     backgroundColor: COLORS.secondary,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 2,
+    borderRadius: BORDER_RADIUS.full,
+  },
+  clubDiscountTextDark: {
+    fontSize: FONT_SIZES.sm,
+    fontWeight: '700',
+    color: COLORS.primary,
+  },
+  clubButton: {
+    backgroundColor: COLORS.primary,
     paddingVertical: SPACING.md,
     borderRadius: BORDER_RADIUS.full,
     alignItems: 'center',
   },
   clubButtonText: {
-    color: COLORS.primary,
+    color: COLORS.secondary,
     fontSize: FONT_SIZES.md,
     fontWeight: '700',
   },
@@ -465,7 +676,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.secondary,
   },
   aboutTitle: {
-    fontSize: FONT_SIZES.xxl,
+    fontSize: FONT_SIZES.xl,
     fontWeight: '700',
     color: COLORS.primary,
     marginBottom: SPACING.md,
@@ -473,28 +684,13 @@ const styles = StyleSheet.create({
   aboutText: {
     fontSize: FONT_SIZES.md,
     color: COLORS.textSecondary,
-    lineHeight: 24,
+    lineHeight: 22,
+    marginBottom: SPACING.md,
   },
-  statsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: SPACING.xl,
-    paddingTop: SPACING.lg,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-  },
-  statItem: {
-    alignItems: 'center',
-  },
-  statNumber: {
-    fontSize: FONT_SIZES.xxl,
-    fontWeight: '700',
+  aboutHighlight: {
+    fontSize: FONT_SIZES.sm,
     color: COLORS.accent,
-  },
-  statLabel: {
-    fontSize: FONT_SIZES.xs,
-    color: COLORS.textSecondary,
-    marginTop: SPACING.xs,
-    textAlign: 'center',
+    fontWeight: '600',
+    fontStyle: 'italic',
   },
 });
