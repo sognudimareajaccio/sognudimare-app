@@ -418,9 +418,9 @@ class AdminCredentials(BaseModel):
     username: str
     password: str
 
-# Simple admin password (in production, use proper auth)
-ADMIN_USERNAME = "admin"
-ADMIN_PASSWORD = "sognudimare2024"
+# Simple admin password (loaded from environment)
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "sognudimare2024")
 
 @api_router.post("/admin/login")
 async def admin_login(credentials: AdminCredentials):
