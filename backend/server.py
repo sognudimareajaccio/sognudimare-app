@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException, Query
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -6,10 +6,10 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Optional
 import uuid
 from datetime import datetime
-
+from enum import Enum
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -19,38 +19,622 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-# Create the main app without a prefix
+# Create the main app
 app = FastAPI()
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+# ============= ENUMS =============
+class CruiseType(str, Enum):
+    CABIN = "cabin"
+    PRIVATE = "private"
+    BOTH = "both"
 
-# Define Models
-class StatusCheck(BaseModel):
+class AvailabilityStatus(str, Enum):
+    AVAILABLE = "available"
+    LIMITED = "limited"
+    FULL = "full"
+
+# ============= MODELS =============
+
+# Cruise Models
+class CruiseDate(BaseModel):
+    date: str
+    status: AvailabilityStatus = AvailabilityStatus.AVAILABLE
+    remaining_places: Optional[int] = None
+
+class CruisePricing(BaseModel):
+    cabin_price: Optional[float] = None
+    private_price: Optional[float] = None
+    currency: str = "EUR"
+
+class Cruise(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    name_fr: str
+    name_en: str
+    subtitle_fr: str
+    subtitle_en: str
+    description_fr: str
+    description_en: str
+    image_url: str
+    destination: str
+    cruise_type: CruiseType
+    duration: str
+    departure_port: str
+    pricing: CruisePricing
+    highlights_fr: List[str] = []
+    highlights_en: List[str] = []
+    available_dates: List[CruiseDate] = []
+    program_fr: List[str] = []
+    program_en: List[str] = []
+    is_active: bool = True
+    order: int = 0
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+class CruiseCreate(BaseModel):
+    name_fr: str
+    name_en: str
+    subtitle_fr: str
+    subtitle_en: str
+    description_fr: str
+    description_en: str
+    image_url: str
+    destination: str
+    cruise_type: CruiseType
+    duration: str
+    departure_port: str
+    pricing: CruisePricing
+    highlights_fr: List[str] = []
+    highlights_en: List[str] = []
+    available_dates: List[CruiseDate] = []
+    program_fr: List[str] = []
+    program_en: List[str] = []
+    is_active: bool = True
+    order: int = 0
 
-# Add your routes to the router instead of directly to app
+class CruiseUpdate(BaseModel):
+    name_fr: Optional[str] = None
+    name_en: Optional[str] = None
+    subtitle_fr: Optional[str] = None
+    subtitle_en: Optional[str] = None
+    description_fr: Optional[str] = None
+    description_en: Optional[str] = None
+    image_url: Optional[str] = None
+    destination: Optional[str] = None
+    cruise_type: Optional[CruiseType] = None
+    duration: Optional[str] = None
+    departure_port: Optional[str] = None
+    pricing: Optional[CruisePricing] = None
+    highlights_fr: Optional[List[str]] = None
+    highlights_en: Optional[List[str]] = None
+    available_dates: Optional[List[CruiseDate]] = None
+    program_fr: Optional[List[str]] = None
+    program_en: Optional[List[str]] = None
+    is_active: Optional[bool] = None
+    order: Optional[int] = None
+
+# Club Member Models
+class ClubMember(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    username: str
+    email: str
+    avatar_url: Optional[str] = None
+    bio_fr: Optional[str] = None
+    bio_en: Optional[str] = None
+    cruises_done: List[str] = []
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class ClubMemberCreate(BaseModel):
+    username: str
+    email: str
+    avatar_url: Optional[str] = None
+    bio_fr: Optional[str] = None
+    bio_en: Optional[str] = None
+
+# Community Post Models
+class PostComment(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    author_id: str
+    author_name: str
+    content: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class CommunityPost(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    author_id: str
+    author_name: str
+    author_avatar: Optional[str] = None
+    title: str
+    content: str
+    image_url: Optional[str] = None
+    category: str = "general"  # general, trip_report, tips, meetup
+    likes: List[str] = []
+    comments: List[PostComment] = []
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class CommunityPostCreate(BaseModel):
+    author_id: str
+    author_name: str
+    author_avatar: Optional[str] = None
+    title: str
+    content: str
+    image_url: Optional[str] = None
+    category: str = "general"
+
+class CommentCreate(BaseModel):
+    author_id: str
+    author_name: str
+    content: str
+
+# ============= CRUISE ROUTES =============
+
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "Bienvenue sur l'API Sognudimare!"}
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.dict()
-    status_obj = StatusCheck(**status_dict)
-    _ = await db.status_checks.insert_one(status_obj.dict())
-    return status_obj
+@api_router.get("/cruises", response_model=List[Cruise])
+async def get_cruises(active_only: bool = True):
+    query = {"is_active": True} if active_only else {}
+    cruises = await db.cruises.find(query).sort("order", 1).to_list(100)
+    return [Cruise(**cruise) for cruise in cruises]
 
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    status_checks = await db.status_checks.find().to_list(1000)
-    return [StatusCheck(**status_check) for status_check in status_checks]
+@api_router.get("/cruises/{cruise_id}", response_model=Cruise)
+async def get_cruise(cruise_id: str):
+    cruise = await db.cruises.find_one({"id": cruise_id})
+    if not cruise:
+        raise HTTPException(status_code=404, detail="Cruise not found")
+    return Cruise(**cruise)
+
+@api_router.post("/cruises", response_model=Cruise)
+async def create_cruise(cruise_data: CruiseCreate):
+    cruise = Cruise(**cruise_data.dict())
+    await db.cruises.insert_one(cruise.dict())
+    return cruise
+
+@api_router.put("/cruises/{cruise_id}", response_model=Cruise)
+async def update_cruise(cruise_id: str, cruise_data: CruiseUpdate):
+    existing = await db.cruises.find_one({"id": cruise_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Cruise not found")
+    
+    update_data = {k: v for k, v in cruise_data.dict().items() if v is not None}
+    update_data["updated_at"] = datetime.utcnow()
+    
+    await db.cruises.update_one({"id": cruise_id}, {"$set": update_data})
+    updated = await db.cruises.find_one({"id": cruise_id})
+    return Cruise(**updated)
+
+@api_router.delete("/cruises/{cruise_id}")
+async def delete_cruise(cruise_id: str):
+    result = await db.cruises.delete_one({"id": cruise_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Cruise not found")
+    return {"message": "Cruise deleted successfully"}
+
+# ============= CLUB MEMBER ROUTES =============
+
+@api_router.get("/members", response_model=List[ClubMember])
+async def get_members():
+    members = await db.members.find({"is_active": True}).to_list(1000)
+    return [ClubMember(**member) for member in members]
+
+@api_router.get("/members/{member_id}", response_model=ClubMember)
+async def get_member(member_id: str):
+    member = await db.members.find_one({"id": member_id})
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found")
+    return ClubMember(**member)
+
+@api_router.post("/members", response_model=ClubMember)
+async def create_member(member_data: ClubMemberCreate):
+    # Check if email already exists
+    existing = await db.members.find_one({"email": member_data.email})
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    member = ClubMember(**member_data.dict())
+    await db.members.insert_one(member.dict())
+    return member
+
+@api_router.get("/members/email/{email}", response_model=ClubMember)
+async def get_member_by_email(email: str):
+    member = await db.members.find_one({"email": email, "is_active": True})
+    if not member:
+        raise HTTPException(status_code=404, detail="Member not found")
+    return ClubMember(**member)
+
+# ============= COMMUNITY POSTS ROUTES =============
+
+@api_router.get("/posts", response_model=List[CommunityPost])
+async def get_posts(category: Optional[str] = None, limit: int = 50):
+    query = {"category": category} if category else {}
+    posts = await db.posts.find(query).sort("created_at", -1).to_list(limit)
+    return [CommunityPost(**post) for post in posts]
+
+@api_router.get("/posts/{post_id}", response_model=CommunityPost)
+async def get_post(post_id: str):
+    post = await db.posts.find_one({"id": post_id})
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    return CommunityPost(**post)
+
+@api_router.post("/posts", response_model=CommunityPost)
+async def create_post(post_data: CommunityPostCreate):
+    post = CommunityPost(**post_data.dict())
+    await db.posts.insert_one(post.dict())
+    return post
+
+@api_router.post("/posts/{post_id}/like")
+async def toggle_like(post_id: str, member_id: str = Query(...)):
+    post = await db.posts.find_one({"id": post_id})
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    
+    likes = post.get("likes", [])
+    if member_id in likes:
+        likes.remove(member_id)
+    else:
+        likes.append(member_id)
+    
+    await db.posts.update_one({"id": post_id}, {"$set": {"likes": likes}})
+    return {"likes_count": len(likes), "liked": member_id in likes}
+
+@api_router.post("/posts/{post_id}/comments", response_model=CommunityPost)
+async def add_comment(post_id: str, comment_data: CommentCreate):
+    post = await db.posts.find_one({"id": post_id})
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    
+    comment = PostComment(**comment_data.dict())
+    await db.posts.update_one(
+        {"id": post_id},
+        {
+            "$push": {"comments": comment.dict()},
+            "$set": {"updated_at": datetime.utcnow()}
+        }
+    )
+    
+    updated = await db.posts.find_one({"id": post_id})
+    return CommunityPost(**updated)
+
+@api_router.delete("/posts/{post_id}")
+async def delete_post(post_id: str):
+    result = await db.posts.delete_one({"id": post_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Post not found")
+    return {"message": "Post deleted successfully"}
+
+# ============= SEED DATA =============
+
+@api_router.post("/seed")
+async def seed_database():
+    """Seed the database with initial cruise data"""
+    
+    # Check if already seeded
+    existing = await db.cruises.find_one()
+    if existing:
+        return {"message": "Database already seeded"}
+    
+    cruises = [
+        {
+            "id": str(uuid.uuid4()),
+            "name_fr": "Tour de Corse",
+            "name_en": "Tour of Corsica",
+            "subtitle_fr": "L'Inoubliable",
+            "subtitle_en": "The Unforgettable",
+            "description_fr": "Partez pour une aventure inoubliable autour de l'Île de Beauté. Découvrez les criques sauvages, les villages de pêcheurs authentiques et les paysages à couper le souffle de la Corse.",
+            "description_en": "Embark on an unforgettable adventure around the Island of Beauty. Discover wild coves, authentic fishing villages and breathtaking landscapes of Corsica.",
+            "image_url": "https://images.unsplash.com/photo-1592314963065-87659404f412?w=800",
+            "destination": "corsica",
+            "cruise_type": "both",
+            "duration": "8 jours / 7 nuits",
+            "departure_port": "Ajaccio",
+            "pricing": {"cabin_price": 1890, "private_price": 12900, "currency": "EUR"},
+            "highlights_fr": ["Scandola (UNESCO)", "Bonifacio", "Cap Corse", "Îles Lavezzi"],
+            "highlights_en": ["Scandola (UNESCO)", "Bonifacio", "Cap Corse", "Lavezzi Islands"],
+            "available_dates": [
+                {"date": "2025-05-02", "status": "available"},
+                {"date": "2025-05-09", "status": "full"},
+                {"date": "2025-05-16", "status": "available"},
+                {"date": "2025-06-13", "status": "limited", "remaining_places": 4},
+                {"date": "2025-06-20", "status": "limited", "remaining_places": 4}
+            ],
+            "program_fr": [
+                "Jour 1: Ajaccio - Îles Sanguinaires",
+                "Jour 2: Girolata - Réserve de Scandola",
+                "Jour 3: Calvi - Citadelle",
+                "Jour 4: Saint-Florent - Cap Corse",
+                "Jour 5: Bastia - Villages du Cap",
+                "Jour 6: Porto-Vecchio",
+                "Jour 7: Bonifacio - Îles Lavezzi",
+                "Jour 8: Retour Ajaccio"
+            ],
+            "program_en": [
+                "Day 1: Ajaccio - Sanguinaires Islands",
+                "Day 2: Girolata - Scandola Reserve",
+                "Day 3: Calvi - Citadel",
+                "Day 4: Saint-Florent - Cap Corse",
+                "Day 5: Bastia - Cap villages",
+                "Day 6: Porto-Vecchio",
+                "Day 7: Bonifacio - Lavezzi Islands",
+                "Day 8: Return to Ajaccio"
+            ],
+            "is_active": True,
+            "order": 1,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "name_fr": "Corse du Sud",
+            "name_en": "South Corsica",
+            "subtitle_fr": "La Radieuse",
+            "subtitle_en": "The Radiant",
+            "description_fr": "Explorez les plus belles plages et criques du sud de la Corse. Eaux turquoise, falaises de Bonifacio et authenticité corse vous attendent.",
+            "description_en": "Explore the most beautiful beaches and coves of southern Corsica. Turquoise waters, Bonifacio cliffs and Corsican authenticity await you.",
+            "image_url": "https://images.unsplash.com/photo-1592285273835-78c20c0aab5d?w=800",
+            "destination": "corsica_south",
+            "cruise_type": "both",
+            "duration": "8 jours / 7 nuits",
+            "departure_port": "Ajaccio",
+            "pricing": {"cabin_price": 1690, "private_price": 11900, "currency": "EUR"},
+            "highlights_fr": ["Bonifacio", "Îles Lavezzi", "Porto-Vecchio", "Palombaggia"],
+            "highlights_en": ["Bonifacio", "Lavezzi Islands", "Porto-Vecchio", "Palombaggia"],
+            "available_dates": [
+                {"date": "2025-05-23", "status": "available"},
+                {"date": "2025-05-30", "status": "available"},
+                {"date": "2025-06-06", "status": "available"}
+            ],
+            "program_fr": [
+                "Jour 1: Ajaccio - Îles Sanguinaires",
+                "Jour 2: Propriano - Campomoro",
+                "Jour 3: Bonifacio",
+                "Jour 4: Îles Lavezzi",
+                "Jour 5: Porto-Vecchio - Palombaggia",
+                "Jour 6: Rondinara",
+                "Jour 7: Cala Rossa",
+                "Jour 8: Retour Ajaccio"
+            ],
+            "program_en": [
+                "Day 1: Ajaccio - Sanguinaires Islands",
+                "Day 2: Propriano - Campomoro",
+                "Day 3: Bonifacio",
+                "Day 4: Lavezzi Islands",
+                "Day 5: Porto-Vecchio - Palombaggia",
+                "Day 6: Rondinara",
+                "Day 7: Cala Rossa",
+                "Day 8: Return to Ajaccio"
+            ],
+            "is_active": True,
+            "order": 2,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "name_fr": "Ouest Corse",
+            "name_en": "West Corsica",
+            "subtitle_fr": "L'Indomptée",
+            "subtitle_en": "The Untamed",
+            "description_fr": "Découvrez la côte sauvage de l'ouest corse avec ses calanques de Piana, la réserve de Scandola et le golfe de Porto.",
+            "description_en": "Discover the wild west coast of Corsica with its Piana calanques, Scandola reserve and Porto gulf.",
+            "image_url": "https://images.unsplash.com/photo-1599580792927-de3b03c5dc20?w=800",
+            "destination": "corsica_west",
+            "cruise_type": "both",
+            "duration": "8 jours / 7 nuits",
+            "departure_port": "Ajaccio",
+            "pricing": {"cabin_price": 1590, "private_price": 10900, "currency": "EUR"},
+            "highlights_fr": ["Scandola (UNESCO)", "Calanques de Piana", "Girolata", "Calvi"],
+            "highlights_en": ["Scandola (UNESCO)", "Piana Calanques", "Girolata", "Calvi"],
+            "available_dates": [
+                {"date": "2025-06-27", "status": "available"},
+                {"date": "2025-07-04", "status": "available"},
+                {"date": "2025-07-11", "status": "available"}
+            ],
+            "program_fr": [
+                "Jour 1: Ajaccio - Cargèse",
+                "Jour 2: Calanques de Piana",
+                "Jour 3: Réserve de Scandola",
+                "Jour 4: Girolata",
+                "Jour 5: Calvi",
+                "Jour 6: L'Île-Rousse",
+                "Jour 7: Saint-Florent",
+                "Jour 8: Retour Ajaccio"
+            ],
+            "program_en": [
+                "Day 1: Ajaccio - Cargèse",
+                "Day 2: Piana Calanques",
+                "Day 3: Scandola Reserve",
+                "Day 4: Girolata",
+                "Day 5: Calvi",
+                "Day 6: L'Île-Rousse",
+                "Day 7: Saint-Florent",
+                "Day 8: Return to Ajaccio"
+            ],
+            "is_active": True,
+            "order": 3,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "name_fr": "Sardaigne & Corse du Sud",
+            "name_en": "Sardinia & South Corsica",
+            "subtitle_fr": "La Sublime",
+            "subtitle_en": "The Sublime",
+            "description_fr": "Une croisière exceptionnelle entre deux îles méditerranéennes. De la Corse à la Sardaigne, vivez une expérience unique.",
+            "description_en": "An exceptional cruise between two Mediterranean islands. From Corsica to Sardinia, live a unique experience.",
+            "image_url": "https://images.unsplash.com/photo-1699287956455-25988986f105?w=800",
+            "destination": "sardinia",
+            "cruise_type": "both",
+            "duration": "8 jours / 7 nuits",
+            "departure_port": "Ajaccio",
+            "pricing": {"cabin_price": 2190, "private_price": 14900, "currency": "EUR"},
+            "highlights_fr": ["Costa Smeralda", "La Maddalena", "Bonifacio", "Îles Lavezzi"],
+            "highlights_en": ["Costa Smeralda", "La Maddalena", "Bonifacio", "Lavezzi Islands"],
+            "available_dates": [
+                {"date": "2025-08-01", "status": "limited", "remaining_places": 4},
+                {"date": "2025-08-15", "status": "available"},
+                {"date": "2025-08-22", "status": "available"}
+            ],
+            "program_fr": [
+                "Jour 1: Ajaccio - Propriano",
+                "Jour 2: Bonifacio",
+                "Jour 3: Îles Lavezzi - La Maddalena",
+                "Jour 4: Archipel de La Maddalena",
+                "Jour 5: Costa Smeralda",
+                "Jour 6: Retour Corse - Porto-Vecchio",
+                "Jour 7: Rondinara",
+                "Jour 8: Retour Ajaccio"
+            ],
+            "program_en": [
+                "Day 1: Ajaccio - Propriano",
+                "Day 2: Bonifacio",
+                "Day 3: Lavezzi Islands - La Maddalena",
+                "Day 4: La Maddalena Archipelago",
+                "Day 5: Costa Smeralda",
+                "Day 6: Return Corsica - Porto-Vecchio",
+                "Day 7: Rondinara",
+                "Day 8: Return to Ajaccio"
+            ],
+            "is_active": True,
+            "order": 4,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "name_fr": "Grèce Authentique",
+            "name_en": "Authentic Greece",
+            "subtitle_fr": "La Sérénissime",
+            "subtitle_en": "The Serene",
+            "description_fr": "Naviguez dans les eaux cristallines des îles Ioniennes. Découvrez la Grèce authentique loin des sentiers battus.",
+            "description_en": "Sail in the crystal clear waters of the Ionian Islands. Discover authentic Greece off the beaten path.",
+            "image_url": "https://images.unsplash.com/photo-1601581875309-fafbf2d3ed3a?w=800",
+            "destination": "greece",
+            "cruise_type": "private",
+            "duration": "8 jours / 7 nuits",
+            "departure_port": "Lefkas",
+            "pricing": {"cabin_price": None, "private_price": 13900, "currency": "EUR"},
+            "highlights_fr": ["Céphalonie", "Ithaque", "Zakynthos", "Lefkas"],
+            "highlights_en": ["Kefalonia", "Ithaca", "Zakynthos", "Lefkas"],
+            "available_dates": [
+                {"date": "2025-09-05", "status": "available"},
+                {"date": "2025-09-12", "status": "available"},
+                {"date": "2025-09-19", "status": "available"}
+            ],
+            "program_fr": [
+                "Jour 1: Lefkas - Meganisi",
+                "Jour 2: Ithaque - Vathy",
+                "Jour 3: Céphalonie - Fiskardo",
+                "Jour 4: Céphalonie - Sami",
+                "Jour 5: Zakynthos - Navagio",
+                "Jour 6: Zakynthos - Port",
+                "Jour 7: Kastos - Kalamos",
+                "Jour 8: Retour Lefkas"
+            ],
+            "program_en": [
+                "Day 1: Lefkas - Meganisi",
+                "Day 2: Ithaca - Vathy",
+                "Day 3: Kefalonia - Fiskardo",
+                "Day 4: Kefalonia - Sami",
+                "Day 5: Zakynthos - Navagio",
+                "Day 6: Zakynthos - Port",
+                "Day 7: Kastos - Kalamos",
+                "Day 8: Return to Lefkas"
+            ],
+            "is_active": True,
+            "order": 5,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "name_fr": "Îles Grenadines",
+            "name_en": "Grenadines Islands",
+            "subtitle_fr": "Les Éclatantes",
+            "subtitle_en": "The Dazzling",
+            "description_fr": "Évasion tropicale aux Caraïbes. Naviguez entre les îles paradisiaques des Grenadines pour une expérience inoubliable.",
+            "description_en": "Tropical escape in the Caribbean. Sail between the paradise islands of the Grenadines for an unforgettable experience.",
+            "image_url": "https://images.unsplash.com/photo-1609097172762-1faf6cc8a0d2?w=800",
+            "destination": "caribbean",
+            "cruise_type": "private",
+            "duration": "2 semaines",
+            "departure_port": "Le Marin (Martinique)",
+            "pricing": {"cabin_price": None, "private_price": 18900, "currency": "EUR"},
+            "highlights_fr": ["Tobago Cays", "Mustique", "Bequia", "Saint-Vincent"],
+            "highlights_en": ["Tobago Cays", "Mustique", "Bequia", "Saint Vincent"],
+            "available_dates": [
+                {"date": "2025-12-05", "status": "available"},
+                {"date": "2025-12-19", "status": "available"},
+                {"date": "2026-01-02", "status": "available"}
+            ],
+            "program_fr": [
+                "Jour 1-2: Le Marin - Sainte-Lucie",
+                "Jour 3-4: Saint-Vincent",
+                "Jour 5-6: Bequia",
+                "Jour 7-8: Mustique",
+                "Jour 9-10: Tobago Cays",
+                "Jour 11-12: Union Island",
+                "Jour 13-14: Retour Le Marin"
+            ],
+            "program_en": [
+                "Day 1-2: Le Marin - Saint Lucia",
+                "Day 3-4: Saint Vincent",
+                "Day 5-6: Bequia",
+                "Day 7-8: Mustique",
+                "Day 9-10: Tobago Cays",
+                "Day 11-12: Union Island",
+                "Day 13-14: Return to Le Marin"
+            ],
+            "is_active": True,
+            "order": 6,
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+    ]
+    
+    await db.cruises.insert_many(cruises)
+    
+    # Add some sample community posts
+    sample_posts = [
+        {
+            "id": str(uuid.uuid4()),
+            "author_id": "sample_user_1",
+            "author_name": "Marie D.",
+            "author_avatar": None,
+            "title": "Incroyable semaine en Corse du Sud!",
+            "content": "Nous avons passé une semaine extraordinaire avec Nicolas et Maud. Les paysages sont à couper le souffle, Bonifacio est magnifique et les îles Lavezzi... un paradis! La cuisine à bord était délicieuse, tous les produits locaux. Je recommande vivement!",
+            "image_url": None,
+            "category": "trip_report",
+            "likes": [],
+            "comments": [],
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        },
+        {
+            "id": str(uuid.uuid4()),
+            "author_id": "sample_user_2",
+            "author_name": "Jean-Pierre L.",
+            "author_avatar": None,
+            "title": "Conseils pour préparer sa croisière",
+            "content": "Après 3 croisières avec Sognudimare, voici mes conseils: 1) Apportez des chaussures d'eau, 2) N'oubliez pas la crème solaire bio, 3) Un sac étanche pour vos affaires lors des baignades. Le reste, l'équipage s'occupe de tout!",
+            "image_url": None,
+            "category": "tips",
+            "likes": [],
+            "comments": [],
+            "created_at": datetime.utcnow(),
+            "updated_at": datetime.utcnow()
+        }
+    ]
+    
+    await db.posts.insert_many(sample_posts)
+    
+    return {"message": "Database seeded successfully", "cruises_count": len(cruises), "posts_count": len(sample_posts)}
 
 # Include the router in the main app
 app.include_router(api_router)
