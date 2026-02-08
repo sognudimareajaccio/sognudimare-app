@@ -20,7 +20,7 @@ const { width } = Dimensions.get('window');
 
 // Boarding card images per destination
 const BOARDING_CARDS: { [key: string]: string } = {
-  corsica: 'https://customer-assets.emergentagent.com/job_b879dc80-6d9d-4bd9-95f6-eb63e0393a89/artifacts/su7vi6in_10.jpg',
+  corsica: 'https://customer-assets.emergentagent.com/job_b879dc80-6d9d-4bd9-95f6-eb63e0393a89/artifacts/q8b4ndh4_6.jpg', // Tour de Corse
   corsica_south: 'https://customer-assets.emergentagent.com/job_b879dc80-6d9d-4bd9-95f6-eb63e0393a89/artifacts/0smxu1vy_11.jpg',
   corsica_west: 'https://customer-assets.emergentagent.com/job_b879dc80-6d9d-4bd9-95f6-eb63e0393a89/artifacts/fd6dl1bq_12.jpg',
   sardinia: 'https://customer-assets.emergentagent.com/job_b879dc80-6d9d-4bd9-95f6-eb63e0393a89/artifacts/8wp4j8ba_13.jpg',
