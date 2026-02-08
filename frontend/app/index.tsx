@@ -317,9 +317,20 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.sm,
     backgroundColor: COLORS.primary,
   },
+  logoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   logo: {
-    width: 150,
-    height: 50,
+    width: 50,
+    height: 40,
+  },
+  logoText: {
+    fontSize: FONT_SIZES.lg,
+    fontWeight: '700',
+    color: COLORS.secondary,
+    marginLeft: SPACING.sm,
+    letterSpacing: 1,
   },
   langButton: {
     flexDirection: 'row',
