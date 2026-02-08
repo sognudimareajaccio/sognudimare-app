@@ -420,6 +420,8 @@ export default function BookingScreen() {
                       <Text style={styles.benefitText}>{t('benefitDescription')}</Text>
                     </View>
                   )}
+                </>
+              )}
             </>
           )}
 
