@@ -225,80 +225,149 @@ export default function BookingScreen() {
           {/* Club Cards Section */}
           {selectedCruise && getCruisePrice() > 0 && (
             <>
-              <Text style={styles.sectionTitle}>{t('clubCards')}</Text>
-              <Text style={styles.clubDescription}>
-                {language === 'fr' 
-                  ? 'Économisez sur votre croisière en rejoignant le Club des Voyageurs !'
-                  : 'Save on your cruise by joining the Travelers Club!'}
+              {/* Toggle for Club Card */}
+              <Text style={styles.sectionTitle}>
+                {language === 'fr' ? 'Carte Club des Voyageurs' : 'Travelers Club Card'}
               </Text>
               
-              <View style={styles.cardsContainer}>
-                {CLUB_CARDS.map((card) => (
+              <View style={styles.clubToggleContainer}>
+                <View style={styles.clubToggleInfo}>
+                  <Text style={styles.clubToggleQuestion}>
+                    {language === 'fr' 
+                      ? 'Souhaitez-vous bénéficier d\'une carte Club ?'
+                      : 'Would you like a Club card?'}
+                  </Text>
+                  <Text style={styles.clubToggleHint}>
+                    {language === 'fr' 
+                      ? 'Économisez jusqu\'à 20% sur votre croisière !'
+                      : 'Save up to 20% on your cruise!'}
+                  </Text>
+                </View>
+                <View style={styles.clubToggleButtons}>
                   <TouchableOpacity
-                    key={card.id}
-                    style={[
-                      styles.clubCard,
-                      selectedCard?.id === card.id && styles.clubCardSelected,
-                    ]}
-                    onPress={() => setSelectedCard(selectedCard?.id === card.id ? null : card)}
+                    style={[styles.toggleButton, !wantsClubCard && styles.toggleButtonActive]}
+                    onPress={() => {
+                      setWantsClubCard(false);
+                      setSelectedCard(null);
+                    }}
                   >
-                    <View style={styles.cardHeader}>
-                      <Text style={[
-                        styles.cardTitle,
-                        selectedCard?.id === card.id && styles.cardTitleSelected,
-                      ]}>
-                        {card.months} {language === 'fr' ? 'mois' : 'months'}
-                      </Text>
-                      <View style={[
-                        styles.discountBadge,
-                        selectedCard?.id === card.id && styles.discountBadgeSelected,
-                      ]}>
-                        <Text style={styles.discountText}>-{card.discount}%</Text>
-                      </View>
-                    </View>
-                    <Text style={[
-                      styles.cardPrice,
-                      selectedCard?.id === card.id && styles.cardPriceSelected,
-                    ]}>
-                      {card.price}€{t('perYear')}
+                    <Text style={[styles.toggleButtonText, !wantsClubCard && styles.toggleButtonTextActive]}>
+                      {language === 'fr' ? 'Non' : 'No'}
                     </Text>
-                    {selectedCard?.id === card.id && (
-                      <Ionicons name="checkmark-circle" size={24} color={COLORS.accent} style={styles.checkIcon} />
-                    )}
                   </TouchableOpacity>
-                ))}
+                  <TouchableOpacity
+                    style={[styles.toggleButton, wantsClubCard && styles.toggleButtonActiveYes]}
+                    onPress={() => setWantsClubCard(true)}
+                  >
+                    <Text style={[styles.toggleButtonText, wantsClubCard && styles.toggleButtonTextActive]}>
+                      {language === 'fr' ? 'Oui' : 'Yes'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
 
-              {/* Number of Club Cards selector */}
-              {selectedCard && (
-                <>
-                  <Text style={styles.sectionTitle}>
-                    {language === 'fr' ? 'Nombre de cartes Club' : 'Number of Club cards'}
+              {/* Price WITHOUT Club Card */}
+              {!wantsClubCard && (
+                <View style={styles.priceWithoutClubContainer}>
+                  <Text style={styles.priceWithoutClubTitle}>
+                    {language === 'fr' ? 'Votre devis' : 'Your quote'}
                   </Text>
-                  <View style={styles.passengersContainer}>
-                    <TouchableOpacity
-                      style={styles.passengerButton}
-                      onPress={() => clubCardCount > 1 && setClubCardCount(clubCardCount - 1)}
-                    >
-                      <Ionicons name="remove" size={24} color={COLORS.primary} />
-                    </TouchableOpacity>
-                    <Text style={styles.passengersText}>
-                      {clubCardCount} {language === 'fr' ? (clubCardCount > 1 ? 'cartes' : 'carte') : (clubCardCount > 1 ? 'cards' : 'card')}
+                  <View style={styles.priceWithoutClubRow}>
+                    <Text style={styles.priceWithoutClubLabel}>
+                      {t('cruisePrice')} ({passengers} {t('passengers')})
                     </Text>
-                    <TouchableOpacity
-                      style={styles.passengerButton}
-                      onPress={() => clubCardCount < passengers && setClubCardCount(clubCardCount + 1)}
-                    >
-                      <Ionicons name="add" size={24} color={COLORS.primary} />
-                    </TouchableOpacity>
+                    <Text style={styles.priceWithoutClubValue}>
+                      {getCruisePrice()}€ x {passengers} = {getCruisePrice() * passengers}€
+                    </Text>
                   </View>
-                  <Text style={styles.cardCountHint}>
-                    {language === 'fr' 
-                      ? `La réduction s'applique à tous les passagers, mais chaque carte est individuelle. Maximum: ${passengers} cartes pour ${passengers} passagers.`
-                      : `The discount applies to all passengers, but each card is individual. Maximum: ${passengers} cards for ${passengers} passengers.`}
-                  </Text>
-                </>
+                  <View style={styles.priceWithoutClubDivider} />
+                  <View style={styles.priceWithoutClubRow}>
+                    <Text style={styles.priceWithoutClubTotalLabel}>
+                      {language === 'fr' ? 'Total à payer' : 'Total to pay'}
+                    </Text>
+                    <Text style={styles.priceWithoutClubTotalValue}>
+                      {getCruisePrice() * passengers}€
+                    </Text>
+                  </View>
+                </View>
               )}
+
+              {/* Club Card Options - Only if wantsClubCard is true */}
+              {wantsClubCard && (
+                <>
+                  <Text style={styles.clubDescription}>
+                    {language === 'fr' 
+                      ? 'Choisissez votre formule et économisez sur votre croisière !'
+                      : 'Choose your plan and save on your cruise!'}
+                  </Text>
+                  
+                  <View style={styles.cardsContainer}>
+                    {CLUB_CARDS.map((card) => (
+                      <TouchableOpacity
+                        key={card.id}
+                        style={[
+                          styles.clubCard,
+                          selectedCard?.id === card.id && styles.clubCardSelected,
+                        ]}
+                        onPress={() => setSelectedCard(selectedCard?.id === card.id ? null : card)}
+                      >
+                        <View style={styles.cardHeader}>
+                          <Text style={[
+                            styles.cardTitle,
+                            selectedCard?.id === card.id && styles.cardTitleSelected,
+                          ]}>
+                            {card.months} {language === 'fr' ? 'mois' : 'months'}
+                          </Text>
+                          <View style={[
+                            styles.discountBadge,
+                            selectedCard?.id === card.id && styles.discountBadgeSelected,
+                          ]}>
+                            <Text style={styles.discountText}>-{card.discount}%</Text>
+                          </View>
+                        </View>
+                        <Text style={[
+                          styles.cardPrice,
+                          selectedCard?.id === card.id && styles.cardPriceSelected,
+                        ]}>
+                          {card.price}€{t('perYear')}
+                        </Text>
+                        {selectedCard?.id === card.id && (
+                          <Ionicons name="checkmark-circle" size={24} color={COLORS.accent} style={styles.checkIcon} />
+                        )}
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+
+                  {/* Number of Club Cards selector */}
+                  {selectedCard && (
+                    <>
+                      <Text style={styles.sectionTitle}>
+                        {language === 'fr' ? 'Nombre de cartes Club' : 'Number of Club cards'}
+                      </Text>
+                      <View style={styles.passengersContainer}>
+                        <TouchableOpacity
+                          style={styles.passengerButton}
+                          onPress={() => clubCardCount > 1 && setClubCardCount(clubCardCount - 1)}
+                        >
+                          <Ionicons name="remove" size={24} color={COLORS.primary} />
+                        </TouchableOpacity>
+                        <Text style={styles.passengersText}>
+                          {clubCardCount} {language === 'fr' ? (clubCardCount > 1 ? 'cartes' : 'carte') : (clubCardCount > 1 ? 'cards' : 'card')}
+                        </Text>
+                        <TouchableOpacity
+                          style={styles.passengerButton}
+                          onPress={() => clubCardCount < passengers && setClubCardCount(clubCardCount + 1)}
+                        >
+                          <Ionicons name="add" size={24} color={COLORS.primary} />
+                        </TouchableOpacity>
+                      </View>
+                      <Text style={styles.cardCountHint}>
+                        {language === 'fr' 
+                          ? `La réduction s'applique à tous les passagers, mais chaque carte est individuelle. Maximum: ${passengers} cartes pour ${passengers} passagers.`
+                          : `The discount applies to all passengers, but each card is individual. Maximum: ${passengers} cards for ${passengers} passengers.`}
+                      </Text>
+                    </>
+                  )}
 
               {/* Savings Calculator - NOW WITH CLUB CARD COUNT */}
               {savings && (
