@@ -1,31 +1,37 @@
 export const COLORS = {
-  // Primary palette - Ocean blues
-  primary: '#0A4D68',
-  primaryLight: '#088395',
-  primaryDark: '#05283F',
+  // Primary palette - Sognudimare colors
+  primary: '#0e1c40',        // Dark blue
+  primaryLight: '#1a2d5a',
+  primaryDark: '#080f24',
   
-  // Secondary - Warm accents
-  secondary: '#D4A853',
-  secondaryLight: '#E8C97A',
-  secondaryDark: '#B8923E',
+  // Secondary - Gold accent
+  secondary: '#ebd0a9',      // Gold/beige
+  secondaryLight: '#f5e4c9',
+  secondaryDark: '#d4b78a',
+  
+  // Accent - Turquoise
+  accent: '#7ad2d4',         // Turquoise
+  accentLight: '#a5e3e5',
+  accentDark: '#5abfc1',
   
   // Neutrals
   white: '#FFFFFF',
   background: '#F8FAFC',
   surface: '#FFFFFF',
   surfaceLight: '#F1F5F9',
+  gray: '#919191',           // Gray from brand
   
   // Text colors
-  text: '#1E293B',
+  text: '#0e1c40',
   textSecondary: '#64748B',
-  textLight: '#94A3B8',
+  textLight: '#919191',
   textOnPrimary: '#FFFFFF',
   
   // Status colors
   success: '#10B981',
   warning: '#F59E0B',
   error: '#EF4444',
-  info: '#3B82F6',
+  info: '#7ad2d4',
   
   // Availability colors
   available: '#10B981',
@@ -37,12 +43,12 @@ export const COLORS = {
   borderLight: '#F1F5F9',
   
   // Shadows
-  shadow: 'rgba(0, 0, 0, 0.1)',
-  shadowDark: 'rgba(0, 0, 0, 0.25)',
+  shadow: 'rgba(14, 28, 64, 0.1)',
+  shadowDark: 'rgba(14, 28, 64, 0.25)',
   
   // Overlay
-  overlay: 'rgba(0, 0, 0, 0.5)',
-  overlayLight: 'rgba(0, 0, 0, 0.3)',
+  overlay: 'rgba(14, 28, 64, 0.5)',
+  overlayLight: 'rgba(14, 28, 64, 0.3)',
 };
 
 export const SPACING = {
