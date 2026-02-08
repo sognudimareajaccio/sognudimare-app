@@ -1,6 +1,4 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Language } from '../i18n/translations';
 
 interface Member {
@@ -29,28 +27,16 @@ interface AppState {
   setIsLoading: (loading: boolean) => void;
 }
 
-export const useAppStore = create<AppState>()(
-  persist(
-    (set) => ({
-      // Language
-      language: 'fr',
-      setLanguage: (lang) => set({ language: lang }),
-      
-      // Member
-      currentMember: null,
-      setCurrentMember: (member) => set({ currentMember: member }),
-      
-      // Loading
-      isLoading: false,
-      setIsLoading: (loading) => set({ isLoading: loading }),
-    }),
-    {
-      name: 'sognudimare-storage',
-      storage: createJSONStorage(() => AsyncStorage),
-      partialize: (state) => ({
-        language: state.language,
-        currentMember: state.currentMember,
-      }),
-    }
-  )
-);
+export const useAppStore = create<AppState>()((set) => ({
+  // Language
+  language: 'fr',
+  setLanguage: (lang) => set({ language: lang }),
+  
+  // Member
+  currentMember: null,
+  setCurrentMember: (member) => set({ currentMember: member }),
+  
+  // Loading
+  isLoading: false,
+  setIsLoading: (loading) => set({ isLoading: loading }),
+}));
