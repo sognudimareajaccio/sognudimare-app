@@ -378,11 +378,12 @@ export default function BookingScreen() {
                     </>
                   )}
 
-                  {/* Savings Calculator - NOW WITH CLUB CARD COUNT */}
+                      {/* Savings Calculator - CORRECTED: Discount per card holder */}
                   {savings && (
                     <View style={styles.savingsContainer}>
                       <Text style={styles.savingsTitle}>{t('savingsSimulator')}</Text>
                       
+                      {/* Base price for all passengers */}
                       <View style={styles.savingsRow}>
                         <Text style={styles.savingsLabel}>
                           {t('cruisePrice')} ({savings.passengers} {t('passengers')})
@@ -392,8 +393,39 @@ export default function BookingScreen() {
                         </Text>
                       </View>
                       
+                      {/* Show breakdown: card holders vs non-card holders */}
+                      {savings.clubCardCount < savings.passengers && (
+                        <>
+                          <View style={styles.savingsRow}>
+                            <Text style={styles.savingsLabelSmall}>
+                              {language === 'fr' 
+                                ? `↳ ${savings.clubCardCount} passager(s) avec carte` 
+                                : `↳ ${savings.clubCardCount} passenger(s) with card`}
+                            </Text>
+                            <Text style={styles.savingsValueSmall}>
+                              {savings.basePricePerPerson}€ x {savings.clubCardCount} = {savings.priceForCardHolders}€
+                            </Text>
+                          </View>
+                          <View style={styles.savingsRow}>
+                            <Text style={styles.savingsLabelSmall}>
+                              {language === 'fr' 
+                                ? `↳ ${savings.passengers - savings.clubCardCount} passager(s) sans carte` 
+                                : `↳ ${savings.passengers - savings.clubCardCount} passenger(s) without card`}
+                            </Text>
+                            <Text style={styles.savingsValueSmall}>
+                              {savings.basePricePerPerson}€ x {savings.passengers - savings.clubCardCount} = {savings.priceForNonCardHolders}€
+                            </Text>
+                          </View>
+                        </>
+                      )}
+                      
+                      {/* Discount only on card holders */}
                       <View style={styles.savingsRow}>
-                        <Text style={styles.savingsLabel}>{t('clubDiscount')} ({savings.discountPercent}%)</Text>
+                        <Text style={styles.savingsLabel}>
+                          {language === 'fr' 
+                            ? `Remise Club (-${savings.discountPercent}% sur ${savings.clubCardCount} pers.)` 
+                            : `Club Discount (-${savings.discountPercent}% on ${savings.clubCardCount} pers.)`}
+                        </Text>
                         <Text style={[styles.savingsValue, styles.discountValue]}>-{savings.discountAmount.toFixed(0)}€</Text>
                       </View>
                       
