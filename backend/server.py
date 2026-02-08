@@ -563,7 +563,7 @@ async def seed_database():
             "image_url": "https://images.unsplash.com/photo-1609097172762-1faf6cc8a0d2?w=800",
             "destination": "caribbean",
             "cruise_type": "private",
-            "duration": "2 semaines",
+            "duration": "8 jours / 7 nuits",
             "departure_port": "Le Marin (Martinique)",
             "pricing": {"cabin_price": None, "private_price": 18900, "currency": "EUR"},
             "highlights_fr": ["Tobago Cays", "Mustique", "Bequia", "Saint-Vincent"],
