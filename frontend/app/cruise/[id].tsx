@@ -7,7 +7,6 @@ import {
   Image,
   TouchableOpacity,
   ActivityIndicator,
-  Linking,
   Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -18,7 +17,9 @@ import { useTranslation } from '../../src/hooks/useTranslation';
 import { cruiseApi, Cruise } from '../../src/services/api';
 
 const { width } = Dimensions.get('window');
-const BOOKING_URL = 'https://www.sognudimare.com/r%C3%A9servation-cabines-privatisation-catamaran-sognudimare';
+
+// Logo URL from website
+const LOGO_URL = 'https://static.wixstatic.com/media/ac2dc0_cf6b3b4e0ae345acbeb00d34a8fdc9d6~mv2.png/v1/fill/w_77,h_77,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/ac2dc0_cf6b3b4e0ae345acbeb00d34a8fdc9d6~mv2.png';
 
 export default function CruiseDetailScreen() {
   const { t, language } = useTranslation();
@@ -26,6 +27,7 @@ export default function CruiseDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const [cruise, setCruise] = useState<Cruise | null>(null);
   const [loading, setLoading] = useState(true);
+  const [selectedDate, setSelectedDate] = useState<string>('');
 
   useEffect(() => {
     loadCruise();
@@ -36,6 +38,11 @@ export default function CruiseDetailScreen() {
     try {
       const data = await cruiseApi.getById(id);
       setCruise(data);
+      // Set first available date as default
+      const firstAvailable = data.available_dates.find(d => d.status !== 'full');
+      if (firstAvailable) {
+        setSelectedDate(firstAvailable.date);
+      }
     } catch (error) {
       console.error('Error loading cruise:', error);
     } finally {
@@ -44,7 +51,12 @@ export default function CruiseDetailScreen() {
   };
 
   const handleBooking = () => {
-    Linking.openURL(BOOKING_URL);
+    if (cruise) {
+      router.push({
+        pathname: '/booking',
+        params: { cruiseId: cruise.id, date: selectedDate }
+      });
+    }
   };
 
   const getAvailabilityColor = (status: string) => {
