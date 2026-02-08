@@ -331,9 +331,9 @@ async def seed_database():
             "image_url": "https://images.unsplash.com/photo-1592314963065-87659404f412?w=800",
             "destination": "corsica",
             "cruise_type": "both",
-            "duration": "8 jours / 7 nuits",
+            "duration": "2 semaines",
             "departure_port": "Ajaccio",
-            "pricing": {"cabin_price": 1890, "private_price": 12900, "currency": "EUR"},
+            "pricing": {"cabin_price": 2560, "private_price": 12900, "currency": "EUR"},
             "highlights_fr": ["Scandola (UNESCO)", "Bonifacio", "Cap Corse", "Îles Lavezzi"],
             "highlights_en": ["Scandola (UNESCO)", "Bonifacio", "Cap Corse", "Lavezzi Islands"],
             "available_dates": [
