@@ -169,7 +169,7 @@ export default function HomeScreen() {
         <View style={styles.header}>
           <View style={styles.logoContainer}>
             <Image source={{ uri: LOGO_URL }} style={styles.logo} resizeMode="contain" />
-            <Text style={styles.logoText}>SOGNUDIMARE</Text>
+            <Text style={styles.logoText}>sognudimare</Text>
           </View>
           <TouchableOpacity onPress={toggleLanguage} style={styles.langButton}>
             <Text style={styles.langText}>{language.toUpperCase()}</Text>
