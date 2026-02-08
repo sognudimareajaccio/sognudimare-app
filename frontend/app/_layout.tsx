@@ -12,11 +12,11 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: COLORS.primary,
-        tabBarInactiveTintColor: COLORS.textSecondary,
+        tabBarActiveTintColor: COLORS.accent,
+        tabBarInactiveTintColor: COLORS.gray,
         tabBarStyle: {
-          backgroundColor: COLORS.white,
-          borderTopColor: COLORS.border,
+          backgroundColor: COLORS.primary,
+          borderTopColor: COLORS.primaryDark,
           borderTopWidth: 1,
           height: Platform.OS === 'ios' ? 88 : 65,
           paddingBottom: Platform.OS === 'ios' ? 28 : 8,
@@ -66,6 +66,12 @@ export default function TabLayout() {
       />
       <Tabs.Screen
         name="cruise/[id]"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="booking"
         options={{
           href: null,
         }}
