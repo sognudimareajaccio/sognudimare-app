@@ -39,14 +39,89 @@ const LOCAL_PARTNERS = [
   { name: 'CARPEDIEM AJACCIO', type: 'Restaurant' },
 ];
 
-// What's included
+// What's included - 9 items with full details
 const ALL_INCLUSIVE_FEATURES = [
-  { icon: 'restaurant', label_fr: 'Petit-déjeuner', label_en: 'Breakfast' },
-  { icon: 'fast-food', label_fr: 'Déjeuner', label_en: 'Lunch' },
-  { icon: 'wine', label_fr: 'Dîner', label_en: 'Dinner' },
-  { icon: 'boat', label_fr: 'Équipage dédié', label_en: 'Dedicated crew' },
-  { icon: 'water', label_fr: 'Matériel nautique', label_en: 'Water sports gear' },
-  { icon: 'bed', label_fr: 'Linge de maison', label_en: 'Bed linen' },
+  { 
+    icon: 'bed', 
+    title_fr: 'HÉBERGEMENT', 
+    title_en: 'ACCOMMODATION',
+    desc_fr: 'Cabine double tout confort avec salle d\'eau et WC indépendants. Draps, serviettes et foutas fournis.',
+    desc_en: 'Double cabin with en-suite bathroom. Sheets, towels and foutas provided.',
+    petit_plus_fr: 'CABINES PERSONNALISÉES',
+    petit_plus_en: 'PERSONALIZED CABINS'
+  },
+  { 
+    icon: 'restaurant', 
+    title_fr: 'REPAS', 
+    title_en: 'MEALS',
+    desc_fr: 'Tous les repas préparés et servis à bord. Cuisine avec des produits locaux de producteurs passionnés.',
+    desc_en: 'All meals prepared and served on board. Cooking with local products from passionate producers.',
+    petit_plus_fr: 'PRODUITS LOCAUX',
+    petit_plus_en: 'LOCAL PRODUCTS'
+  },
+  { 
+    icon: 'wine', 
+    title_fr: 'BOISSONS', 
+    title_en: 'DRINKS',
+    desc_fr: 'Toutes les boissons (softs & alcools). Vins issus exclusivement de vignobles locaux.',
+    desc_en: 'All drinks (soft & alcoholic). Wines exclusively from local vineyards.',
+    petit_plus_fr: 'VINS LOCAUX',
+    petit_plus_en: 'LOCAL WINES'
+  },
+  { 
+    icon: 'boat', 
+    title_fr: 'CATAMARAN', 
+    title_en: 'CATAMARAN',
+    desc_fr: 'Bateaux modernes et confortables vers des criques confidentielles accessibles uniquement par la mer.',
+    desc_en: 'Modern and comfortable boats to secluded coves accessible only by sea.',
+    petit_plus_fr: 'BATEAUX RÉCENTS',
+    petit_plus_en: 'RECENT BOATS'
+  },
+  { 
+    icon: 'fish', 
+    title_fr: 'MATÉRIELS DE PÊCHE', 
+    title_en: 'FISHING GEAR',
+    desc_fr: 'Cannes à pêche à disposition. Moment privilégié pour se reconnecter à la mer.',
+    desc_en: 'Fishing rods available. A special moment to reconnect with the sea.',
+    petit_plus_fr: 'DU POISSON FRAIS',
+    petit_plus_en: 'FRESH FISH'
+  },
+  { 
+    icon: 'water', 
+    title_fr: 'PADDLE', 
+    title_en: 'PADDLE',
+    desc_fr: 'Glissez dans une crique sauvage ou profitez d\'un moment de détente au coucher du soleil.',
+    desc_en: 'Glide into a wild cove or enjoy a relaxing moment at sunset.',
+    petit_plus_fr: 'FORMATION DU CAPITAINE ;)',
+    petit_plus_en: 'CAPTAIN TRAINING ;)'
+  },
+  { 
+    icon: 'people', 
+    title_fr: 'CANOË', 
+    title_en: 'CANOE',
+    desc_fr: 'Naviguer en douceur au rythme des pagaies, dans le respect de la nature.',
+    desc_en: 'Navigate gently at the rhythm of the paddles, respecting nature.',
+    petit_plus_fr: 'POUR DÉCOUVRIR EN COUPLE',
+    petit_plus_en: 'FOR COUPLES TO DISCOVER'
+  },
+  { 
+    icon: 'car', 
+    title_fr: 'TRANSFERT', 
+    title_en: 'TRANSFER',
+    desc_fr: 'Transfert aéroport / port d\'embarquement inclus à l\'aller et au retour. Navette privative.',
+    desc_en: 'Airport / boarding port transfer included both ways. Private shuttle.',
+    petit_plus_fr: 'EXCLUSIVITÉ SOGNUDIMARE',
+    petit_plus_en: 'SOGNUDIMARE EXCLUSIVE'
+  },
+  { 
+    icon: 'heart', 
+    title_fr: 'ÉQUIPAGE', 
+    title_en: 'CREW',
+    desc_fr: 'Équipe professionnelle et passionnée, dédiée à votre confort et sécurité.',
+    desc_en: 'Professional and passionate team, dedicated to your comfort and safety.',
+    petit_plus_fr: 'L\'ÉQUIPAGE EST UN COUPLE',
+    petit_plus_en: 'THE CREW IS A COUPLE'
+  },
 ];
 
 export default function HomeScreen() {
