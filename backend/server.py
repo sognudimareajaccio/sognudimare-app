@@ -433,7 +433,10 @@ async def admin_login(credentials: AdminCredentials):
 async def admin_get_all_posts():
     """Get all posts for moderation"""
     posts = await db.posts.find().sort("created_at", -1).to_list(100)
-    return posts
+    return [
+        {**post, "_id": str(post["_id"])} if "_id" in post else post 
+        for post in posts
+    ]
 
 @api_router.delete("/admin/posts/{post_id}")
 async def admin_delete_post(post_id: str):
