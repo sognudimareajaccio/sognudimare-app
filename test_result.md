@@ -123,11 +123,14 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Returns single cruise by ID"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Successfully retrieved cruise by ID. Returns complete cruise data with all required fields (name, description, pricing, dates, etc.)"
   
   - task: "POST /api/seed endpoint"
     implemented: true
