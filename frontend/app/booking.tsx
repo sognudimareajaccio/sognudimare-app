@@ -30,6 +30,9 @@ const TIME_SLOTS = [
   '14h - 15h', '15h - 16h', '16h - 17h', '17h - 18h', '18h - 19h'
 ];
 
+// Destinations that are PRIVATE ONLY (full boat rental, base 8 passengers)
+const PRIVATE_ONLY_DESTINATIONS = ['greece', 'caribbean'];
+
 export default function BookingScreen() {
   const { t, language } = useTranslation();
   const router = useRouter();
