@@ -173,7 +173,7 @@ export default function CruiseDetailScreen() {
   const description = language === 'fr' ? cruise.description_fr : cruise.description_en;
   const highlights = language === 'fr' ? cruise.highlights_fr : cruise.highlights_en;
   const program = language === 'fr' ? cruise.program_fr : cruise.program_en;
-  const included = language === 'fr' ? INCLUDED_FR : INCLUDED_EN;
+  const included = language === 'fr' ? getIncludedFR(cruise.duration) : getIncludedEN(cruise.duration);
   const notIncluded = language === 'fr' ? NOT_INCLUDED_FR : NOT_INCLUDED_EN;
 
   return (
