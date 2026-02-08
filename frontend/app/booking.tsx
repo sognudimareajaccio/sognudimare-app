@@ -268,6 +268,37 @@ export default function BookingScreen() {
                 ))}
               </View>
 
+              {/* Number of Club Cards selector */}
+              {selectedCard && (
+                <>
+                  <Text style={styles.sectionTitle}>
+                    {language === 'fr' ? 'Nombre de cartes Club' : 'Number of Club cards'}
+                  </Text>
+                  <View style={styles.passengersContainer}>
+                    <TouchableOpacity
+                      style={styles.passengerButton}
+                      onPress={() => clubCardCount > 1 && setClubCardCount(clubCardCount - 1)}
+                    >
+                      <Ionicons name="remove" size={24} color={COLORS.primary} />
+                    </TouchableOpacity>
+                    <Text style={styles.passengersText}>
+                      {clubCardCount} {language === 'fr' ? (clubCardCount > 1 ? 'cartes' : 'carte') : (clubCardCount > 1 ? 'cards' : 'card')}
+                    </Text>
+                    <TouchableOpacity
+                      style={styles.passengerButton}
+                      onPress={() => clubCardCount < passengers && setClubCardCount(clubCardCount + 1)}
+                    >
+                      <Ionicons name="add" size={24} color={COLORS.primary} />
+                    </TouchableOpacity>
+                  </View>
+                  <Text style={styles.cardCountHint}>
+                    {language === 'fr' 
+                      ? `La réduction s'applique à tous les passagers, mais chaque carte est individuelle. Maximum: ${passengers} cartes pour ${passengers} passagers.`
+                      : `The discount applies to all passengers, but each card is individual. Maximum: ${passengers} cards for ${passengers} passengers.`}
+                  </Text>
+                </>
+              )}
+
               {/* Savings Calculator - NOW WITH PASSENGERS */}
               {savings && (
                 <View style={styles.savingsContainer}>
