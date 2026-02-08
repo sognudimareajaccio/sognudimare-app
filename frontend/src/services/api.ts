@@ -182,3 +182,118 @@ export const seedDatabase = async (): Promise<{ message: string }> => {
     method: 'POST',
   });
 };
+
+// Direct Messaging types
+export interface DirectMessage {
+  id: string;
+  sender_id: string;
+  sender_name: string;
+  receiver_id: string;
+  receiver_name: string;
+  content: string;
+  is_from_captain: boolean;
+  is_read: boolean;
+  created_at: string;
+}
+
+export interface Conversation {
+  id: string;
+  participant_ids: string[];
+  participant_names: string[];
+  last_message?: string;
+  last_message_at?: string;
+  unread_count: number;
+}
+
+export interface CaptainInfo {
+  id: string;
+  name: string;
+  avatar: string;
+  is_captain: boolean;
+}
+
+// Messaging API
+export const messageApi = {
+  getConversations: async (userId: string): Promise<Conversation[]> => {
+    return fetchApi<Conversation[]>(`/messages/conversations/${userId}`);
+  },
+  
+  getMessages: async (userId: string, otherUserId: string): Promise<DirectMessage[]> => {
+    return fetchApi<DirectMessage[]>(`/messages/${userId}/${otherUserId}`);
+  },
+  
+  sendMessage: async (data: {
+    sender_id: string;
+    sender_name: string;
+    receiver_id: string;
+    receiver_name: string;
+    content: string;
+    is_from_captain?: boolean;
+  }): Promise<DirectMessage> => {
+    return fetchApi<DirectMessage>('/messages', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+  
+  getCaptainInfo: async (): Promise<CaptainInfo> => {
+    return fetchApi<CaptainInfo>('/messages/captain');
+  },
+};
+
+// Admin API
+export const adminApi = {
+  login: async (username: string, password: string): Promise<{ success: boolean; token: string }> => {
+    return fetchApi<{ success: boolean; token: string }>('/admin/login', {
+      method: 'POST',
+      body: JSON.stringify({ username, password }),
+    });
+  },
+  
+  getPosts: async (): Promise<CommunityPost[]> => {
+    return fetchApi<CommunityPost[]>('/admin/posts');
+  },
+  
+  deletePost: async (postId: string): Promise<void> => {
+    await fetchApi<void>(`/admin/posts/${postId}`, { method: 'DELETE' });
+  },
+  
+  deleteComment: async (postId: string, commentId: string): Promise<void> => {
+    await fetchApi<void>(`/admin/posts/${postId}/comments/${commentId}`, { method: 'DELETE' });
+  },
+  
+  getMembers: async (): Promise<Member[]> => {
+    return fetchApi<Member[]>('/admin/members');
+  },
+  
+  banMember: async (memberId: string): Promise<void> => {
+    await fetchApi<void>(`/admin/members/${memberId}/ban`, { method: 'PUT' });
+  },
+  
+  unbanMember: async (memberId: string): Promise<void> => {
+    await fetchApi<void>(`/admin/members/${memberId}/unban`, { method: 'PUT' });
+  },
+  
+  getMessages: async (): Promise<DirectMessage[]> => {
+    return fetchApi<DirectMessage[]>('/admin/messages');
+  },
+  
+  deleteMessage: async (messageId: string): Promise<void> => {
+    await fetchApi<void>(`/admin/messages/${messageId}`, { method: 'DELETE' });
+  },
+  
+  getCruises: async (): Promise<Cruise[]> => {
+    return fetchApi<Cruise[]>('/admin/cruises');
+  },
+  
+  updateCruise: async (cruiseId: string, data: Partial<Cruise>): Promise<Cruise> => {
+    return fetchApi<Cruise>(`/admin/cruises/${cruiseId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  },
+  
+  deleteCruise: async (cruiseId: string): Promise<void> => {
+    await fetchApi<void>(`/admin/cruises/${cruiseId}`, { method: 'DELETE' });
+  },
+};
