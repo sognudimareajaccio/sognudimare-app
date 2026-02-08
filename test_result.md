@@ -150,11 +150,14 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Returns community posts with optional category filter"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Successfully retrieves community posts. Returns proper post structure with all required fields (id, author, title, content, category, likes, comments, timestamps)"
   
   - task: "POST /api/posts endpoint"
     implemented: true
