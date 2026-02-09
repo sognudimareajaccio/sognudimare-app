@@ -254,6 +254,11 @@ const styles = StyleSheet.create({
     borderRadius: BORDER_RADIUS.xl,
     alignItems: 'center',
   },
+  companyLogo: {
+    width: 200,
+    height: 100,
+    marginBottom: SPACING.md,
+  },
   companyTitle: {
     fontSize: FONT_SIZES.xxl,
     fontWeight: '700',
