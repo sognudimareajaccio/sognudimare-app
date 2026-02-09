@@ -13,6 +13,7 @@ from enum import Enum
 
 # Square Payment SDK
 from square import Square
+from square.environment import SquareEnvironment
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
