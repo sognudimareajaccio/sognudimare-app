@@ -83,6 +83,8 @@ class Cruise(BaseModel):
     available_dates: List[dict] = []
     program_fr: List[str] = []
     program_en: List[str] = []
+    # Boarding pass image for each cruise
+    boarding_pass_image: Optional[str] = None
     is_active: bool = True
     order: int = 0
     created_at: datetime = Field(default_factory=datetime.utcnow)
