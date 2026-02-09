@@ -141,7 +141,7 @@ export default function ClubScreen() {
       info: { fr: 'Infos', en: 'Info' },
       community: { fr: 'Communauté', en: 'Community' },
       messages: { fr: 'Messages', en: 'Messages' },
-      joinClub: { fr: 'Rejoindre le Club', en: 'Join the Club' },
+      joinClub: { fr: 'Choisir sa croisière et sa carte Club', en: 'Choose your cruise and Club card' },
       clubDescription: { 
         fr: 'Le Club des Voyageurs Sognudimare vous offre des avantages exclusifs et une communauté de passionnés de la mer.',
         en: 'The Sognudimare Travelers Club offers you exclusive benefits and a community of sea enthusiasts.'
