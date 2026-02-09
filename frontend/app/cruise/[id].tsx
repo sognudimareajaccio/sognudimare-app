@@ -26,9 +26,6 @@ const BOARDING_CARDS: { [key: string]: string } = {
   sardinia: 'https://static.wixstatic.com/media/ce6ce7_68a8fb4c934c44cb909dfc0075f36d83~mv2.png/v1/fill/w_400,h_267,al_c,q_85,enc_avif,quality_auto/croisiere%20catamaran%20la%20sardaigne%20et%20la%20corse%20du%20sud%20sognudimare.png',
 };
 
-// Destinations that are PRIVATE ONLY (full boat rental, base 8 passengers)
-const PRIVATE_ONLY_DESTINATIONS = ['greece', 'caribbean'];
-
 // What's included - base items (cruise duration is added dynamically)
 const getIncludedFR = (duration: string) => [
   `La croisière de ${duration}`,
