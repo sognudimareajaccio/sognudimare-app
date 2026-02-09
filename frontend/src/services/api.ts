@@ -82,6 +82,8 @@ export interface Cruise {
   available_dates: CruiseDate[];
   program_fr: string[];
   program_en: string[];
+  // Boarding pass image from database
+  boarding_pass_image?: string;
   is_active: boolean;
   order: number;
 }
