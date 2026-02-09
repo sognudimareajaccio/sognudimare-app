@@ -424,51 +424,92 @@ export default function BookingScreen() {
 
         {/* Club Cards */}
         <View style={styles.section}>
-          <View style={styles.clubCardHeader}>
-            <Text style={styles.sectionTitle}>
-              <Ionicons name="card" size={20} color={COLORS.secondary} /> Cartes Club Sognudimare
-            </Text>
-            <View style={styles.clubCardBadge}>
-              <Text style={styles.clubCardBadgeText}>{CLUB_CARD_PRICE}€/carte</Text>
-            </View>
-          </View>
+          <Text style={styles.sectionTitle}>
+            <Ionicons name="card" size={20} color={COLORS.secondary} /> Carte Club Sognudimare
+          </Text>
           
           <View style={styles.clubCardInfo}>
             <Ionicons name="information-circle" size={20} color={COLORS.primary} />
             <Text style={styles.clubCardInfoText}>
-              La carte Club vous donne accès à des réductions exclusives, des événements privés et des avantages membres toute l'année.
+              Profitez de remises immédiates sur votre croisière avec nos cartes Club !
             </Text>
           </View>
-          
-          <View style={styles.counterContainer}>
-            <TouchableOpacity 
-              style={[styles.counterButton, clubCards <= 0 && styles.counterButtonDisabled]}
-              onPress={decrementClubCards}
-              disabled={clubCards <= 0}
-            >
-              <Ionicons name="remove" size={24} color={clubCards <= 0 ? COLORS.border : COLORS.secondary} />
-            </TouchableOpacity>
-            
-            <View style={styles.counterValue}>
-              <Text style={[styles.counterValueText, { color: COLORS.secondary }]}>{clubCards}</Text>
-              <Text style={styles.counterValueLabel}>
-                {clubCards === 1 ? 'carte' : 'cartes'}
+
+          {/* Card Type Selection */}
+          <View style={styles.clubCardOptions}>
+            {CLUB_CARDS.map((card) => (
+              <TouchableOpacity
+                key={card.id}
+                style={[
+                  styles.clubCardOption,
+                  selectedClubCard.id === card.id && styles.clubCardOptionSelected,
+                  card.id === 'none' && styles.clubCardOptionNone
+                ]}
+                onPress={() => selectClubCard(card)}
+              >
+                <View style={styles.clubCardOptionHeader}>
+                  <View style={[
+                    styles.radioCircle,
+                    selectedClubCard.id === card.id && styles.radioCircleSelectedGold
+                  ]}>
+                    {selectedClubCard.id === card.id && <View style={styles.radioInnerGold} />}
+                  </View>
+                  <Text style={[
+                    styles.clubCardOptionName,
+                    selectedClubCard.id === card.id && styles.clubCardOptionNameSelected
+                  ]}>
+                    {card.name}
+                  </Text>
+                </View>
+                
+                {card.id !== 'none' && (
+                  <>
+                    <View style={styles.clubCardPriceRow}>
+                      <Text style={styles.clubCardPrice}>{card.price}€</Text>
+                      <View style={styles.discountBadge}>
+                        <Text style={styles.discountBadgeText}>-{card.discount}%</Text>
+                      </View>
+                    </View>
+                    <Text style={styles.clubCardDescription}>{card.description}</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {/* Quantity selector (only if a card is selected) */}
+          {selectedClubCard.id !== 'none' && (
+            <View style={styles.clubCardQuantitySection}>
+              <Text style={styles.clubCardQuantityLabel}>Nombre de cartes</Text>
+              <View style={styles.counterContainer}>
+                <TouchableOpacity 
+                  style={[styles.counterButton, clubCardQuantity <= 0 && styles.counterButtonDisabled]}
+                  onPress={decrementClubCardQuantity}
+                  disabled={clubCardQuantity <= 0}
+                >
+                  <Ionicons name="remove" size={24} color={clubCardQuantity <= 0 ? COLORS.border : COLORS.secondary} />
+                </TouchableOpacity>
+                
+                <View style={styles.counterValue}>
+                  <Text style={[styles.counterValueText, { color: COLORS.secondary }]}>{clubCardQuantity}</Text>
+                  <Text style={styles.counterValueLabel}>
+                    {clubCardQuantity === 1 ? 'carte' : 'cartes'}
+                  </Text>
+                </View>
+                
+                <TouchableOpacity 
+                  style={[styles.counterButton, clubCardQuantity >= passengers && styles.counterButtonDisabled]}
+                  onPress={incrementClubCardQuantity}
+                  disabled={clubCardQuantity >= passengers}
+                >
+                  <Ionicons name="add" size={24} color={clubCardQuantity >= passengers ? COLORS.border : COLORS.secondary} />
+                </TouchableOpacity>
+              </View>
+              
+              <Text style={styles.clubCardNote}>
+                {clubCardQuantity} × {selectedClubCard.price}€ = {clubCardQuantity * selectedClubCard.price}€
               </Text>
             </View>
-            
-            <TouchableOpacity 
-              style={[styles.counterButton, clubCards >= passengers && styles.counterButtonDisabled]}
-              onPress={incrementClubCards}
-              disabled={clubCards >= passengers}
-            >
-              <Ionicons name="add" size={24} color={clubCards >= passengers ? COLORS.border : COLORS.secondary} />
-            </TouchableOpacity>
-          </View>
-          
-          {clubCards > 0 && (
-            <Text style={styles.clubCardNote}>
-              {clubCards} carte{clubCards > 1 ? 's' : ''} Club : {clubCards} × {CLUB_CARD_PRICE}€ = {clubCards * CLUB_CARD_PRICE}€
-            </Text>
           )}
         </View>
 
@@ -483,18 +524,29 @@ export default function BookingScreen() {
                 : `Cabine × ${passengers} passager${passengers > 1 ? 's' : ''}`}
             </Text>
             <Text style={styles.priceValue}>
-              {bookingType === 'private' 
-                ? cruise.pricing.private_price?.toLocaleString('fr-FR')
-                : (cruise.pricing.cabin_price * passengers).toLocaleString('fr-FR')}€
+              {calculatePriceDetails().basePrice.toLocaleString('fr-FR')}€
             </Text>
           </View>
           
-          {clubCards > 0 && (
+          {selectedClubCard.id !== 'none' && calculatePriceDetails().discount > 0 && (
+            <View style={styles.priceRow}>
+              <Text style={[styles.priceLabel, { color: COLORS.success }]}>
+                Remise Carte Club (-{selectedClubCard.discount}%)
+              </Text>
+              <Text style={[styles.priceValue, { color: COLORS.success }]}>
+                -{calculatePriceDetails().discount.toLocaleString('fr-FR')}€
+              </Text>
+            </View>
+          )}
+          
+          {clubCardQuantity > 0 && (
             <View style={styles.priceRow}>
               <Text style={styles.priceLabel}>
-                Carte{clubCards > 1 ? 's' : ''} Club × {clubCards}
+                {selectedClubCard.name} × {clubCardQuantity}
               </Text>
-              <Text style={styles.priceValue}>{(clubCards * CLUB_CARD_PRICE)}€</Text>
+              <Text style={styles.priceValue}>
+                +{calculatePriceDetails().clubCardTotal.toLocaleString('fr-FR')}€
+              </Text>
             </View>
           )}
           
@@ -504,6 +556,12 @@ export default function BookingScreen() {
             <Text style={styles.totalLabel}>Total</Text>
             <Text style={styles.totalValue}>{total.toLocaleString('fr-FR')} €</Text>
           </View>
+          
+          {selectedClubCard.id !== 'none' && calculatePriceDetails().discount > 0 && (
+            <Text style={styles.savingsNote}>
+              Vous économisez {calculatePriceDetails().discount.toLocaleString('fr-FR')}€ avec votre Carte Club !
+            </Text>
+          )}
         </View>
 
         <View style={styles.bottomPadding} />
