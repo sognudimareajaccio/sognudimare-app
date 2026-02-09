@@ -38,14 +38,23 @@ class AvailabilityStatus(str, Enum):
 
 # ============= MODELS =============
 
-# Cruise Models
-class CruiseDate(BaseModel):
-    date: str
+# Cruise Models - NEW DETAILED STRUCTURE
+class CruiseAvailability(BaseModel):
+    """Detailed availability with date range, price, and status"""
+    date_range: str  # e.g., "du 23 mai au 6 juin 2026"
+    price: float  # Price per passenger
     status: AvailabilityStatus = AvailabilityStatus.AVAILABLE
-    remaining_places: Optional[int] = None
+    remaining_places: Optional[int] = None  # e.g., 4 if "Reste 4 places"
+    status_label: Optional[str] = None  # e.g., "COMPLET", "Reste 4 places"
+
+class ProgramDay(BaseModel):
+    """Detailed day-by-day program"""
+    day: int
+    title: str
+    description: str
 
 class CruisePricing(BaseModel):
-    cabin_price: Optional[float] = None
+    cabin_price: Optional[float] = None  # Base price (starting from)
     private_price: Optional[float] = None
     currency: str = "EUR"
 
@@ -65,7 +74,13 @@ class Cruise(BaseModel):
     pricing: CruisePricing
     highlights_fr: List[str] = []
     highlights_en: List[str] = []
-    available_dates: List[CruiseDate] = []
+    # NEW: Detailed availabilities with date range, price, status
+    availabilities: List[CruiseAvailability] = []
+    # NEW: Detailed program day by day
+    detailed_program_fr: List[ProgramDay] = []
+    detailed_program_en: List[ProgramDay] = []
+    # Legacy fields (kept for backward compatibility)
+    available_dates: List[dict] = []
     program_fr: List[str] = []
     program_en: List[str] = []
     is_active: bool = True
