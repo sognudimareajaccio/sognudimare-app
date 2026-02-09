@@ -325,54 +325,126 @@ export default function CruiseDetailScreen() {
             </View>
           </View>
 
-          {/* Program */}
+          {/* Program - Use detailed if available */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>{t('program')}</Text>
-            {program.map((day, index) => (
-              <View key={index} style={styles.programItem}>
-                <View style={styles.programDot} />
-                <Text style={styles.programText}>{day}</Text>
-              </View>
-            ))}
+            {hasDetailedProgram ? (
+              // NEW: Detailed program with day, title, description
+              detailedProgram.map((dayInfo, index) => (
+                <View key={index} style={styles.programDetailedItem}>
+                  <View style={styles.programDayBadge}>
+                    <Text style={styles.programDayNumber}>{language === 'fr' ? 'J' : 'D'}{dayInfo.day}</Text>
+                  </View>
+                  <View style={styles.programDetailContent}>
+                    <Text style={styles.programDetailTitle}>{dayInfo.title}</Text>
+                    <Text style={styles.programDetailDescription}>{dayInfo.description}</Text>
+                  </View>
+                </View>
+              ))
+            ) : (
+              // Legacy: Simple program list
+              program.map((day, index) => (
+                <View key={index} style={styles.programItem}>
+                  <View style={styles.programDot} />
+                  <Text style={styles.programText}>{day}</Text>
+                </View>
+              ))
+            )}
           </View>
 
-          {/* Available Dates */}
+          {/* Available Dates - Use detailed availabilities if available */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>{t('availableDates')}</Text>
-            {cruise.available_dates.map((dateInfo, index) => (
-              <TouchableOpacity 
-                key={index} 
-                style={[
-                  styles.dateItem,
-                  selectedDate === dateInfo.date && styles.dateItemSelected
-                ]}
-                onPress={() => dateInfo.status !== 'full' && setSelectedDate(dateInfo.date)}
-              >
-                <View
+            {hasDetailedAvailabilities ? (
+              // NEW: Detailed availabilities with date range, price, status
+              cruise.availabilities!.map((avail, index) => (
+                <TouchableOpacity 
+                  key={index} 
                   style={[
-                    styles.dateStatus,
-                    { backgroundColor: getAvailabilityColor(dateInfo.status) },
+                    styles.availabilityItem,
+                    selectedDate === avail.date_range && styles.dateItemSelected,
+                    avail.status === 'full' && styles.availabilityFull
                   ]}
-                />
-                <View style={styles.dateInfo}>
-                  <Text style={[
-                    styles.dateText,
-                    selectedDate === dateInfo.date && styles.dateTextSelected
-                  ]}>
-                    {formatDate(dateInfo.date)}
-                  </Text>
-                  <Text style={styles.dateStatusText}>
-                    {getAvailabilityLabel(dateInfo.status)}
-                    {dateInfo.status === 'limited' &&
-                      dateInfo.remaining_places &&
-                      ` - ${dateInfo.remaining_places} ${t('remainingPlaces')}`}
-                  </Text>
-                </View>
-                {selectedDate === dateInfo.date && (
-                  <Ionicons name="checkmark-circle" size={24} color={COLORS.accent} />
-                )}
-              </TouchableOpacity>
-            ))}
+                  onPress={() => avail.status !== 'full' && setSelectedDate(avail.date_range)}
+                  disabled={avail.status === 'full'}
+                >
+                  <View style={styles.availabilityMain}>
+                    <View
+                      style={[
+                        styles.dateStatus,
+                        { backgroundColor: getAvailabilityColor(avail.status) },
+                      ]}
+                    />
+                    <View style={styles.availabilityInfo}>
+                      <Text style={[
+                        styles.availabilityDateText,
+                        selectedDate === avail.date_range && styles.dateTextSelected,
+                        avail.status === 'full' && styles.textFull
+                      ]}>
+                        {avail.date_range}
+                      </Text>
+                      <Text style={[
+                        styles.availabilityStatusLabel,
+                        avail.status === 'full' && styles.statusLabelFull,
+                        avail.status === 'limited' && styles.statusLabelLimited,
+                      ]}>
+                        {avail.status_label || getAvailabilityLabel(avail.status)}
+                      </Text>
+                    </View>
+                  </View>
+                  <View style={styles.availabilityPriceContainer}>
+                    <Text style={[
+                      styles.availabilityPrice,
+                      avail.status === 'full' && styles.textFull
+                    ]}>
+                      {avail.price}€
+                    </Text>
+                    <Text style={styles.availabilityPriceLabel}>
+                      {language === 'fr' ? '/passager' : '/passenger'}
+                    </Text>
+                  </View>
+                  {selectedDate === avail.date_range && (
+                    <Ionicons name="checkmark-circle" size={24} color={COLORS.accent} />
+                  )}
+                </TouchableOpacity>
+              ))
+            ) : (
+              // Legacy: Old available_dates format
+              cruise.available_dates.map((dateInfo, index) => (
+                <TouchableOpacity 
+                  key={index} 
+                  style={[
+                    styles.dateItem,
+                    selectedDate === dateInfo.date && styles.dateItemSelected
+                  ]}
+                  onPress={() => dateInfo.status !== 'full' && setSelectedDate(dateInfo.date)}
+                >
+                  <View
+                    style={[
+                      styles.dateStatus,
+                      { backgroundColor: getAvailabilityColor(dateInfo.status) },
+                    ]}
+                  />
+                  <View style={styles.dateInfo}>
+                    <Text style={[
+                      styles.dateText,
+                      selectedDate === dateInfo.date && styles.dateTextSelected
+                    ]}>
+                      {formatDate(dateInfo.date)}
+                    </Text>
+                    <Text style={styles.dateStatusText}>
+                      {getAvailabilityLabel(dateInfo.status)}
+                      {dateInfo.status === 'limited' &&
+                        dateInfo.remaining_places &&
+                        ` - ${dateInfo.remaining_places} ${t('remainingPlaces')}`}
+                    </Text>
+                  </View>
+                  {selectedDate === dateInfo.date && (
+                    <Ionicons name="checkmark-circle" size={24} color={COLORS.accent} />
+                  )}
+                </TouchableOpacity>
+              ))
+            )}
           </View>
 
           <View style={{ height: 100 }} />
