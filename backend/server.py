@@ -24,15 +24,15 @@ db = client[os.environ['DB_NAME']]
 
 # Square Payment client
 square_client = None
-square_location_id = os.environ.get('SQUARE_LOCATION_ID', '')
+square_location_id = os.environ.get('SQUARE_LOCATION_ID', '').strip()
 
 def get_square_client():
     global square_client
     if square_client is None:
-        access_token = os.environ.get('SQUARE_ACCESS_TOKEN', '')
-        environment = os.environ.get('SQUARE_ENVIRONMENT', 'sandbox')
-        square_client = SquareClient(
-            access_token=access_token,
+        access_token = os.environ.get('SQUARE_ACCESS_TOKEN', '').strip()
+        environment = os.environ.get('SQUARE_ENVIRONMENT', 'sandbox').strip()
+        square_client = Square(
+            token=access_token,
             environment=environment
         )
     return square_client
