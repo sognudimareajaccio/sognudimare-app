@@ -1237,35 +1237,31 @@ async def create_payment(payment_request: CreatePaymentRequest):
     """Process a payment using Square Payments API"""
     try:
         sq_client = get_square_client()
-        payments_api = sq_client.payments
         
         # Create idempotency key to prevent duplicate charges
         idempotency_key = str(uuid.uuid4())
         
-        # Create the payment request body
-        body = {
-            "source_id": payment_request.source_id,
-            "idempotency_key": idempotency_key,
-            "amount_money": {
+        # Call Square Payments API with new SDK syntax
+        result = sq_client.payments.create(
+            source_id=payment_request.source_id,
+            idempotency_key=idempotency_key,
+            amount_money={
                 "amount": payment_request.amount,
                 "currency": payment_request.currency
             },
-            "location_id": square_location_id,
-            "note": f"Croisière: {payment_request.cruise_name} - {payment_request.booking_type} - {payment_request.passengers} passagers",
-            "buyer_email_address": payment_request.customer_email,
-            "reference_id": f"cruise-{payment_request.cruise_id}-{datetime.utcnow().strftime('%Y%m%d%H%M%S')}"
-        }
+            location_id=square_location_id,
+            note=f"Croisière: {payment_request.cruise_name} - {payment_request.booking_type} - {payment_request.passengers} passagers",
+            buyer_email_address=payment_request.customer_email,
+            reference_id=f"cruise-{payment_request.cruise_id}-{datetime.utcnow().strftime('%Y%m%d%H%M%S')}"
+        )
         
-        # Call Square Payments API
-        result = payments_api.create_payment(body)
-        
-        if result.is_success():
-            payment = result.body.get("payment", {})
+        if result.payment:
+            payment = result.payment
             
             # Save payment record to database
             payment_record = {
                 "id": str(uuid.uuid4()),
-                "square_payment_id": payment.get("id"),
+                "square_payment_id": payment.id,
                 "amount": payment_request.amount,
                 "currency": payment_request.currency,
                 "status": PaymentStatus.COMPLETED,
@@ -1277,7 +1273,7 @@ async def create_payment(payment_request: CreatePaymentRequest):
                 "selected_date": payment_request.selected_date,
                 "booking_type": payment_request.booking_type,
                 "note": payment_request.note,
-                "receipt_url": payment.get("receipt_url"),
+                "receipt_url": payment.receipt_url,
                 "created_at": datetime.utcnow(),
                 "updated_at": datetime.utcnow()
             }
@@ -1286,17 +1282,16 @@ async def create_payment(payment_request: CreatePaymentRequest):
             
             return {
                 "success": True,
-                "payment_id": payment.get("id"),
-                "receipt_url": payment.get("receipt_url"),
-                "status": payment.get("status"),
+                "payment_id": payment.id,
+                "receipt_url": payment.receipt_url,
+                "status": payment.status,
                 "amount": payment_request.amount,
                 "currency": payment_request.currency,
                 "message": "Paiement réussi ! Votre réservation est confirmée."
             }
         else:
             # Payment failed
-            errors = result.errors
-            error_message = errors[0].get("detail", "Payment failed") if errors else "Unknown error"
+            error_message = "Payment failed - no payment object returned"
             
             # Save failed payment record
             payment_record = {
