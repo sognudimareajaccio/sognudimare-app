@@ -104,15 +104,12 @@ export default function CruiseDetailScreen() {
 
   const handleBooking = () => {
     if (cruise) {
-      // Redirect to payment page with booking details
+      // Redirect to booking page to select passengers, cards, etc.
       router.push({
-        pathname: `/payment/${cruise.id}`,
+        pathname: `/booking/${cruise.id}`,
         params: { 
           cruiseId: cruise.id, 
-          selectedDate: selectedDate || '',
-          bookingType: 'cabin',
-          passengers: '2',
-          amount: String(cruise.pricing.cabin_price * 2 * 100) // Amount in cents
+          selectedDate: selectedDate || ''
         }
       });
     }
