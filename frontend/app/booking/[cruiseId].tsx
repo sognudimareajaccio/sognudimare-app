@@ -13,7 +13,7 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { apiService, Cruise } from '../../src/services/api';
+import { cruiseApi, Cruise } from '../../src/services/api';
 
 // Design tokens
 const COLORS = {
