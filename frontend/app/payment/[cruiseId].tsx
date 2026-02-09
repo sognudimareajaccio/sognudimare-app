@@ -296,7 +296,7 @@ export default function PaymentScreen() {
           <View style={styles.divider} />
           <View style={styles.totalRow}>
             <Text style={styles.totalLabel}>Total à payer</Text>
-            <Text style={styles.totalAmount}>{paymentAmount.toLocaleString('fr-FR')} €</Text>
+            <Text style={styles.totalAmount}>{displayAmount.toLocaleString('fr-FR')} €</Text>
           </View>
         </View>
 
