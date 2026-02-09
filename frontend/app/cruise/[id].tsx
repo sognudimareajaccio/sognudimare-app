@@ -176,8 +176,13 @@ export default function CruiseDetailScreen() {
   const description = language === 'fr' ? cruise.description_fr : cruise.description_en;
   const highlights = language === 'fr' ? cruise.highlights_fr : cruise.highlights_en;
   const program = language === 'fr' ? cruise.program_fr : cruise.program_en;
+  const detailedProgram = language === 'fr' ? cruise.detailed_program_fr : cruise.detailed_program_en;
   const included = language === 'fr' ? getIncludedFR(cruise.duration) : getIncludedEN(cruise.duration);
   const notIncluded = language === 'fr' ? NOT_INCLUDED_FR : NOT_INCLUDED_EN;
+  
+  // Check if we have new detailed availabilities data
+  const hasDetailedAvailabilities = cruise.availabilities && cruise.availabilities.length > 0;
+  const hasDetailedProgram = detailedProgram && detailedProgram.length > 0;
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
