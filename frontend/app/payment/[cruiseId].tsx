@@ -431,7 +431,7 @@ export default function PaymentScreen() {
             <>
               <Ionicons name="lock-closed" size={20} color={COLORS.white} />
               <Text style={styles.payButtonText}>
-                Payer {paymentAmount.toLocaleString('fr-FR')} €
+                Payer {displayAmount.toLocaleString('fr-FR')} €
               </Text>
             </>
           )}
