@@ -356,8 +356,8 @@ export default function BookingScreen() {
               onPress={() => setBookingType('private')}
             >
               <View style={styles.bookingTypeHeader}>
-                <Ionicons 
-                  name="boat" 
+                <MaterialCommunityIcons 
+                  name="sail-boat" 
                   size={28} 
                   color={bookingType === 'private' ? COLORS.secondary : COLORS.textSecondary} 
                 />
