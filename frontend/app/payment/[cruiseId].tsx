@@ -256,9 +256,12 @@ export default function PaymentScreen() {
 
   const paymentAmount = parseInt(amount as string) || (
     bookingType === 'private' 
-      ? (cruise?.pricing.private_price || 0)
-      : (cruise?.pricing.cabin_price || 0) * parseInt(passengers as string || '2')
+      ? (cruise?.pricing.private_price || 0) * 100
+      : (cruise?.pricing.cabin_price || 0) * parseInt(passengers as string || '2') * 100
   );
+  
+  // Display amount in EUR (divide by 100 since amount is in cents)
+  const displayAmount = Math.round(paymentAmount / 100);
 
   return (
     <SafeAreaView style={styles.container}>
