@@ -212,7 +212,7 @@ export default function CruiseDetailScreen() {
           {/* Boarding Card Image */}
           <View style={styles.boardingCardContainer}>
             <Image 
-              source={{ uri: getBoardingCardImage(cruise.destination) }} 
+              source={{ uri: getBoardingCardImage(cruise) }} 
               style={styles.boardingCardImage} 
               resizeMode="contain"
             />
