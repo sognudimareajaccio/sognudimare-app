@@ -42,7 +42,7 @@ export default function TabLayout() {
         options={{
           title: t('cruises'),
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="boat-outline" size={size} color={color} />
+            <MaterialCommunityIcons name="sail-boat" size={size} color={color} />
           ),
         }}
       />
