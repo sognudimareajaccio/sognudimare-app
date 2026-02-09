@@ -22,7 +22,7 @@ const { width } = Dimensions.get('window');
 // Images from sognudimare website
 const HERO_IMAGE = 'https://static.wixstatic.com/media/ce6ce7_d0178804b62b4c56802db975ade4e29ff000.jpg/v1/fill/w_1904,h_1008,al_c,q_85,usm_0.33_1.00_0.00,enc_avif,quality_auto/ce6ce7_d0178804b62b4c56802db975ade4e29ff000.jpg';
 const LOGO_URL = 'https://static.wixstatic.com/media/ce6ce7_a82e3e86741143d6ab7acd99c121af7b~mv2.png/v1/fill/w_317,h_161,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/croisieres%20catamaran%20corse%20sognudimare.png';
-const BOARDING_CARDS_IMAGE = 'https://static.wixstatic.com/media/ce6ce7_ab228aee4c1841158b75f736dd159af7~mv2.png/v1/fill/w_815,h_533,al_c,q_90,usm_0.66_1.00_0.01,enc_avif,quality_auto/cartes%20embarquement%20croisi%C3%A8res%20catamarans%20sognudimare.png';
+const BOARDING_CARDS_IMAGE = 'https://customer-assets.emergentagent.com/job_sognudi-app/artifacts/b4ya6cm8_15.jpg';
 
 // Portfolio photos from sognudimare website
 const PORTFOLIO_PHOTOS = [
