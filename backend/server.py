@@ -12,7 +12,7 @@ from datetime import datetime
 from enum import Enum
 
 # Square Payment SDK
-from square.client import Client as SquareClient
+from square import Square
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
