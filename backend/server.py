@@ -1355,31 +1355,29 @@ async def refund_payment(payment_id: str, amount: Optional[int] = None):
             raise HTTPException(status_code=400, detail="Only completed payments can be refunded")
         
         sq_client = get_square_client()
-        refunds_api = sq_client.refunds
         
         refund_amount = amount if amount else payment.get("amount")
         
-        body = {
-            "idempotency_key": str(uuid.uuid4()),
-            "payment_id": payment_id,
-            "amount_money": {
+        # Call Square Refunds API with new SDK syntax
+        result = sq_client.refunds.refund_payment(
+            idempotency_key=str(uuid.uuid4()),
+            payment_id=payment_id,
+            amount_money={
                 "amount": refund_amount,
                 "currency": payment.get("currency", "EUR")
             },
-            "reason": "Customer requested refund"
-        }
+            reason="Customer requested refund"
+        )
         
-        result = refunds_api.refund_payment(body)
-        
-        if result.is_success():
-            refund = result.body.get("refund", {})
+        if result.refund:
+            refund = result.refund
             
             # Update payment record
             await db.payments.update_one(
                 {"square_payment_id": payment_id},
                 {"$set": {
                     "status": PaymentStatus.REFUNDED,
-                    "refund_id": refund.get("id"),
+                    "refund_id": refund.id,
                     "refunded_amount": refund_amount,
                     "updated_at": datetime.utcnow()
                 }}
@@ -1387,15 +1385,13 @@ async def refund_payment(payment_id: str, amount: Optional[int] = None):
             
             return {
                 "success": True,
-                "refund_id": refund.get("id"),
-                "status": refund.get("status"),
+                "refund_id": refund.id,
+                "status": refund.status,
                 "amount": refund_amount,
                 "message": "Remboursement effectué avec succès"
             }
         else:
-            errors = result.errors
-            error_message = errors[0].get("detail", "Refund failed") if errors else "Unknown error"
-            raise HTTPException(status_code=400, detail=error_message)
+            raise HTTPException(status_code=400, detail="Refund failed - no refund object returned")
             
     except HTTPException:
         raise
