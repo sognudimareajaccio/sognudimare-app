@@ -103,7 +103,10 @@ class CruiseCreate(BaseModel):
     pricing: CruisePricing
     highlights_fr: List[str] = []
     highlights_en: List[str] = []
-    available_dates: List[CruiseDate] = []
+    availabilities: List[CruiseAvailability] = []
+    detailed_program_fr: List[ProgramDay] = []
+    detailed_program_en: List[ProgramDay] = []
+    available_dates: List[dict] = []
     program_fr: List[str] = []
     program_en: List[str] = []
     is_active: bool = True
@@ -124,7 +127,10 @@ class CruiseUpdate(BaseModel):
     pricing: Optional[CruisePricing] = None
     highlights_fr: Optional[List[str]] = None
     highlights_en: Optional[List[str]] = None
-    available_dates: Optional[List[CruiseDate]] = None
+    availabilities: Optional[List[CruiseAvailability]] = None
+    detailed_program_fr: Optional[List[ProgramDay]] = None
+    detailed_program_en: Optional[List[ProgramDay]] = None
+    available_dates: Optional[List[dict]] = None
     program_fr: Optional[List[str]] = None
     program_en: Optional[List[str]] = None
     is_active: Optional[bool] = None
