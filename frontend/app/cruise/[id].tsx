@@ -142,8 +142,13 @@ export default function CruiseDetailScreen() {
     });
   };
 
-  const getBoardingCardImage = (destination: string) => {
-    return BOARDING_CARDS[destination] || BOARDING_CARDS['corsica'];
+  const getBoardingCardImage = (cruiseData: Cruise) => {
+    // Use the boarding_pass_image from the database if available
+    if (cruiseData.boarding_pass_image) {
+      return cruiseData.boarding_pass_image;
+    }
+    // Fallback to static mapping based on destination
+    return BOARDING_CARDS[cruiseData.destination] || BOARDING_CARDS['corsica'];
   };
 
   if (loading) {
