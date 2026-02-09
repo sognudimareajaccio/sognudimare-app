@@ -254,6 +254,42 @@ export default function HomeScreen() {
           </View>
         </View>
 
+        {/* Photo Portfolio Section */}
+        <View style={styles.portfolioSection}>
+          <Text style={styles.portfolioTitle}>
+            {language === 'fr' ? 'Découvrez nos croisières en images' : 'Discover our cruises in pictures'}
+          </Text>
+          <View style={styles.portfolioGrid}>
+            {PORTFOLIO_PHOTOS.slice(0, 6).map((photo, index) => (
+              <TouchableOpacity key={index} style={styles.portfolioItem}>
+                <Image source={{ uri: photo.url }} style={styles.portfolioImage} />
+                <View style={styles.portfolioOverlay}>
+                  <Text style={styles.portfolioLabel}>
+                    {language === 'fr' ? photo.label_fr : photo.label_en}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false} 
+            contentContainerStyle={styles.portfolioScrollContent}
+            style={styles.portfolioScroll}
+          >
+            {PORTFOLIO_PHOTOS.slice(6).map((photo, index) => (
+              <TouchableOpacity key={index} style={styles.portfolioScrollItem}>
+                <Image source={{ uri: photo.url }} style={styles.portfolioScrollImage} />
+                <View style={styles.portfolioScrollOverlay}>
+                  <Text style={styles.portfolioScrollLabel}>
+                    {language === 'fr' ? photo.label_fr : photo.label_en}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+
         {/* Boarding Cards Section */}
         <View style={styles.boardingSection}>
           <Text style={styles.sectionTitle}>
