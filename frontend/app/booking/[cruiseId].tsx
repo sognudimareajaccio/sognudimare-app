@@ -905,6 +905,86 @@ const styles = StyleSheet.create({
     marginTop: SPACING.md,
     fontWeight: '600',
   },
+  // New Club Card styles
+  clubCardOptions: {
+    gap: SPACING.md,
+  },
+  clubCardOption: {
+    padding: SPACING.lg,
+    borderRadius: BORDER_RADIUS.lg,
+    borderWidth: 2,
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.white,
+  },
+  clubCardOptionSelected: {
+    borderColor: COLORS.secondary,
+    backgroundColor: '#FFFBEB',
+  },
+  clubCardOptionNone: {
+    paddingVertical: SPACING.md,
+  },
+  clubCardOptionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.md,
+  },
+  clubCardOptionName: {
+    fontSize: FONT_SIZES.md,
+    fontWeight: '600',
+    color: COLORS.text,
+  },
+  clubCardOptionNameSelected: {
+    color: COLORS.secondary,
+  },
+  clubCardPriceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: SPACING.sm,
+    marginLeft: 36,
+    gap: SPACING.md,
+  },
+  clubCardPrice: {
+    fontSize: FONT_SIZES.xl,
+    fontWeight: '700',
+    color: COLORS.secondary,
+  },
+  discountBadge: {
+    backgroundColor: COLORS.success,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.xs,
+    borderRadius: BORDER_RADIUS.full,
+  },
+  discountBadgeText: {
+    color: COLORS.white,
+    fontSize: FONT_SIZES.sm,
+    fontWeight: '700',
+  },
+  clubCardDescription: {
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.textSecondary,
+    marginTop: SPACING.xs,
+    marginLeft: 36,
+  },
+  clubCardQuantitySection: {
+    marginTop: SPACING.lg,
+    paddingTop: SPACING.lg,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+  },
+  clubCardQuantityLabel: {
+    fontSize: FONT_SIZES.md,
+    fontWeight: '600',
+    color: COLORS.text,
+    textAlign: 'center',
+    marginBottom: SPACING.md,
+  },
+  savingsNote: {
+    textAlign: 'center',
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.success,
+    fontWeight: '600',
+    marginTop: SPACING.md,
+  },
   priceSummary: {
     backgroundColor: COLORS.white,
     padding: SPACING.lg,
