@@ -91,7 +91,7 @@ export default function BookingScreen() {
     try {
       setLoading(true);
       console.log('Loading cruise with ID:', cruiseId);
-      const data = await apiService.cruises.getById(cruiseId as string);
+      const data = await cruiseApi.getById(cruiseId as string);
       console.log('Cruise loaded:', data?.name_fr);
       setCruise(data);
       
