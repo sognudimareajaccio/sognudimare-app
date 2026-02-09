@@ -35,6 +35,22 @@ export interface CruiseDate {
   remaining_places?: number;
 }
 
+// NEW: Detailed availability with date range, price, and status
+export interface CruiseAvailability {
+  date_range: string;  // e.g., "du 23 mai au 6 juin 2026"
+  price: number;  // Price per passenger
+  status: 'available' | 'limited' | 'full';
+  remaining_places?: number;
+  status_label?: string;  // e.g., "COMPLET", "Reste 4 places"
+}
+
+// NEW: Detailed program day by day
+export interface ProgramDay {
+  day: number;
+  title: string;
+  description: string;
+}
+
 export interface CruisePricing {
   cabin_price: number | null;
   private_price: number | null;
@@ -57,6 +73,12 @@ export interface Cruise {
   pricing: CruisePricing;
   highlights_fr: string[];
   highlights_en: string[];
+  // NEW: Detailed availabilities with date range, price, status
+  availabilities?: CruiseAvailability[];
+  // NEW: Detailed program day by day
+  detailed_program_fr?: ProgramDay[];
+  detailed_program_en?: ProgramDay[];
+  // Legacy fields
   available_dates: CruiseDate[];
   program_fr: string[];
   program_en: string[];
