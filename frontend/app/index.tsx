@@ -572,6 +572,73 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginRight: SPACING.sm,
   },
+  // Portfolio Photo styles
+  portfolioSection: {
+    padding: SPACING.lg,
+    backgroundColor: COLORS.white,
+  },
+  portfolioTitle: {
+    fontSize: FONT_SIZES.xl,
+    fontWeight: '700',
+    color: COLORS.primary,
+    textAlign: 'center',
+    marginBottom: SPACING.lg,
+  },
+  portfolioGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  portfolioItem: {
+    width: '48%',
+    height: 120,
+    marginBottom: SPACING.sm,
+    borderRadius: BORDER_RADIUS.lg,
+    overflow: 'hidden',
+  },
+  portfolioImage: {
+    width: '100%',
+    height: '100%',
+  },
+  portfolioOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,37,82,0.4)',
+    justifyContent: 'flex-end',
+    padding: SPACING.sm,
+  },
+  portfolioLabel: {
+    color: COLORS.white,
+    fontSize: FONT_SIZES.sm,
+    fontWeight: '700',
+  },
+  portfolioScroll: {
+    marginTop: SPACING.sm,
+  },
+  portfolioScrollContent: {
+    paddingRight: SPACING.lg,
+  },
+  portfolioScrollItem: {
+    width: 180,
+    height: 120,
+    marginRight: SPACING.sm,
+    borderRadius: BORDER_RADIUS.lg,
+    overflow: 'hidden',
+  },
+  portfolioScrollImage: {
+    width: '100%',
+    height: '100%',
+  },
+  portfolioScrollOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,37,82,0.4)',
+    justifyContent: 'flex-end',
+    padding: SPACING.sm,
+  },
+  portfolioScrollLabel: {
+    color: COLORS.white,
+    fontSize: FONT_SIZES.sm,
+    fontWeight: '600',
+  },
   boardingSection: {
     padding: SPACING.lg,
     backgroundColor: COLORS.white,
