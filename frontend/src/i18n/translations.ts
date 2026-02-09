@@ -108,6 +108,7 @@ export const translations = {
     followUs: "Suivez-nous",
     address: "Port Tino Rossi - 20000 AJACCIO",
     bookingWebsite: "Réserver sur le site",
+    viewWebsite: "Voir le site web",
     
     // General
     loading: "Chargement...",
