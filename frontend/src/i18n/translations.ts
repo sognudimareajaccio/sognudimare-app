@@ -140,7 +140,7 @@ export const translations = {
     contact: "Contact",
     
     // Home Screen
-    heroTitle: "From dream to reality...",
+    heroTitle: "From dream\nto reality...",
     heroSubtitle: "Travel slower, healthier and more humanely",
     discoverCruises: "Discover our cruises",
     ourDifference: "What makes us different",
