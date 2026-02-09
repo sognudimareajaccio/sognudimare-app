@@ -241,6 +241,7 @@ export const translations = {
     followUs: "Follow us",
     address: "Port Tino Rossi - 20000 AJACCIO",
     bookingWebsite: "Book on website",
+    viewWebsite: "View website",
     
     // General
     loading: "Loading...",
