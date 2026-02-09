@@ -71,12 +71,6 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="booking"
-        options={{
-          href: null,
-        }}
-      />
-      <Tabs.Screen
         name="booking/[cruiseId]"
         options={{
           href: null,
