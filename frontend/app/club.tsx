@@ -289,6 +289,15 @@ export default function ClubScreen() {
         <Text style={styles.heroDescription}>{t('clubDescription')}</Text>
       </View>
 
+      {/* Club Cards Image */}
+      <View style={styles.clubCardsImageContainer}>
+        <Image 
+          source={{ uri: 'https://customer-assets.emergentagent.com/job_sognudi-app/artifacts/nfk3yqi1_CARTE%20CLUB.avif' }}
+          style={styles.clubCardsImage}
+          resizeMode="contain"
+        />
+      </View>
+
       {/* How it works */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>{t('howItWorks')}</Text>
