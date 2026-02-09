@@ -797,4 +797,99 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     marginRight: SPACING.sm,
   },
+  // NEW: Detailed Program Styles
+  programDetailedItem: {
+    flexDirection: 'row',
+    marginBottom: SPACING.lg,
+    backgroundColor: COLORS.white,
+    borderRadius: BORDER_RADIUS.lg,
+    padding: SPACING.md,
+    borderLeftWidth: 4,
+    borderLeftColor: COLORS.accent,
+  },
+  programDayBadge: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: COLORS.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: SPACING.md,
+  },
+  programDayNumber: {
+    color: COLORS.secondary,
+    fontSize: FONT_SIZES.sm,
+    fontWeight: '700',
+  },
+  programDetailContent: {
+    flex: 1,
+  },
+  programDetailTitle: {
+    fontSize: FONT_SIZES.md,
+    fontWeight: '700',
+    color: COLORS.primary,
+    marginBottom: SPACING.xs,
+  },
+  programDetailDescription: {
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.textSecondary,
+    lineHeight: 20,
+  },
+  // NEW: Detailed Availability Styles
+  availabilityItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    padding: SPACING.md,
+    borderRadius: BORDER_RADIUS.lg,
+    marginBottom: SPACING.sm,
+    borderWidth: 2,
+    borderColor: COLORS.border,
+  },
+  availabilityFull: {
+    backgroundColor: COLORS.surfaceLight,
+    opacity: 0.7,
+  },
+  availabilityMain: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  availabilityInfo: {
+    flex: 1,
+  },
+  availabilityDateText: {
+    fontSize: FONT_SIZES.md,
+    fontWeight: '600',
+    color: COLORS.text,
+  },
+  availabilityStatusLabel: {
+    fontSize: FONT_SIZES.xs,
+    fontWeight: '600',
+    color: COLORS.available,
+    marginTop: 2,
+  },
+  statusLabelFull: {
+    color: COLORS.full,
+  },
+  statusLabelLimited: {
+    color: COLORS.limited,
+  },
+  textFull: {
+    color: COLORS.textSecondary,
+    textDecorationLine: 'line-through',
+  },
+  availabilityPriceContainer: {
+    alignItems: 'flex-end',
+    marginRight: SPACING.md,
+  },
+  availabilityPrice: {
+    fontSize: FONT_SIZES.lg,
+    fontWeight: '700',
+    color: COLORS.primary,
+  },
+  availabilityPriceLabel: {
+    fontSize: FONT_SIZES.xs,
+    color: COLORS.textSecondary,
+  },
 });
