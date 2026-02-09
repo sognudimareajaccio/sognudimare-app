@@ -57,8 +57,50 @@ const BORDER_RADIUS = {
   full: 9999,
 };
 
-// Club card price
-const CLUB_CARD_PRICE = 25; // €25 per card
+// Club Card types with prices and discounts
+interface ClubCardType {
+  id: string;
+  name: string;
+  duration: string;
+  price: number;
+  discount: number; // percentage
+  description: string;
+}
+
+const CLUB_CARDS: ClubCardType[] = [
+  {
+    id: 'none',
+    name: 'Sans carte',
+    duration: '',
+    price: 0,
+    discount: 0,
+    description: 'Prix standard sans réduction'
+  },
+  {
+    id: '12months',
+    name: 'Carte Club 12 mois',
+    duration: '12 mois',
+    price: 90,
+    discount: 10,
+    description: '10% de remise immédiate sur votre croisière'
+  },
+  {
+    id: '24months',
+    name: 'Carte Club 24 mois',
+    duration: '24 mois',
+    price: 150,
+    discount: 15,
+    description: '15% de remise immédiate sur votre croisière'
+  },
+  {
+    id: '36months',
+    name: 'Carte Club 36 mois',
+    duration: '36 mois',
+    price: 140,
+    discount: 20,
+    description: '20% de remise immédiate sur votre croisière'
+  }
+];
 
 export default function BookingScreen() {
   const { cruiseId, selectedDate } = useLocalSearchParams();
@@ -70,7 +112,8 @@ export default function BookingScreen() {
   // Booking options
   const [bookingType, setBookingType] = useState<'cabin' | 'private'>('cabin');
   const [passengers, setPassengers] = useState(2);
-  const [clubCards, setClubCards] = useState(0);
+  const [selectedClubCard, setSelectedClubCard] = useState<ClubCardType>(CLUB_CARDS[0]);
+  const [clubCardQuantity, setClubCardQuantity] = useState(0); // Number of cards (for multiple passengers)
   
   // Modal for date selection
   const [showDateModal, setShowDateModal] = useState(false);
@@ -110,9 +153,10 @@ export default function BookingScreen() {
     }
   };
 
-  const calculateTotal = () => {
-    if (!cruise) return 0;
+  const calculatePriceDetails = () => {
+    if (!cruise) return { basePrice: 0, discount: 0, clubCardTotal: 0, total: 0 };
     
+    // Base cruise price
     let basePrice = 0;
     if (bookingType === 'private') {
       basePrice = cruise.pricing.private_price || 0;
@@ -120,8 +164,21 @@ export default function BookingScreen() {
       basePrice = (cruise.pricing.cabin_price || 0) * passengers;
     }
     
-    const clubCardsTotal = clubCards * CLUB_CARD_PRICE;
-    return basePrice + clubCardsTotal;
+    // Club card discount
+    const discountPercentage = selectedClubCard.discount;
+    const discountAmount = Math.round(basePrice * discountPercentage / 100);
+    
+    // Club card cost (price × quantity)
+    const clubCardTotal = selectedClubCard.price * clubCardQuantity;
+    
+    // Total = base price - discount + club cards
+    const total = basePrice - discountAmount + clubCardTotal;
+    
+    return { basePrice, discount: discountAmount, clubCardTotal, total };
+  };
+
+  const calculateTotal = () => {
+    return calculatePriceDetails().total;
   };
 
   const handleProceedToPayment = () => {
