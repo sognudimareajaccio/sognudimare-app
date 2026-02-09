@@ -234,21 +234,9 @@ export default function CruiseDetailScreen() {
             <Text style={styles.descriptionText}>{description}</Text>
           </View>
 
-          {/* Private Only Notice for Greece & Caribbean */}
-          {PRIVATE_ONLY_DESTINATIONS.includes(cruise.destination) && (
-            <View style={styles.privateOnlyNotice}>
-              <Ionicons name="information-circle" size={20} color={COLORS.secondary} />
-              <Text style={styles.privateOnlyText}>
-                {language === 'fr' 
-                  ? 'Cette croisière est uniquement disponible en privatisation complète du navire (base 8 passagers)'
-                  : 'This cruise is only available as full boat charter (base 8 passengers)'}
-              </Text>
-            </View>
-          )}
-
           {/* Pricing */}
           <View style={styles.pricingSection}>
-            {cruise.pricing.cabin_price && !PRIVATE_ONLY_DESTINATIONS.includes(cruise.destination) && (
+            {cruise.pricing.cabin_price && (
               <View style={styles.priceCard}>
                 <View style={styles.priceHeader}>
                   <Ionicons name="bed" size={24} color={COLORS.primary} />
@@ -261,23 +249,16 @@ export default function CruiseDetailScreen() {
               </View>
             )}
             {cruise.pricing.private_price && (
-              <View style={[styles.priceCard, PRIVATE_ONLY_DESTINATIONS.includes(cruise.destination) ? styles.priceCardPrivateFull : styles.priceCardPrivate]}>
+              <View style={[styles.priceCard, styles.priceCardPrivate]}>
                 <View style={styles.priceHeader}>
                   <Ionicons name="boat" size={24} color={COLORS.secondary} />
                   <Text style={[styles.priceCardTitle, { color: COLORS.secondary }]}>
-                    {PRIVATE_ONLY_DESTINATIONS.includes(cruise.destination) 
-                      ? (language === 'fr' ? 'Privatisation complète' : 'Full Charter')
-                      : t('fullPrivatization')}
+                    {t('fullPrivatization')}
                   </Text>
                 </View>
                 <Text style={[styles.priceAmount, { color: COLORS.secondary }]}>
                   {cruise.pricing.private_price}€
                 </Text>
-                {PRIVATE_ONLY_DESTINATIONS.includes(cruise.destination) && (
-                  <Text style={styles.privatePriceNote}>
-                    {language === 'fr' ? '(base 8 passagers)' : '(base 8 passengers)'}
-                  </Text>
-                )}
               </View>
             )}
           </View>
