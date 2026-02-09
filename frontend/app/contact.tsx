@@ -122,13 +122,17 @@ export default function ContactScreen() {
           </View>
         </View>
 
-        {/* Company Info */}
+        {/* Company Info with Logo */}
         <View style={styles.companyInfo}>
-          <Text style={styles.companyTitle}>SOGNUDIMARE</Text>
+          <Image 
+            source={{ uri: LOGO_URL }} 
+            style={styles.companyLogo}
+            resizeMode="contain"
+          />
           <Text style={styles.companyText}>
             Croisières catamaran & Promenades privatives en mer
           </Text>
-          <Text style={styles.companyText}>Corse | Sardaigne | Grèce | Caraïbes</Text>
+          <Text style={styles.companyText}>Corse | Sardaigne</Text>
           <View style={styles.companyDetails}>
             <Text style={styles.companyDetailText}>SIRET: 45138736900031</Text>
             <Text style={styles.companyDetailText}>APE: 52.22Z</Text>
