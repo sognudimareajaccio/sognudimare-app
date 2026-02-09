@@ -32,9 +32,10 @@ def get_square_client():
     if square_client is None:
         access_token = os.environ.get('SQUARE_ACCESS_TOKEN', '').strip()
         environment = os.environ.get('SQUARE_ENVIRONMENT', 'sandbox').strip()
+        env = SquareEnvironment.SANDBOX if environment == 'sandbox' else SquareEnvironment.PRODUCTION
         square_client = Square(
             token=access_token,
-            environment=environment
+            environment=env
         )
     return square_client
 
