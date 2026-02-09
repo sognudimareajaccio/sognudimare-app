@@ -158,15 +158,31 @@ export default function BookingScreen() {
     
     // Base cruise price
     let basePrice = 0;
+    const pricePerPerson = cruise.pricing.cabin_price || 0;
+    
     if (bookingType === 'private') {
       basePrice = cruise.pricing.private_price || 0;
     } else {
-      basePrice = (cruise.pricing.cabin_price || 0) * passengers;
+      basePrice = pricePerPerson * passengers;
     }
     
-    // Club card discount
+    // Club card discount - ONLY applies to the number of cards purchased
+    // Each card gives discount on ONE passenger's price
     const discountPercentage = selectedClubCard.discount;
-    const discountAmount = Math.round(basePrice * discountPercentage / 100);
+    let discountAmount = 0;
+    
+    if (bookingType === 'private') {
+      // For private booking, discount applies to total if at least 1 card
+      if (clubCardQuantity > 0) {
+        discountAmount = Math.round(basePrice * discountPercentage / 100);
+      }
+    } else {
+      // For cabin booking, discount applies only to passengers with cards
+      // Each card = discount on 1 passenger's price
+      const passengersWithDiscount = Math.min(clubCardQuantity, passengers);
+      const discountableAmount = pricePerPerson * passengersWithDiscount;
+      discountAmount = Math.round(discountableAmount * discountPercentage / 100);
+    }
     
     // Club card cost (price × quantity)
     const clubCardTotal = selectedClubCard.price * clubCardQuantity;
@@ -174,7 +190,7 @@ export default function BookingScreen() {
     // Total = base price - discount + club cards
     const total = basePrice - discountAmount + clubCardTotal;
     
-    return { basePrice, discount: discountAmount, clubCardTotal, total };
+    return { basePrice, discount: discountAmount, clubCardTotal, total, passengersWithDiscount: Math.min(clubCardQuantity, passengers) };
   };
 
   const calculateTotal = () => {
