@@ -198,7 +198,8 @@ export default function BookingScreen() {
         selectedDate: chosenDate,
         bookingType: bookingType,
         passengers: String(passengers),
-        clubCards: String(clubCards),
+        clubCardId: selectedClubCard.id,
+        clubCardQuantity: String(clubCardQuantity),
         amount: String(totalAmount)
       }
     });
@@ -209,15 +210,35 @@ export default function BookingScreen() {
   };
 
   const decrementPassengers = () => {
-    if (passengers > 1) setPassengers(passengers - 1);
+    if (passengers > 1) {
+      setPassengers(passengers - 1);
+      // Reduce club card quantity if needed
+      if (clubCardQuantity > passengers - 1) {
+        setClubCardQuantity(passengers - 1);
+      }
+    }
   };
 
-  const incrementClubCards = () => {
-    if (clubCards < passengers) setClubCards(clubCards + 1);
+  const incrementClubCardQuantity = () => {
+    if (clubCardQuantity < passengers && selectedClubCard.id !== 'none') {
+      setClubCardQuantity(clubCardQuantity + 1);
+    }
   };
 
-  const decrementClubCards = () => {
-    if (clubCards > 0) setClubCards(clubCards - 1);
+  const decrementClubCardQuantity = () => {
+    if (clubCardQuantity > 0) {
+      setClubCardQuantity(clubCardQuantity - 1);
+    }
+  };
+
+  const selectClubCard = (card: ClubCardType) => {
+    setSelectedClubCard(card);
+    // Reset quantity when changing card type
+    if (card.id === 'none') {
+      setClubCardQuantity(0);
+    } else if (clubCardQuantity === 0) {
+      setClubCardQuantity(1); // Auto-select 1 card
+    }
   };
 
   if (loading) {
