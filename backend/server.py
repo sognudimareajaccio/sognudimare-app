@@ -891,11 +891,12 @@ async def seed_database():
 
 @api_router.post("/apply-corrections")
 async def apply_cruise_corrections():
-    """Apply all user-requested corrections: fix programs, images, and delete unwanted cruises"""
+    """Apply all user-requested corrections: fix programs, images, prices and delete unwanted cruises"""
     
     results = {
         "programs_updated": [],
         "images_updated": [],
+        "prices_updated": [],
         "cruises_deleted": [],
         "errors": []
     }
@@ -909,23 +910,23 @@ async def apply_cruise_corrections():
     except Exception as e:
         results["errors"].append(f"Error deleting cruises: {str(e)}")
     
-    # 2. Update Tour de Corse - Program (shortened to location names only)
+    # 2. Update Tour de Corse - Program, Price (20480€ privatisation)
     tour_de_corse_program = [
-        "J1: Ajaccio & Îles Sanguinaires",
-        "J2: Cargèse",
-        "J3: Calanques de Piana & Golfe de Porto",
-        "J4: Girolata",
-        "J5: Réserve de Scandola & Galéria",
-        "J6: Golfe de la Revelatta & Calvi",
-        "J7: Plages de Saleccia & Saint-Florent",
-        "J8: Plage de Nonza & Port de Centuri",
-        "J9: Cap Corse, Erbalunga & Bastia",
-        "J10: Solenzara",
-        "J11: Porto-Vecchio & Santa Giulia",
-        "J12: Bonifacio",
-        "J13: Plage de Roccapina & Tizzano",
-        "J14: Cala di Conca & Ajaccio",
-        "J15: Débarquement Ajaccio"
+        "JOUR 1 : AJACCIO & LES ÎLES SANGUINAIRES",
+        "JOUR 2 : CARGÈSE",
+        "JOUR 3 : LES CALANQUES DE PIANA & LE GOLFE DE PORTO",
+        "JOUR 4 : LE PETIT VILLAGE DE GIROLATA",
+        "JOUR 5 : LA RÉSERVE NATURELLE DE SCANDOLA & GALÉRIA",
+        "JOUR 6 : LE GOLFE DE LA REVELATTA & CALVI",
+        "JOUR 7 : LES PLAGES DE SALECCIA ET LE PORT DE SAINT FLORENT",
+        "JOUR 8 : LA PLAGE DE NONZA & LE PORT DE CENTURI",
+        "JOUR 9 : CAP CORSE, ERBALUNGA & BASTIA",
+        "JOUR 10 : SOLENZARA",
+        "JOUR 11 : PORTO VECCHIO & SANTA GIULIA",
+        "JOUR 12 : BONIFACIO",
+        "JOUR 13 : LA PLAGE DE ROCCAPINA & TIZZANO",
+        "JOUR 14 : RETOUR SUR AJACCIO AVEC ARRÊT SUR CALA DI CONCA",
+        "JOUR 15 : DEBARQUEMENT PORT TINO ROSSI À AJACCIO"
     ]
     
     try:
@@ -933,25 +934,27 @@ async def apply_cruise_corrections():
             {"name_fr": "Tour de Corse"},
             {"$set": {
                 "program_fr": tour_de_corse_program,
+                "pricing.private_price": 20480,
                 "boarding_pass_image": "https://static.wixstatic.com/media/ce6ce7_170fb96af2764aecb7eb7c526a48eb27~mv2.png/v1/fill/w_400,h_267,al_c,q_85,enc_avif,quality_auto/croisiere%20catamaran%20le%20tour%20de%20Corse%20sognudimare.png",
                 "updated_at": datetime.utcnow()
             }}
         )
         if result.modified_count > 0:
             results["programs_updated"].append("Tour de Corse")
+            results["prices_updated"].append("Tour de Corse (privatisation: 20480€)")
     except Exception as e:
         results["errors"].append(f"Error updating Tour de Corse: {str(e)}")
     
     # 3. Update Ouest Corse - Program and boarding pass image
     ouest_corse_program = [
-        "J1: Ajaccio & Îles Sanguinaires",
-        "J2: Cargèse",
-        "J3: Calanques de Piana",
-        "J4: Réserve de Scandola",
-        "J5: Girolata",
-        "J6: Calvi",
-        "J7: Saint-Florent",
-        "J8: Retour Ajaccio"
+        "JOUR 1 : AJACCIO & LES ÎLES SANGUINAIRES",
+        "JOUR 2 : CARGÈSE & CALA DI PALU",
+        "JOUR 3 : LES CALANQUES DE PIANA & FICAJOLA",
+        "JOUR 4 : LE GOLFE DE PORTO & LE PETIT VILLAGE DE GIROLATA",
+        "JOUR 5 : LA RÉSERVE NATURELLE DE SCANDOLA & GALÉRIA",
+        "JOUR 6 : LE GOLFE DE LA REVELATTA & CALVI",
+        "JOUR 7 : RETOUR SUR AJACCIO AVEC ARRÊT SUR LA PLAGE D'ARONE",
+        "JOUR 8 : DEBARQUEMENT PORT TINO ROSSI À AJACCIO"
     ]
     
     try:
@@ -971,14 +974,14 @@ async def apply_cruise_corrections():
     
     # 4. Update Corse du Sud - Program and boarding pass image
     corse_sud_program = [
-        "J1: Ajaccio & Îles Sanguinaires",
-        "J2: Propriano & Campomoro",
-        "J3: Bonifacio",
-        "J4: Îles Lavezzi",
-        "J5: Porto-Vecchio",
-        "J6: Santa Giulia",
-        "J7: Rondinara",
-        "J8: Retour Ajaccio"
+        "JOUR 1 : AJACCIO & ANSE DE CACALU",
+        "JOUR 2 : CAMPOMORO & ROCCAPINA",
+        "JOUR 3 : ANSE D'ARBITRU (PLAGE D'ARGENT) & BONIFACIO",
+        "JOUR 4 : SANT' AMANZA & CAVALLO",
+        "JOUR 5 : LES ÎLES LAVEZZI",
+        "JOUR 6 : GOLFE DE MURTOLI & TIZZANO",
+        "JOUR 7 : RETOUR SUR AJACCIO AVEC ARRÊT SUR CALA DI CONCA",
+        "JOUR 8 : DEBARQUEMENT PORT TINO ROSSI À AJACCIO"
     ]
     
     try:
@@ -998,14 +1001,14 @@ async def apply_cruise_corrections():
     
     # 5. Update Sardaigne & Corse du Sud - Program and boarding pass image
     sardaigne_program = [
-        "J1: Ajaccio & Îles Sanguinaires",
-        "J2: Propriano",
-        "J3: Bonifacio",
-        "J4: Îles Lavezzi & La Maddalena",
-        "J5: Archipel de La Maddalena",
-        "J6: Costa Smeralda",
-        "J7: Porto-Vecchio",
-        "J8: Retour Ajaccio"
+        "JOUR 1 : AJACCIO & ANSE DE CACALU",
+        "JOUR 2 : ROCCAPINA & BONIFACIO",
+        "JOUR 3 : LES ÎLES LAVEZZI, L'ARCHIPEL DE LA MADDALENA & CALA GAVETTA",
+        "JOUR 4 : CALA CRIS - CALA GRANU & PORTO CERVO (SARDAIGNE)",
+        "JOUR 5 : L'ÎLE DE CAPRERA, CALA DI COTICCIO",
+        "JOUR 6 : GOLFE DE MURTOLI & TIZZANO",
+        "JOUR 7 : CALA DI CONCA & PROPRIANO",
+        "JOUR 8 : DEBARQUEMENT PORT TINO ROSSI À AJACCIO"
     ]
     
     try:
