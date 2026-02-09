@@ -1158,6 +1158,225 @@ async def update_cruises_with_detailed_data():
     
     return {"message": "Cruises updated with detailed data successfully"}
 
+# ============= SQUARE PAYMENT MODELS =============
+
+class PaymentStatus(str, Enum):
+    PENDING = "PENDING"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+    REFUNDED = "REFUNDED"
+
+class CreatePaymentRequest(BaseModel):
+    """Request to create a payment"""
+    source_id: str  # Card nonce from Square Web Payments SDK
+    amount: int  # Amount in cents (EUR)
+    currency: str = "EUR"
+    cruise_id: str
+    cruise_name: str
+    customer_email: str
+    customer_name: str
+    passengers: int = 2
+    selected_date: Optional[str] = None
+    booking_type: str = "cabin"  # "cabin" or "private"
+    note: Optional[str] = None
+
+class PaymentRecord(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    square_payment_id: Optional[str] = None
+    amount: int
+    currency: str = "EUR"
+    status: PaymentStatus = PaymentStatus.PENDING
+    cruise_id: str
+    cruise_name: str
+    customer_email: str
+    customer_name: str
+    passengers: int
+    selected_date: Optional[str] = None
+    booking_type: str
+    note: Optional[str] = None
+    receipt_url: Optional[str] = None
+    error_message: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+# ============= SQUARE PAYMENT ENDPOINTS =============
+
+@api_router.get("/payments/config")
+async def get_payment_config():
+    """Get Square payment configuration for frontend"""
+    return {
+        "application_id": os.environ.get('SQUARE_APPLICATION_ID', '').strip(),
+        "location_id": os.environ.get('SQUARE_LOCATION_ID', '').strip(),
+        "environment": os.environ.get('SQUARE_ENVIRONMENT', 'sandbox').strip()
+    }
+
+@api_router.post("/payments/create")
+async def create_payment(payment_request: CreatePaymentRequest):
+    """Process a payment using Square Payments API"""
+    try:
+        sq_client = get_square_client()
+        
+        # Create idempotency key to prevent duplicate charges
+        idempotency_key = str(uuid.uuid4())
+        
+        # Call Square Payments API with new SDK syntax
+        result = sq_client.payments.create(
+            source_id=payment_request.source_id,
+            idempotency_key=idempotency_key,
+            amount_money={
+                "amount": payment_request.amount,
+                "currency": payment_request.currency
+            },
+            location_id=square_location_id,
+            note=f"Croisière: {payment_request.cruise_name} - {payment_request.booking_type} - {payment_request.passengers} passagers",
+            buyer_email_address=payment_request.customer_email,
+            reference_id=f"cruise-{payment_request.cruise_id}-{datetime.utcnow().strftime('%Y%m%d%H%M%S')}"
+        )
+        
+        if result.payment:
+            payment = result.payment
+            
+            # Save payment record to database
+            payment_record = {
+                "id": str(uuid.uuid4()),
+                "square_payment_id": payment.id,
+                "amount": payment_request.amount,
+                "currency": payment_request.currency,
+                "status": PaymentStatus.COMPLETED.value,
+                "cruise_id": payment_request.cruise_id,
+                "cruise_name": payment_request.cruise_name,
+                "customer_email": payment_request.customer_email,
+                "customer_name": payment_request.customer_name,
+                "passengers": payment_request.passengers,
+                "selected_date": payment_request.selected_date,
+                "booking_type": payment_request.booking_type,
+                "note": payment_request.note,
+                "receipt_url": payment.receipt_url,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            }
+            
+            await db.payments.insert_one(payment_record)
+            
+            return {
+                "success": True,
+                "payment_id": payment.id,
+                "receipt_url": payment.receipt_url,
+                "status": payment.status,
+                "amount": payment_request.amount,
+                "currency": payment_request.currency,
+                "message": "Paiement réussi ! Votre réservation est confirmée."
+            }
+        else:
+            # Payment failed
+            error_message = "Payment failed - no payment object returned"
+            
+            # Save failed payment record
+            payment_record = {
+                "id": str(uuid.uuid4()),
+                "amount": payment_request.amount,
+                "currency": payment_request.currency,
+                "status": PaymentStatus.FAILED.value,
+                "cruise_id": payment_request.cruise_id,
+                "cruise_name": payment_request.cruise_name,
+                "customer_email": payment_request.customer_email,
+                "customer_name": payment_request.customer_name,
+                "passengers": payment_request.passengers,
+                "error_message": error_message,
+                "created_at": datetime.utcnow(),
+                "updated_at": datetime.utcnow()
+            }
+            
+            await db.payments.insert_one(payment_record)
+            
+            raise HTTPException(status_code=400, detail=error_message)
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Payment error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Erreur de paiement: {str(e)}")
+
+@api_router.get("/payments/{payment_id}")
+async def get_payment(payment_id: str):
+    """Get payment details by ID"""
+    payment = await db.payments.find_one({"square_payment_id": payment_id})
+    if not payment:
+        payment = await db.payments.find_one({"id": payment_id})
+    
+    if not payment:
+        raise HTTPException(status_code=404, detail="Payment not found")
+    
+    payment["_id"] = str(payment["_id"])
+    return payment
+
+@api_router.get("/payments/customer/{email}")
+async def get_customer_payments(email: str):
+    """Get all payments for a customer by email"""
+    payments_list = await db.payments.find({"customer_email": email}).sort("created_at", -1).to_list(length=100)
+    
+    for payment in payments_list:
+        payment["_id"] = str(payment["_id"])
+    
+    return {"payments": payments_list, "count": len(payments_list)}
+
+@api_router.post("/payments/{payment_id}/refund")
+async def refund_payment(payment_id: str, amount: Optional[int] = None):
+    """Refund a payment (full or partial)"""
+    try:
+        # Get payment record
+        payment = await db.payments.find_one({"square_payment_id": payment_id})
+        if not payment:
+            raise HTTPException(status_code=404, detail="Payment not found")
+        
+        if payment.get("status") != PaymentStatus.COMPLETED.value:
+            raise HTTPException(status_code=400, detail="Only completed payments can be refunded")
+        
+        sq_client = get_square_client()
+        
+        refund_amount = amount if amount else payment.get("amount")
+        
+        # Call Square Refunds API with new SDK syntax
+        result = sq_client.refunds.refund_payment(
+            idempotency_key=str(uuid.uuid4()),
+            payment_id=payment_id,
+            amount_money={
+                "amount": refund_amount,
+                "currency": payment.get("currency", "EUR")
+            },
+            reason="Customer requested refund"
+        )
+        
+        if result.refund:
+            refund = result.refund
+            
+            # Update payment record
+            await db.payments.update_one(
+                {"square_payment_id": payment_id},
+                {"$set": {
+                    "status": PaymentStatus.REFUNDED.value,
+                    "refund_id": refund.id,
+                    "refunded_amount": refund_amount,
+                    "updated_at": datetime.utcnow()
+                }}
+            )
+            
+            return {
+                "success": True,
+                "refund_id": refund.id,
+                "status": refund.status,
+                "amount": refund_amount,
+                "message": "Remboursement effectué avec succès"
+            }
+        else:
+            raise HTTPException(status_code=400, detail="Refund failed - no refund object returned")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Refund error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Erreur de remboursement: {str(e)}")
+
 # Include the router in the main app
 app.include_router(api_router)
 
