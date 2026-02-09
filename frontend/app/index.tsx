@@ -24,6 +24,70 @@ const HERO_IMAGE = 'https://static.wixstatic.com/media/ce6ce7_d0178804b62b4c5680
 const LOGO_URL = 'https://static.wixstatic.com/media/ce6ce7_a82e3e86741143d6ab7acd99c121af7b~mv2.png/v1/fill/w_317,h_161,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/croisieres%20catamaran%20corse%20sognudimare.png';
 const BOARDING_CARDS_IMAGE = 'https://static.wixstatic.com/media/ce6ce7_ab228aee4c1841158b75f736dd159af7~mv2.png/v1/fill/w_815,h_533,al_c,q_90,usm_0.66_1.00_0.01,enc_avif,quality_auto/cartes%20embarquement%20croisi%C3%A8res%20catamarans%20sognudimare.png';
 
+// Portfolio photos from sognudimare website
+const PORTFOLIO_PHOTOS = [
+  { 
+    url: 'https://static.wixstatic.com/media/ce6ce7_0ce032b8fe2e4bf58652c8d18e897478~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/SOGNUDIMARE%20CROISIERE%20CATAMARAN%20DEPUIS%20AJACCIO%20copie.jpg',
+    label_fr: 'Tour de Corse',
+    label_en: 'Tour of Corsica'
+  },
+  { 
+    url: 'https://static.wixstatic.com/media/ce6ce7_f3bee630d0c549388bbc71c0e58fb9ea~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/sognudimare%20a%20scandola_edited.jpg',
+    label_fr: 'Scandola',
+    label_en: 'Scandola'
+  },
+  { 
+    url: 'https://static.wixstatic.com/media/ce6ce7_9e15d4c9779b4d48ad56a689ab2fe02b~mv2.avif/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/LAGOON%2043%20SOGNUDIMARE.avif',
+    label_fr: 'Notre Catamaran',
+    label_en: 'Our Catamaran'
+  },
+  { 
+    url: 'https://static.wixstatic.com/media/ce6ce7_1872feb30a584c1da72e05ee7d37fb22~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/ce6ce7_1872feb30a584c1da72e05ee7d37fb22~mv2.jpg',
+    label_fr: 'Îles Lavezzi',
+    label_en: 'Lavezzi Islands'
+  },
+  { 
+    url: 'https://static.wixstatic.com/media/ce6ce7_7f55aceeb39542168e40d1384ab96e09~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/ce6ce7_7f55aceeb39542168e40d1384ab96e09~mv2.jpg',
+    label_fr: 'Criques secrètes',
+    label_en: 'Secret coves'
+  },
+  { 
+    url: 'https://static.wixstatic.com/media/ce6ce7_e68872eb7cb44d2ba34396071f003322~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/ce6ce7_e68872eb7cb44d2ba34396071f003322~mv2.jpg',
+    label_fr: 'Eaux cristallines',
+    label_en: 'Crystal waters'
+  },
+  { 
+    url: 'https://static.wixstatic.com/media/ce6ce7_d9f82f1b7c874908a2b4e92a82d98086~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/cala-orzu.jpg',
+    label_fr: 'Cala d\'Orzu',
+    label_en: 'Cala d\'Orzu'
+  },
+  { 
+    url: 'https://static.wixstatic.com/media/ce6ce7_322d9b6fa5b1489689b338b8367512ef~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/team.jpg',
+    label_fr: 'L\'équipage',
+    label_en: 'The crew'
+  },
+  { 
+    url: 'https://static.wixstatic.com/media/ce6ce7_33c3f5377f8546a68ad7377405f13f95~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/PHOTO-2025-08-02-23-15-20%204.jpg',
+    label_fr: 'À bord',
+    label_en: 'On board'
+  },
+  { 
+    url: 'https://static.wixstatic.com/media/ce6ce7_0a265a0d38054848b9385830b50ac84f~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/slider-lagoon-43-21.jpg',
+    label_fr: 'Lagoon 43',
+    label_en: 'Lagoon 43'
+  },
+  { 
+    url: 'https://static.wixstatic.com/media/ce6ce7_98fe44ee0ba0419794505afe2c70aa95~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/SOGNUDIMARE%20CROISIERE%20CATAMARAN%20DEPUIS%20AJACCIO.jpg',
+    label_fr: 'Coucher de soleil',
+    label_en: 'Sunset'
+  },
+  { 
+    url: 'https://static.wixstatic.com/media/ce6ce7_1f87dc5f279b4f8c910f5badc47d8385~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/tour%20santa%20maria%20cap%20corse%20avec%20sognudimare%20catamarans_JPG.jpg',
+    label_fr: 'Cap Corse',
+    label_en: 'Cap Corse'
+  },
+];
+
 // Local partners
 const LOCAL_PARTNERS = [
   { name: 'ANAREDA', type: 'Epicerie Vrac' },
