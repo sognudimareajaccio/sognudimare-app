@@ -77,13 +77,22 @@ export default function BookingScreen() {
   const [chosenDate, setChosenDate] = useState<string>(selectedDate as string || '');
 
   useEffect(() => {
-    loadCruise();
+    if (cruiseId) {
+      loadCruise();
+    }
   }, [cruiseId]);
 
   const loadCruise = async () => {
+    if (!cruiseId) {
+      console.log('No cruiseId provided');
+      return;
+    }
+    
     try {
       setLoading(true);
+      console.log('Loading cruise with ID:', cruiseId);
       const data = await apiService.cruises.getById(cruiseId as string);
+      console.log('Cruise loaded:', data?.name_fr);
       setCruise(data);
       
       // Set default date if availabilities exist
