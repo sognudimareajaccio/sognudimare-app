@@ -885,6 +885,148 @@ async def seed_database():
     
     return {"message": "Database seeded successfully", "cruises_count": len(cruises), "posts_count": len(sample_posts)}
 
+# ============= APPLY CORRECTIONS =============
+
+@api_router.post("/apply-corrections")
+async def apply_cruise_corrections():
+    """Apply all user-requested corrections: fix programs, images, and delete unwanted cruises"""
+    
+    results = {
+        "programs_updated": [],
+        "images_updated": [],
+        "cruises_deleted": [],
+        "errors": []
+    }
+    
+    # 1. Delete "Grèce Authentique" and "Îles Grenadines" cruises
+    try:
+        delete_result = await db.cruises.delete_many({
+            "name_fr": {"$in": ["Grèce Authentique", "Îles Grenadines"]}
+        })
+        results["cruises_deleted"].append(f"Deleted {delete_result.deleted_count} cruises (Grèce and Caraïbes)")
+    except Exception as e:
+        results["errors"].append(f"Error deleting cruises: {str(e)}")
+    
+    # 2. Update Tour de Corse - Program (shortened to location names only)
+    tour_de_corse_program = [
+        "J1: Ajaccio & Îles Sanguinaires",
+        "J2: Cargèse",
+        "J3: Calanques de Piana & Golfe de Porto",
+        "J4: Girolata",
+        "J5: Réserve de Scandola & Galéria",
+        "J6: Golfe de la Revelatta & Calvi",
+        "J7: Plages de Saleccia & Saint-Florent",
+        "J8: Plage de Nonza & Port de Centuri",
+        "J9: Cap Corse, Erbalunga & Bastia",
+        "J10: Solenzara",
+        "J11: Porto-Vecchio & Santa Giulia",
+        "J12: Bonifacio",
+        "J13: Plage de Roccapina & Tizzano",
+        "J14: Cala di Conca & Ajaccio",
+        "J15: Débarquement Ajaccio"
+    ]
+    
+    try:
+        result = await db.cruises.update_one(
+            {"name_fr": "Tour de Corse"},
+            {"$set": {
+                "program_fr": tour_de_corse_program,
+                "boarding_pass_image": "https://static.wixstatic.com/media/ce6ce7_170fb96af2764aecb7eb7c526a48eb27~mv2.png/v1/fill/w_400,h_267,al_c,q_85,enc_avif,quality_auto/croisiere%20catamaran%20le%20tour%20de%20Corse%20sognudimare.png",
+                "updated_at": datetime.utcnow()
+            }}
+        )
+        if result.modified_count > 0:
+            results["programs_updated"].append("Tour de Corse")
+    except Exception as e:
+        results["errors"].append(f"Error updating Tour de Corse: {str(e)}")
+    
+    # 3. Update Ouest Corse - Program and boarding pass image
+    ouest_corse_program = [
+        "J1: Ajaccio & Îles Sanguinaires",
+        "J2: Cargèse",
+        "J3: Calanques de Piana",
+        "J4: Réserve de Scandola",
+        "J5: Girolata",
+        "J6: Calvi",
+        "J7: Saint-Florent",
+        "J8: Retour Ajaccio"
+    ]
+    
+    try:
+        result = await db.cruises.update_one(
+            {"name_fr": "Ouest Corse"},
+            {"$set": {
+                "program_fr": ouest_corse_program,
+                "boarding_pass_image": "https://static.wixstatic.com/media/ce6ce7_bdc5406402ea4be3b94eeeb747d2da1a~mv2.png/v1/fill/w_400,h_267,al_c,q_85,enc_avif,quality_auto/croisiere%20catamaran%20ouest%20corse%20sognudimare.png",
+                "updated_at": datetime.utcnow()
+            }}
+        )
+        if result.modified_count > 0:
+            results["programs_updated"].append("Ouest Corse")
+            results["images_updated"].append("Ouest Corse boarding pass")
+    except Exception as e:
+        results["errors"].append(f"Error updating Ouest Corse: {str(e)}")
+    
+    # 4. Update Corse du Sud - Program and boarding pass image
+    corse_sud_program = [
+        "J1: Ajaccio & Îles Sanguinaires",
+        "J2: Propriano & Campomoro",
+        "J3: Bonifacio",
+        "J4: Îles Lavezzi",
+        "J5: Porto-Vecchio",
+        "J6: Santa Giulia",
+        "J7: Rondinara",
+        "J8: Retour Ajaccio"
+    ]
+    
+    try:
+        result = await db.cruises.update_one(
+            {"name_fr": "Corse du Sud"},
+            {"$set": {
+                "program_fr": corse_sud_program,
+                "boarding_pass_image": "https://static.wixstatic.com/media/ce6ce7_2c02fe160efb49b6930f0c695a53e34f~mv2.png/v1/fill/w_400,h_267,al_c,q_85,enc_avif,quality_auto/croisiere%20catamaran%20la%20corse%20du%20sud%20sognudimare.png",
+                "updated_at": datetime.utcnow()
+            }}
+        )
+        if result.modified_count > 0:
+            results["programs_updated"].append("Corse du Sud")
+            results["images_updated"].append("Corse du Sud boarding pass")
+    except Exception as e:
+        results["errors"].append(f"Error updating Corse du Sud: {str(e)}")
+    
+    # 5. Update Sardaigne & Corse du Sud - Program and boarding pass image
+    sardaigne_program = [
+        "J1: Ajaccio & Îles Sanguinaires",
+        "J2: Propriano",
+        "J3: Bonifacio",
+        "J4: Îles Lavezzi & La Maddalena",
+        "J5: Archipel de La Maddalena",
+        "J6: Costa Smeralda",
+        "J7: Porto-Vecchio",
+        "J8: Retour Ajaccio"
+    ]
+    
+    try:
+        result = await db.cruises.update_one(
+            {"name_fr": "Sardaigne & Corse du Sud"},
+            {"$set": {
+                "program_fr": sardaigne_program,
+                "boarding_pass_image": "https://static.wixstatic.com/media/ce6ce7_68a8fb4c934c44cb909dfc0075f36d83~mv2.png/v1/fill/w_400,h_267,al_c,q_85,enc_avif,quality_auto/croisiere%20catamaran%20la%20sardaigne%20et%20la%20corse%20du%20sud%20sognudimare.png",
+                "updated_at": datetime.utcnow()
+            }}
+        )
+        if result.modified_count > 0:
+            results["programs_updated"].append("Sardaigne & Corse du Sud")
+            results["images_updated"].append("Sardaigne boarding pass")
+    except Exception as e:
+        results["errors"].append(f"Error updating Sardaigne: {str(e)}")
+    
+    return {
+        "success": len(results["errors"]) == 0,
+        "message": "Corrections applied successfully" if len(results["errors"]) == 0 else "Some errors occurred",
+        "details": results
+    }
+
 # ============= UPDATE WITH DETAILED DATA =============
 
 @api_router.post("/update-detailed-data")
