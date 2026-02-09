@@ -11,6 +11,9 @@ import uuid
 from datetime import datetime
 from enum import Enum
 
+# Square Payment SDK
+from square.client import Client as SquareClient
+
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
@@ -18,6 +21,21 @@ load_dotenv(ROOT_DIR / '.env')
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
+
+# Square Payment client
+square_client = None
+square_location_id = os.environ.get('SQUARE_LOCATION_ID', '')
+
+def get_square_client():
+    global square_client
+    if square_client is None:
+        access_token = os.environ.get('SQUARE_ACCESS_TOKEN', '')
+        environment = os.environ.get('SQUARE_ENVIRONMENT', 'sandbox')
+        square_client = SquareClient(
+            access_token=access_token,
+            environment=environment
+        )
+    return square_client
 
 # Create the main app
 app = FastAPI()
