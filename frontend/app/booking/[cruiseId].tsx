@@ -584,7 +584,13 @@ export default function BookingScreen() {
             <Text style={styles.totalValue}>{total.toLocaleString('fr-FR')} €</Text>
           </View>
           
-          {selectedClubCard.id !== 'none' && calculatePriceDetails().discount > 0 && (
+          {selectedClubCard.id !== 'none' && calculatePriceDetails().discount > 0 && bookingType === 'cabin' && (
+            <Text style={styles.savingsNote}>
+              Vous économisez {calculatePriceDetails().discount.toLocaleString('fr-FR')}€ avec {clubCardQuantity} Carte{clubCardQuantity > 1 ? 's' : ''} Club !
+            </Text>
+          )}
+          
+          {selectedClubCard.id !== 'none' && calculatePriceDetails().discount > 0 && bookingType === 'private' && (
             <Text style={styles.savingsNote}>
               Vous économisez {calculatePriceDetails().discount.toLocaleString('fr-FR')}€ avec votre Carte Club !
             </Text>
