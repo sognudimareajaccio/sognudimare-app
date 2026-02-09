@@ -770,6 +770,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     opacity: 0.9,
   },
+  // Club Cards Image
+  clubCardsImageContainer: {
+    padding: SPACING.lg,
+    alignItems: 'center',
+    backgroundColor: COLORS.background,
+  },
+  clubCardsImage: {
+    width: '100%',
+    height: 200,
+    borderRadius: BORDER_RADIUS.xl,
+  },
   // Sections
   section: {
     padding: SPACING.lg,
