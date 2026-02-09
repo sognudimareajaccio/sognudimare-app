@@ -7,7 +7,7 @@ export const translations = {
     contact: "Contact",
     
     // Home Screen
-    heroTitle: "Passer du rêve à la réalité...",
+    heroTitle: "Passer du rêve\nà la réalité...",
     heroSubtitle: "Voyagez plus lentement, plus sainement et plus humainement",
     discoverCruises: "Découvrir nos croisières",
     ourDifference: "Ce qui fait notre différence",
