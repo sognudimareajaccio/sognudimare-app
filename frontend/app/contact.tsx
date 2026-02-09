@@ -101,8 +101,8 @@ export default function ContactScreen() {
 
         {/* Book Now Button */}
         <TouchableOpacity style={styles.bookButton} onPress={handleOpenWebsite}>
-          <Ionicons name="boat" size={24} color={COLORS.white} />
-          <Text style={styles.bookButtonText}>{t('bookingWebsite')}</Text>
+          <MaterialCommunityIcons name="sail-boat" size={24} color={COLORS.white} />
+          <Text style={styles.bookButtonText}>{t('viewWebsite')}</Text>
         </TouchableOpacity>
 
         {/* Social Media */}
