@@ -537,21 +537,10 @@ export default function BookingScreen() {
             </Text>
           </View>
           
-          {selectedClubCard.id !== 'none' && calculatePriceDetails().discount > 0 && bookingType === 'cabin' && (
+          {selectedClubCard.id !== 'none' && calculatePriceDetails().discount > 0 && (
             <View style={styles.priceRow}>
               <Text style={[styles.priceLabel, { color: COLORS.success }]}>
                 Remise -{selectedClubCard.discount}% sur {clubCardQuantity} passager{clubCardQuantity > 1 ? 's' : ''}
-              </Text>
-              <Text style={[styles.priceValue, { color: COLORS.success }]}>
-                -{calculatePriceDetails().discount.toLocaleString('fr-FR')}€
-              </Text>
-            </View>
-          )}
-          
-          {selectedClubCard.id !== 'none' && calculatePriceDetails().discount > 0 && bookingType === 'private' && (
-            <View style={styles.priceRow}>
-              <Text style={[styles.priceLabel, { color: COLORS.success }]}>
-                Remise Carte Club (-{selectedClubCard.discount}%)
               </Text>
               <Text style={[styles.priceValue, { color: COLORS.success }]}>
                 -{calculatePriceDetails().discount.toLocaleString('fr-FR')}€
