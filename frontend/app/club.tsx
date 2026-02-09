@@ -349,7 +349,7 @@ export default function ClubScreen() {
       {/* Join Button */}
       <TouchableOpacity 
         style={styles.joinButton}
-        onPress={() => router.push('/booking')}
+        onPress={() => router.push('/cruises')}
       >
         <Text style={styles.joinButtonText}>{t('joinClub')}</Text>
         <Ionicons name="arrow-forward" size={20} color={COLORS.white} />
