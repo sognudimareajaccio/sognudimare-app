@@ -7,42 +7,31 @@
     "icon": "./assets/images/icon.png",
     "scheme": "sognudimare",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0e1c40"
+    },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.sognudimare.app"
+      "bundleIdentifier": "com.sognudimare.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#0e1c40"
       },
-      "edgeToEdgeEnabled": true,
       "package": "com.sognudimare.app"
     },
-    "web": {
-      "bundler": "metro",
-      "output": "server",
-      "favicon": "./assets/images/favicon.png"
-    },
     "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#0e1c40"
-        }
-      ]
+      "expo-router"
     ],
-    "experiments": {
-      "typedRoutes": true
-    },
     "extra": {
       "eas": {
-        "projectId": "sognudimare-app"
+        "projectId": "b7a9c1d8-ab6b-4ae4-8b4e-3f0cde55d8f0"
       }
     }
   }
