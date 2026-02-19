@@ -484,6 +484,39 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
 
+        {/* Engagements Section */}
+        <View style={styles.engagementsSection}>
+          <View style={styles.engagementsIconRow}>
+            <Ionicons name="leaf" size={28} color={COLORS.accent} />
+            <Text style={styles.engagementsBadge}>1%</Text>
+            <Ionicons name="heart" size={28} color={COLORS.accent} />
+          </View>
+          <Text style={styles.engagementsTitle}>
+            {language === 'fr' ? 'Nos engagements écoresponsables' : 'Our eco-responsible commitments'}
+          </Text>
+          <Text style={styles.engagementsText}>
+            {language === 'fr' 
+              ? 'Tourisme durable, circuits courts, protection de la biodiversité marine... 1% de notre CA est reversé à des associations locales qui œuvrent pour la préservation de la Méditerranée.'
+              : 'Sustainable tourism, short supply chains, marine biodiversity protection... 1% of our revenue is donated to local associations working to preserve the Mediterranean.'}
+          </Text>
+          <View style={styles.engagementsAssociations}>
+            <View style={styles.engagementAssocItem}>
+              <Ionicons name="checkmark-circle" size={18} color={COLORS.secondary} />
+              <Text style={styles.engagementAssocName}>Mare Vivu</Text>
+            </View>
+            <View style={styles.engagementAssocItem}>
+              <Ionicons name="checkmark-circle" size={18} color={COLORS.secondary} />
+              <Text style={styles.engagementAssocName}>La Girelle</Text>
+            </View>
+          </View>
+          <TouchableOpacity style={styles.engagementsButton} onPress={() => router.push('/engagements')}>
+            <Text style={styles.engagementsButtonText}>
+              {language === 'fr' ? 'Découvrir nos engagements' : 'Discover our commitments'}
+            </Text>
+            <Ionicons name="arrow-forward" size={18} color={COLORS.primary} />
+          </TouchableOpacity>
+        </View>
+
         {/* About Section */}
         <View style={styles.aboutSection}>
           <Text style={styles.aboutTitle}>{t('aboutTitle')}</Text>
