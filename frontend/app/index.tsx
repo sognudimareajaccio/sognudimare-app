@@ -29,23 +29,26 @@ const PORTFOLIO_PHOTOS = [
   { 
     url: 'https://static.wixstatic.com/media/ce6ce7_0ce032b8fe2e4bf58652c8d18e897478~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/SOGNUDIMARE%20CROISIERE%20CATAMARAN%20DEPUIS%20AJACCIO%20copie.jpg',
     label_fr: 'Tour de Corse',
-    label_en: 'Tour of Corsica'
+    label_en: 'Tour of Corsica',
+    cruiseName: 'Tour de Corse'
   },
   { 
     url: 'https://static.wixstatic.com/media/ce6ce7_f3bee630d0c549388bbc71c0e58fb9ea~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/sognudimare%20a%20scandola_edited.jpg',
     label_fr: 'Scandola',
-    label_en: 'Scandola'
+    label_en: 'Scandola',
+    cruiseName: 'Ouest Corse'
   },
   { 
     url: 'https://static.wixstatic.com/media/ce6ce7_9e15d4c9779b4d48ad56a689ab2fe02b~mv2.avif/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/LAGOON%2043%20SOGNUDIMARE.avif',
-    label_fr: 'Notre Catamaran',
-    label_en: 'Our Catamaran',
+    label_fr: 'Les Catamarans',
+    label_en: 'The Catamarans',
     link: '/catamarans'
   },
   { 
     url: 'https://static.wixstatic.com/media/ce6ce7_1872feb30a584c1da72e05ee7d37fb22~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/ce6ce7_1872feb30a584c1da72e05ee7d37fb22~mv2.jpg',
     label_fr: 'Îles Lavezzi',
-    label_en: 'Lavezzi Islands'
+    label_en: 'Lavezzi Islands',
+    cruiseName: 'Corse du Sud'
   },
   { 
     url: 'https://static.wixstatic.com/media/ce6ce7_7f55aceeb39542168e40d1384ab96e09~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/ce6ce7_7f55aceeb39542168e40d1384ab96e09~mv2.jpg',
@@ -58,9 +61,10 @@ const PORTFOLIO_PHOTOS = [
     label_en: 'Crystal waters'
   },
   { 
-    url: 'https://static.wixstatic.com/media/ce6ce7_d9f82f1b7c874908a2b4e92a82d98086~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/cala-orzu.jpg',
-    label_fr: 'Cala d\'Orzu',
-    label_en: 'Cala d\'Orzu'
+    url: 'https://customer-assets.emergentagent.com/job_fe2730ba-35c4-4eb7-98c9-325cf295cc88/artifacts/c45b6sng_maddalena.jpg',
+    label_fr: 'Archipel la Maddalena',
+    label_en: 'Maddalena Archipelago',
+    cruiseName: 'Sardaigne'
   },
   { 
     url: 'https://static.wixstatic.com/media/ce6ce7_322d9b6fa5b1489689b338b8367512ef~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/team.jpg',
