@@ -137,14 +137,8 @@ export default function EngagementsScreen() {
               : 'Because the sea is at the heart of our passion and activity, we are committed to protecting it and supporting those who act concretely for its preservation.\n\nThat\'s why 1% of our revenue is donated to two Corsican associations:'}
           </Text>
           <View style={styles.associationsList}>
-            <View style={styles.associationItem}>
-              <Ionicons name="checkmark-circle" size={20} color={COLORS.accent} />
-              <Text style={styles.associationName}>Mare Vivu</Text>
-            </View>
-            <View style={styles.associationItem}>
-              <Ionicons name="checkmark-circle" size={20} color={COLORS.accent} />
-              <Text style={styles.associationName}>La Girelle</Text>
-            </View>
+            <Text style={styles.associationNameCentered}>Mare Vivu</Text>
+            <Text style={styles.associationNameCentered}>La Girelle</Text>
           </View>
           <Text style={styles.percentFooter}>
             {language === 'fr' 
