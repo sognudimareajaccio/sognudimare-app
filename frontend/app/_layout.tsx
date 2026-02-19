@@ -100,6 +100,12 @@ export default function TabLayout() {
           href: null,
         }}
       />
+      <Tabs.Screen
+        name="equipage"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }
