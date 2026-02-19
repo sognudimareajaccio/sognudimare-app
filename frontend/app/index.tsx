@@ -39,7 +39,8 @@ const PORTFOLIO_PHOTOS = [
   { 
     url: 'https://static.wixstatic.com/media/ce6ce7_9e15d4c9779b4d48ad56a689ab2fe02b~mv2.avif/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/LAGOON%2043%20SOGNUDIMARE.avif',
     label_fr: 'Notre Catamaran',
-    label_en: 'Our Catamaran'
+    label_en: 'Our Catamaran',
+    link: '/catamarans'
   },
   { 
     url: 'https://static.wixstatic.com/media/ce6ce7_1872feb30a584c1da72e05ee7d37fb22~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/ce6ce7_1872feb30a584c1da72e05ee7d37fb22~mv2.jpg',
