@@ -308,12 +308,28 @@ export default function HomeScreen() {
             style={styles.portfolioScroll}
           >
             {PORTFOLIO_PHOTOS.slice(6).map((photo, index) => (
-              <TouchableOpacity key={index} style={styles.portfolioScrollItem}>
+              <TouchableOpacity 
+                key={index} 
+                style={styles.portfolioScrollItem}
+                onPress={() => {
+                  if ((photo as any).link) {
+                    router.push((photo as any).link);
+                  } else if ((photo as any).cruiseName && cruises.length > 0) {
+                    const cruise = cruises.find(c => c.name_fr.includes((photo as any).cruiseName));
+                    if (cruise) {
+                      router.push(`/cruise/${cruise.id}`);
+                    }
+                  }
+                }}
+              >
                 <Image source={{ uri: photo.url }} style={styles.portfolioScrollImage} />
                 <View style={styles.portfolioScrollOverlay}>
                   <Text style={styles.portfolioScrollLabel}>
                     {language === 'fr' ? photo.label_fr : photo.label_en}
                   </Text>
+                  {((photo as any).link || (photo as any).cruiseName) && (
+                    <Ionicons name="arrow-forward-circle" size={18} color={COLORS.white} style={{ marginTop: 2 }} />
+                  )}
                 </View>
               </TouchableOpacity>
             ))}
