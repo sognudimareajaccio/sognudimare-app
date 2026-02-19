@@ -372,7 +372,11 @@ export default function HomeScreen() {
             {ALL_INCLUSIVE_FEATURES.map((feature, index) => (
               <View key={index} style={styles.inclusiveCard}>
                 <View style={styles.inclusiveHeader}>
-                  <Ionicons name={feature.icon as any} size={32} color={COLORS.accent} />
+                  {feature.iconType === 'material' ? (
+                    <MaterialCommunityIcons name={feature.icon as any} size={32} color={COLORS.accent} />
+                  ) : (
+                    <Ionicons name={feature.icon as any} size={32} color={COLORS.accent} />
+                  )}
                   <Text style={styles.inclusiveTitle}>
                     {language === 'fr' ? feature.title_fr : feature.title_en}
                   </Text>
