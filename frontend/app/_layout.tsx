@@ -88,6 +88,12 @@ export default function TabLayout() {
           href: null,
         }}
       />
+      <Tabs.Screen
+        name="engagements"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }
