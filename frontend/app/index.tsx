@@ -281,6 +281,11 @@ export default function HomeScreen() {
                 onPress={() => {
                   if ((photo as any).link) {
                     router.push((photo as any).link);
+                  } else if ((photo as any).cruiseName && cruises.length > 0) {
+                    const cruise = cruises.find(c => c.name_fr.includes((photo as any).cruiseName));
+                    if (cruise) {
+                      router.push(`/cruise/${cruise.id}`);
+                    }
                   }
                 }}
               >
@@ -289,7 +294,7 @@ export default function HomeScreen() {
                   <Text style={styles.portfolioLabel}>
                     {language === 'fr' ? photo.label_fr : photo.label_en}
                   </Text>
-                  {(photo as any).link && (
+                  {((photo as any).link || (photo as any).cruiseName) && (
                     <Ionicons name="arrow-forward-circle" size={24} color={COLORS.white} style={{ marginTop: 4 }} />
                   )}
                 </View>
