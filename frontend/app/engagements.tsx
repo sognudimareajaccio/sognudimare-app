@@ -410,10 +410,12 @@ const styles = StyleSheet.create({
   },
   associationsList: {
     marginVertical: SPACING.md,
+    alignItems: 'center',
   },
   associationItem: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     marginVertical: SPACING.xs,
   },
   associationName: {
