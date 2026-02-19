@@ -309,19 +309,19 @@ export default function HomeScreen() {
         <View style={styles.statsSection}>
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>2021</Text>
-            <Text style={styles.statLabel}>{language === 'fr' ? 'Date de création' : 'Creation date'}</Text>
+            <Text style={styles.statLabel}>{language === 'fr' ? 'Date\nde création' : 'Creation\ndate'}</Text>
           </View>
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>4</Text>
-            <Text style={styles.statLabel}>{language === 'fr' ? 'Destinations Slow tourisme' : 'Slow tourism destinations'}</Text>
+            <Text style={styles.statLabel}>{language === 'fr' ? 'Destinations\nSlow tourisme' : 'Slow tourism\ndestinations'}</Text>
           </View>
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>13-26</Text>
-            <Text style={styles.statLabel}>{language === 'fr' ? 'Repas frais servis à bord' : 'Fresh meals served on board'}</Text>
+            <Text style={styles.statLabel}>{language === 'fr' ? 'Repas frais\nservis à bord' : 'Fresh meals\nserved on board'}</Text>
           </View>
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>11</Text>
-            <Text style={styles.statLabel}>{language === 'fr' ? 'Partenaires locaux' : 'Local partners'}</Text>
+            <Text style={styles.statLabel}>{language === 'fr' ? 'Partenaires\nlocaux' : 'Local\npartners'}</Text>
           </View>
         </View>
 
