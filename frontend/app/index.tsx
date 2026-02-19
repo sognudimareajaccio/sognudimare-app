@@ -69,7 +69,8 @@ const PORTFOLIO_PHOTOS = [
   { 
     url: 'https://static.wixstatic.com/media/ce6ce7_322d9b6fa5b1489689b338b8367512ef~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/team.jpg',
     label_fr: 'L\'équipage',
-    label_en: 'The crew'
+    label_en: 'The crew',
+    link: '/equipage'
   },
   { 
     url: 'https://static.wixstatic.com/media/ce6ce7_33c3f5377f8546a68ad7377405f13f95~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/PHOTO-2025-08-02-23-15-20%204.jpg',
