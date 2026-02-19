@@ -405,6 +405,7 @@ const styles = StyleSheet.create({
   associationsList: {
     marginVertical: SPACING.md,
     alignItems: 'center',
+    width: '100%',
   },
   associationItem: {
     flexDirection: 'row',
@@ -417,6 +418,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: COLORS.primary,
     marginLeft: SPACING.sm,
+  },
+  associationNameCentered: {
+    fontSize: FONT_SIZES.lg,
+    fontWeight: '700',
+    color: COLORS.primary,
+    textAlign: 'center',
+    marginVertical: SPACING.xs,
   },
   percentFooter: {
     fontSize: FONT_SIZES.sm,
