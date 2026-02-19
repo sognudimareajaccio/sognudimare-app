@@ -94,6 +94,12 @@ export default function TabLayout() {
           href: null,
         }}
       />
+      <Tabs.Screen
+        name="catamarans"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }
