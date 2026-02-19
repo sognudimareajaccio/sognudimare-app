@@ -673,10 +673,11 @@ const styles = StyleSheet.create({
     color: COLORS.secondary,
   },
   statLabel: {
-    fontSize: FONT_SIZES.xs,
+    fontSize: 10,
     color: COLORS.white,
-    opacity: 0.8,
+    opacity: 0.9,
     marginTop: 2,
+    textAlign: 'center',
   },
   section: {
     padding: SPACING.lg,
