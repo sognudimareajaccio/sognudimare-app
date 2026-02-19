@@ -107,6 +107,7 @@ const LOCAL_PARTNERS = [
 const ALL_INCLUSIVE_FEATURES = [
   { 
     icon: 'bed', 
+    iconType: 'ionicons',
     title_fr: 'HÉBERGEMENT', 
     title_en: 'ACCOMMODATION',
     desc_fr: 'Cabine double tout confort avec salle d\'eau et WC indépendants. Draps, serviettes et foutas fournis.',
@@ -116,6 +117,7 @@ const ALL_INCLUSIVE_FEATURES = [
   },
   { 
     icon: 'restaurant', 
+    iconType: 'ionicons',
     title_fr: 'REPAS', 
     title_en: 'MEALS',
     desc_fr: 'Tous les repas préparés et servis à bord. Cuisine avec des produits locaux de producteurs passionnés.',
@@ -125,6 +127,7 @@ const ALL_INCLUSIVE_FEATURES = [
   },
   { 
     icon: 'wine', 
+    iconType: 'ionicons',
     title_fr: 'BOISSONS', 
     title_en: 'DRINKS',
     desc_fr: 'Toutes les boissons (softs & alcools). Vins issus exclusivement de vignobles locaux.',
@@ -133,43 +136,48 @@ const ALL_INCLUSIVE_FEATURES = [
     petit_plus_en: 'LOCAL WINES'
   },
   { 
-    icon: 'boat', 
+    icon: 'sail-boat', 
+    iconType: 'material',
     title_fr: 'CATAMARAN', 
     title_en: 'CATAMARAN',
-    desc_fr: 'Bateaux modernes et confortables vers des criques confidentielles accessibles uniquement par la mer.',
-    desc_en: 'Modern and comfortable boats to secluded coves accessible only by sea.',
+    desc_fr: 'Embarquez pour une escapade en mer à bord de nos bateaux modernes et confortables, pensés pour la détente et l\'exploration en douceur.',
+    desc_en: 'Embark on a sea getaway aboard our modern and comfortable boats, designed for relaxation and gentle exploration.',
     petit_plus_fr: 'BATEAUX RÉCENTS',
     petit_plus_en: 'RECENT BOATS'
   },
   { 
     icon: 'fish', 
+    iconType: 'ionicons',
     title_fr: 'MATÉRIELS DE PÊCHE', 
     title_en: 'FISHING GEAR',
-    desc_fr: 'Cannes à pêche à disposition. Moment privilégié pour se reconnecter à la mer.',
-    desc_en: 'Fishing rods available. A special moment to reconnect with the sea.',
+    desc_fr: 'Tout au long de votre croisière en catamaran, des cannes à pêche sont mises à disposition des passagers. Libre à vous de tenter votre chance, que ce soit au lever du soleil.',
+    desc_en: 'Throughout your catamaran cruise, fishing rods are available for passengers. Feel free to try your luck, whether at sunrise.',
     petit_plus_fr: 'DU POISSON FRAIS',
     petit_plus_en: 'FRESH FISH'
   },
   { 
-    icon: 'water', 
+    icon: 'rowing', 
+    iconType: 'material',
     title_fr: 'PADDLE', 
     title_en: 'PADDLE',
-    desc_fr: 'Glissez dans une crique sauvage ou profitez d\'un moment de détente au coucher du soleil.',
-    desc_en: 'Glide into a wild cove or enjoy a relaxing moment at sunset.',
+    desc_fr: 'Le paddle est l\'activité idéale pour s\'évader et se ressourcer. Accessible à tous, il permet de se reconnecter à la nature en douceur, de vivre la mer autrement et de prolonger l\'esprit du slow tourisme.',
+    desc_en: 'Paddleboarding is the ideal activity to escape and recharge. Accessible to all, it allows you to gently reconnect with nature, experience the sea differently and extend the spirit of slow tourism.',
     petit_plus_fr: 'FORMATION DU CAPITAINE ;)',
     petit_plus_en: 'CAPTAIN TRAINING ;)'
   },
   { 
-    icon: 'people', 
+    icon: 'kayaking', 
+    iconType: 'material',
     title_fr: 'CANOË', 
     title_en: 'CANOE',
-    desc_fr: 'Naviguer en douceur au rythme des pagaies, dans le respect de la nature.',
-    desc_en: 'Navigate gently at the rhythm of the paddles, respecting nature.',
+    desc_fr: 'Facile d\'accès et convivial, le canoë invite à prendre le temps de naviguer en douceur, au rythme des pagaies, dans le respect de la nature et loin de l\'agitation.',
+    desc_en: 'Easy to access and friendly, the canoe invites you to take the time to navigate gently, at the rhythm of the paddles, respecting nature and away from the hustle.',
     petit_plus_fr: 'POUR DÉCOUVRIR EN COUPLE',
     petit_plus_en: 'FOR COUPLES TO DISCOVER'
   },
   { 
     icon: 'car', 
+    iconType: 'ionicons',
     title_fr: 'TRANSFERT', 
     title_en: 'TRANSFER',
     desc_fr: 'Transfert aéroport / port d\'embarquement inclus à l\'aller et au retour. Navette privative.',
@@ -178,11 +186,12 @@ const ALL_INCLUSIVE_FEATURES = [
     petit_plus_en: 'SOGNUDIMARE EXCLUSIVE'
   },
   { 
-    icon: 'heart', 
+    icon: 'account-group', 
+    iconType: 'material',
     title_fr: 'ÉQUIPAGE', 
     title_en: 'CREW',
-    desc_fr: 'Équipe professionnelle et passionnée, dédiée à votre confort et sécurité.',
-    desc_en: 'Professional and passionate team, dedicated to your comfort and safety.',
+    desc_fr: 'Vous êtes accompagnés par une équipe professionnelle et passionnée, entièrement dédiée à votre confort et à votre sécurité tout au long de la croisière.',
+    desc_en: 'You are accompanied by a professional and passionate team, entirely dedicated to your comfort and safety throughout the cruise.',
     petit_plus_fr: 'L\'ÉQUIPAGE EST UN COUPLE',
     petit_plus_en: 'THE CREW IS A COUPLE'
   },
