@@ -260,7 +260,7 @@ export default function HomeScreen() {
             {language === 'fr' ? 'Découvrez nos croisières en images' : 'Discover our cruises in pictures'}
           </Text>
           <View style={styles.portfolioGrid}>
-            {PORTFOLIO_PHOTOS.slice(0, 6).map((photo, index) => (
+            {PORTFOLIO_PHOTOS.slice(0, 4).map((photo, index) => (
               <TouchableOpacity key={index} style={styles.portfolioItem}>
                 <Image source={{ uri: photo.url }} style={styles.portfolioImage} />
                 <View style={styles.portfolioOverlay}>
