@@ -271,12 +271,23 @@ export default function HomeScreen() {
           </Text>
           <View style={styles.portfolioGrid}>
             {PORTFOLIO_PHOTOS.slice(0, 4).map((photo, index) => (
-              <TouchableOpacity key={index} style={styles.portfolioItem}>
+              <TouchableOpacity 
+                key={index} 
+                style={styles.portfolioItem}
+                onPress={() => {
+                  if ((photo as any).link) {
+                    router.push((photo as any).link);
+                  }
+                }}
+              >
                 <Image source={{ uri: photo.url }} style={styles.portfolioImage} />
                 <View style={styles.portfolioOverlay}>
                   <Text style={styles.portfolioLabel}>
                     {language === 'fr' ? photo.label_fr : photo.label_en}
                   </Text>
+                  {(photo as any).link && (
+                    <Ionicons name="arrow-forward-circle" size={24} color={COLORS.white} style={{ marginTop: 4 }} />
+                  )}
                 </View>
               </TouchableOpacity>
             ))}
