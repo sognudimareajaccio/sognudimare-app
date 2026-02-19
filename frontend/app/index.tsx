@@ -664,6 +664,8 @@ const styles = StyleSheet.create({
   },
   statItem: {
     alignItems: 'center',
+    flex: 1,
+    paddingHorizontal: 4,
   },
   statNumber: {
     fontSize: FONT_SIZES.xxl,
