@@ -1023,7 +1023,7 @@ async def apply_cruise_corrections():
     except Exception as e:
         results["errors"].append(f"Error updating Corse du Sud: {str(e)}")
     
-    # 5. Update Sardaigne & Corse du Sud - Program and boarding pass image
+    # 5. Update Sardaigne & Corse du Sud - Program, main image and boarding pass image
     sardaigne_program = [
         "JOUR 1 : AJACCIO & ANSE DE CACALU",
         "JOUR 2 : ROCCAPINA & BONIFACIO",
@@ -1040,13 +1040,14 @@ async def apply_cruise_corrections():
             {"name_fr": "Sardaigne & Corse du Sud"},
             {"$set": {
                 "program_fr": sardaigne_program,
+                "image_url": "https://static.wixstatic.com/media/ce6ce7_9e15d4c9779b4d48ad56a689ab2fe02b~mv2.avif/v1/fill/w_800,h_600,al_c,q_80,enc_avif,quality_auto/LAGOON%2043%20SOGNUDIMARE.avif",
                 "boarding_pass_image": "https://static.wixstatic.com/media/ce6ce7_68a8fb4c934c44cb909dfc0075f36d83~mv2.png/v1/fill/w_400,h_267,al_c,q_85,enc_avif,quality_auto/croisiere%20catamaran%20la%20sardaigne%20et%20la%20corse%20du%20sud%20sognudimare.png",
                 "updated_at": datetime.utcnow()
             }}
         )
         if result.modified_count > 0:
             results["programs_updated"].append("Sardaigne & Corse du Sud")
-            results["images_updated"].append("Sardaigne boarding pass")
+            results["images_updated"].append("Sardaigne main image and boarding pass")
     except Exception as e:
         results["errors"].append(f"Error updating Sardaigne: {str(e)}")
     
