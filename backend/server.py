@@ -984,13 +984,14 @@ async def apply_cruise_corrections():
             {"name_fr": "Ouest Corse"},
             {"$set": {
                 "program_fr": ouest_corse_program,
+                "image_url": "https://static.wixstatic.com/media/ce6ce7_f3bee630d0c549388bbc71c0e58fb9ea~mv2.jpg/v1/fill/w_800,h_600,al_c,q_80,enc_avif,quality_auto/sognudimare%20a%20scandola_edited.jpg",
                 "boarding_pass_image": "https://static.wixstatic.com/media/ce6ce7_bdc5406402ea4be3b94eeeb747d2da1a~mv2.png/v1/fill/w_400,h_267,al_c,q_85,enc_avif,quality_auto/croisiere%20catamaran%20ouest%20corse%20sognudimare.png",
                 "updated_at": datetime.utcnow()
             }}
         )
         if result.modified_count > 0:
             results["programs_updated"].append("Ouest Corse")
-            results["images_updated"].append("Ouest Corse boarding pass")
+            results["images_updated"].append("Ouest Corse main image and boarding pass")
     except Exception as e:
         results["errors"].append(f"Error updating Ouest Corse: {str(e)}")
     
