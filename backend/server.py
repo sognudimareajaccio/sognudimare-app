@@ -1040,7 +1040,7 @@ async def apply_cruise_corrections():
             {"name_fr": "Sardaigne & Corse du Sud"},
             {"$set": {
                 "program_fr": sardaigne_program,
-                "image_url": "https://static.wixstatic.com/media/ce6ce7_9e15d4c9779b4d48ad56a689ab2fe02b~mv2.avif/v1/fill/w_800,h_600,al_c,q_80,enc_avif,quality_auto/LAGOON%2043%20SOGNUDIMARE.avif",
+                "image_url": "https://customer-assets.emergentagent.com/job_afa5a00c-4a00-46ec-8226-a02b125f14ef/artifacts/ilw3qnwh_maddalena.jpg",
                 "boarding_pass_image": "https://static.wixstatic.com/media/ce6ce7_68a8fb4c934c44cb909dfc0075f36d83~mv2.png/v1/fill/w_400,h_267,al_c,q_85,enc_avif,quality_auto/croisiere%20catamaran%20la%20sardaigne%20et%20la%20corse%20du%20sud%20sognudimare.png",
                 "updated_at": datetime.utcnow()
             }}
