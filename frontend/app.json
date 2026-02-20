@@ -49,7 +49,8 @@
     "extra": {
       "eas": {
         "projectId": "sognudimare-app"
-      }
+      },
+      "backendUrl": "https://sognudimare-app-production.up.railway.app"
     }
   }
 }
