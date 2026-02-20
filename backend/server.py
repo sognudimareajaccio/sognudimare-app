@@ -1012,13 +1012,14 @@ async def apply_cruise_corrections():
             {"name_fr": "Corse du Sud"},
             {"$set": {
                 "program_fr": corse_sud_program,
+                "image_url": "https://static.wixstatic.com/media/ce6ce7_98fe44ee0ba0419794505afe2c70aa95~mv2.jpg/v1/fill/w_800,h_600,al_c,q_80,enc_avif,quality_auto/SOGNUDIMARE%20CROISIERE%20CATAMARAN%20DEPUIS%20AJACCIO.jpg",
                 "boarding_pass_image": "https://static.wixstatic.com/media/ce6ce7_2c02fe160efb49b6930f0c695a53e34f~mv2.png/v1/fill/w_400,h_267,al_c,q_85,enc_avif,quality_auto/croisiere%20catamaran%20la%20corse%20du%20sud%20sognudimare.png",
                 "updated_at": datetime.utcnow()
             }}
         )
         if result.modified_count > 0:
             results["programs_updated"].append("Corse du Sud")
-            results["images_updated"].append("Corse du Sud boarding pass")
+            results["images_updated"].append("Corse du Sud main image and boarding pass")
     except Exception as e:
         results["errors"].append(f"Error updating Corse du Sud: {str(e)}")
     
