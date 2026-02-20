@@ -955,6 +955,7 @@ async def apply_cruise_corrections():
             {"$set": {
                 "program_fr": tour_de_corse_program,
                 "pricing.private_price": 20480,
+                "image_url": "https://static.wixstatic.com/media/ce6ce7_0ce032b8fe2e4bf58652c8d18e897478~mv2.jpg/v1/fill/w_800,h_600,al_c,q_80,enc_avif,quality_auto/SOGNUDIMARE%20CROISIERE%20CATAMARAN%20DEPUIS%20AJACCIO%20copie.jpg",
                 "boarding_pass_image": "https://static.wixstatic.com/media/ce6ce7_170fb96af2764aecb7eb7c526a48eb27~mv2.png/v1/fill/w_400,h_267,al_c,q_85,enc_avif,quality_auto/croisiere%20catamaran%20le%20tour%20de%20Corse%20sognudimare.png",
                 "updated_at": datetime.utcnow()
             }}
@@ -962,6 +963,7 @@ async def apply_cruise_corrections():
         if result.modified_count > 0:
             results["programs_updated"].append("Tour de Corse")
             results["prices_updated"].append("Tour de Corse (privatisation: 20480€)")
+            results["images_updated"].append("Tour de Corse main image")
     except Exception as e:
         results["errors"].append(f"Error updating Tour de Corse: {str(e)}")
     
