@@ -395,7 +395,7 @@ export default function BookingScreen() {
                 Privatisation Complète
               </Text>
               <Text style={[styles.bookingTypePrice, { color: COLORS.secondary }]}>
-                {cruise.pricing.private_price?.toLocaleString('fr-FR')}€
+                {((calculatePriceDetails().pricePerPerson || cruise.pricing.cabin_price || 0) * 8).toLocaleString('fr-FR')}€
               </Text>
               <Text style={styles.bookingTypeDescription}>
                 Le catamaran rien que pour vous (jusqu'à 8 personnes)
