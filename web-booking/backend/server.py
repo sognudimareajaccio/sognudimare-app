@@ -1048,111 +1048,125 @@ async def apply_cruise_corrections():
         "details": results
     }
 
-# ============= UPDATE WITH DETAILED DATA =============
+# ============= UPDATE WITH DETAILED DATA (FÉVRIER 2026) =============
 
 @api_router.post("/update-detailed-data")
 async def update_cruises_with_detailed_data():
-    """Update cruises with detailed availability and program data"""
+    """Update cruises with detailed availability, pricing and contact info - Feb 2026"""
     
-    # Tour de Corse - Detailed Data
+    results = {"updated": [], "errors": []}
+    
+    # Tour de Corse - Availabilities 2026
     tour_de_corse_availabilities = [
-        {"date_range": "du 23 mai au 6 juin 2026", "price": 2560, "status": "available", "remaining_places": 8, "status_label": "Reste 8 places"},
-        {"date_range": "du 13 au 27 juin 2026", "price": 2560, "status": "limited", "remaining_places": 4, "status_label": "Reste 4 places"},
-        {"date_range": "du 27 juin au 11 juillet 2026", "price": 3150, "status": "available", "remaining_places": 8, "status_label": "Reste 8 places"},
-        {"date_range": "du 11 au 25 juillet 2026", "price": 3150, "status": "available", "remaining_places": 8, "status_label": "Reste 8 places"},
+        {"date_range": "du 23 mai au 6 juin 2026", "price": 2560, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 13 au 27 juin 2026", "price": 2560, "status": "limited", "remaining_places": 4, "status_label": "Quelques places"},
+        {"date_range": "du 27 juin au 11 juillet 2026", "price": 3150, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 11 au 25 juillet 2026", "price": 3150, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
         {"date_range": "du 25 juillet au 8 août 2026", "price": 3450, "status": "full", "remaining_places": 0, "status_label": "COMPLET"},
         {"date_range": "du 8 au 22 août 2026", "price": 3450, "status": "full", "remaining_places": 0, "status_label": "COMPLET"},
-        {"date_range": "du 22 août au 5 septembre 2026", "price": 3450, "status": "available", "remaining_places": 8, "status_label": "Reste 8 places"},
-        {"date_range": "du 5 au 19 septembre 2026", "price": 3150, "status": "available", "remaining_places": 8, "status_label": "Reste 8 places"},
-        {"date_range": "du 19 septembre au 3 octobre 2026", "price": 2660, "status": "available", "remaining_places": 8, "status_label": "Reste 8 places"},
+        {"date_range": "du 22 août au 5 septembre 2026", "price": 3450, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 5 au 19 septembre 2026", "price": 3150, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 19 septembre au 3 octobre 2026", "price": 2660, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
     ]
     
-    tour_de_corse_program = [
-        {"day": 1, "title": "Embarquement Ajaccio & Îles Sanguinaires", "description": "Embarquement au port Tino Rossi à partir de 15h30. Navigation vers les Îles Sanguinaires, site maritime classé offrant un refuge paisible à diverses espèces d'oiseaux marins."},
-        {"day": 2, "title": "Cargèse", "description": "Découvrez la charmante commune de Cargèse. Flânez dans les ruelles pavées, découvrez les églises aux influences grecques et latines qui témoignent du passé singulier de ce village."},
-        {"day": 3, "title": "Calanques de Piana & Golfe de Porto", "description": "Admirez les falaises impressionnantes des Calanques de Piana avec leurs teintes rougeâtres. Le Golfe de Porto, classé au patrimoine mondial de l'UNESCO, offre une beauté naturelle à son apogée."},
-        {"day": 4, "title": "Village de Girolata", "description": "Découverte du charmant village de Girolata, accessible uniquement par bateau. Laissez-vous séduire par ses maisons de pierre aux toits de lauze et son atmosphère paisible."},
-        {"day": 5, "title": "Réserve de Scandola & Galéria", "description": "Navigation jusqu'au cap le plus à l'ouest de la Corse. La réserve naturelle de Scandola, unique en son genre, englobe des environnements marins et terrestres avec une palette exceptionnelle de couleurs."},
-        {"day": 6, "title": "Golfe de la Revelatta & Calvi", "description": "Snorkeling et paddle dans les eaux cristallines du Golfe de la Revelatta. Arrivée au port de Calvi avec la vue majestueuse de sa citadelle."},
-        {"day": 7, "title": "Plages de Saleccia & Saint-Florent", "description": "Les plages de Saleccia, parmi les plus belles de la Méditerranée. Sable blanc bordé d'eaux turquoises. Direction le port de Saint-Florent."},
-        {"day": 8, "title": "Plage de Nonza & Port de Centuri", "description": "Plage de Nonza réputée pour son sable noir et ses falaises imposantes. Découverte du pittoresque port de Centuri, petit port de pêche traditionnel."},
-        {"day": 9, "title": "Cap Corse, Erbalunga & Bastia", "description": "Périple le long du Cap Corse, péninsule sauvage et préservée. Visite d'Erbalunga, charmant village de pêcheurs, puis Bastia avec sa citadelle génoise."},
-        {"day": 10, "title": "Solenzara", "description": "Solenzara, réputée pour ses plages de sable fin et ses eaux turquoises. Paddle, snorkeling et exploration du charmant centre-ville."},
-        {"day": 11, "title": "Porto-Vecchio & Santa Giulia", "description": "Porto-Vecchio, ville emblématique avec ses plages de sable blanc et criques isolées. Promenade dans le centre historique avec ses ruelles pittoresques."},
-        {"day": 12, "title": "Bonifacio", "description": "Bonifacio, ville fascinante perchée au sommet de falaises calcaires spectaculaires. Découverte de l'Escalier du Roi d'Aragon et de la citadelle médiévale."},
-        {"day": 13, "title": "Plage de Roccapina & Tizzano", "description": "Plage de Roccapina, étendue de sable doré bordée par des falaises de granit rose. Déjeuner à Tizzano avec ses spécialités de fruits de mer."},
-        {"day": 14, "title": "Retour Ajaccio via Cala di Conca", "description": "Arrêt à la plage de Cala di Conca, crique sauvage aux eaux turquoises. Dernière nuit à bord au port de Tino Rossi à Ajaccio."},
-        {"day": 15, "title": "Débarquement Ajaccio", "description": "Dernier petit-déjeuner à bord. Débarquement à 8h30 au port de Tino Rossi."},
-    ]
-    
-    # Corse du Sud - Detailed Data
-    corse_sud_availabilities = [
-        {"date_range": "du 2 au 9 mai 2026", "price": 1470, "status": "available", "remaining_places": 8, "status_label": "Reste 8 places"},
+    # Ouest Corse / Corse du Sud / Sardaigne - Availabilities 2026 (same dates)
+    cruises_8_days_availabilities = [
+        {"date_range": "du 2 au 9 mai 2026", "price": 1470, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
         {"date_range": "du 9 au 16 mai 2026", "price": 1470, "status": "full", "remaining_places": 0, "status_label": "COMPLET"},
-        {"date_range": "du 6 au 13 juin 2026", "price": 1670, "status": "available", "remaining_places": 8, "status_label": "Reste 8 places"},
-        {"date_range": "du 27 juin au 4 juillet 2026", "price": 1970, "status": "available", "remaining_places": 8, "status_label": "Reste 8 places"},
-        {"date_range": "du 4 au 11 juillet 2026", "price": 1970, "status": "available", "remaining_places": 8, "status_label": "Reste 8 places"},
-        {"date_range": "du 11 au 18 juillet 2026", "price": 1970, "status": "available", "remaining_places": 8, "status_label": "Reste 8 places"},
-        {"date_range": "du 25 juillet au 1er août 2026", "price": 2070, "status": "available", "remaining_places": 8, "status_label": "Reste 8 places"},
-        {"date_range": "du 1er au 8 août 2026", "price": 2070, "status": "limited", "remaining_places": 4, "status_label": "Reste 4 places"},
+        {"date_range": "du 6 au 13 juin 2026", "price": 1670, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 27 juin au 4 juillet 2026", "price": 1970, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 4 au 11 juillet 2026", "price": 1970, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 11 au 18 juillet 2026", "price": 1970, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 25 juillet au 1er août 2026", "price": 2070, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 1er au 8 août 2026", "price": 2070, "status": "limited", "remaining_places": 4, "status_label": "Quelques places"},
         {"date_range": "du 8 au 15 août 2026", "price": 2070, "status": "full", "remaining_places": 0, "status_label": "COMPLET"},
-        {"date_range": "du 15 au 22 août 2026", "price": 2170, "status": "available", "remaining_places": 8, "status_label": "Reste 8 places"},
-        {"date_range": "du 22 au 29 août 2026", "price": 2170, "status": "available", "remaining_places": 8, "status_label": "Reste 8 places"},
-        {"date_range": "du 29 août au 5 septembre 2026", "price": 2070, "status": "available", "remaining_places": 8, "status_label": "Reste 8 places"},
-        {"date_range": "du 5 au 12 septembre 2026", "price": 1870, "status": "available", "remaining_places": 8, "status_label": "Reste 8 places"},
-        {"date_range": "du 12 au 19 septembre 2026", "price": 1770, "status": "available", "remaining_places": 8, "status_label": "Reste 8 places"},
-        {"date_range": "du 19 au 26 septembre 2026", "price": 1770, "status": "available", "remaining_places": 8, "status_label": "Reste 8 places"},
-        {"date_range": "du 26 septembre au 3 octobre 2026", "price": 1470, "status": "available", "remaining_places": 8, "status_label": "Reste 8 places"},
+        {"date_range": "du 15 au 22 août 2026", "price": 2170, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 22 au 29 août 2026", "price": 2170, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 29 août au 5 septembre 2026", "price": 2070, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 5 au 12 septembre 2026", "price": 1870, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 12 au 19 septembre 2026", "price": 1770, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 19 au 26 septembre 2026", "price": 1770, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 26 septembre au 3 octobre 2026", "price": 1470, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
     ]
     
-    # Ouest Corse - Same dates as Corse du Sud
-    ouest_corse_availabilities = corse_sud_availabilities.copy()
-    
-    # Sardaigne & Corse du Sud - Same dates as Corse du Sud
-    sardaigne_availabilities = corse_sud_availabilities.copy()
-    
-    # Update Tour de Corse
-    await db.cruises.update_one(
-        {"name_fr": "Tour de Corse"},
-        {"$set": {
-            "availabilities": tour_de_corse_availabilities,
-            "detailed_program_fr": tour_de_corse_program,
-            "pricing": {"cabin_price": 2560, "private_price": 12900, "currency": "EUR"},
-            "updated_at": datetime.utcnow()
-        }}
-    )
+    # Update Tour de Corse with correct pricing (privatisation = price × 8)
+    try:
+        await db.cruises.update_one(
+            {"name_fr": "Tour de Corse"},
+            {"$set": {
+                "availabilities": tour_de_corse_availabilities,
+                "pricing": {"cabin_price": 2560, "private_price": 20480, "currency": "EUR"},
+                "updated_at": datetime.utcnow()
+            }}
+        )
+        results["updated"].append("Tour de Corse")
+    except Exception as e:
+        results["errors"].append(f"Tour de Corse: {str(e)}")
     
     # Update Corse du Sud
-    await db.cruises.update_one(
-        {"name_fr": "Corse du Sud"},
-        {"$set": {
-            "availabilities": corse_sud_availabilities,
-            "pricing": {"cabin_price": 1470, "private_price": 11900, "currency": "EUR"},
-            "updated_at": datetime.utcnow()
-        }}
-    )
+    try:
+        await db.cruises.update_one(
+            {"name_fr": "Corse du Sud"},
+            {"$set": {
+                "availabilities": cruises_8_days_availabilities,
+                "pricing": {"cabin_price": 1470, "private_price": 11760, "currency": "EUR"},
+                "updated_at": datetime.utcnow()
+            }}
+        )
+        results["updated"].append("Corse du Sud")
+    except Exception as e:
+        results["errors"].append(f"Corse du Sud: {str(e)}")
     
     # Update Ouest Corse
-    await db.cruises.update_one(
-        {"name_fr": "Ouest Corse"},
-        {"$set": {
-            "availabilities": ouest_corse_availabilities,
-            "pricing": {"cabin_price": 1470, "private_price": 11900, "currency": "EUR"},
-            "updated_at": datetime.utcnow()
-        }}
-    )
+    try:
+        await db.cruises.update_one(
+            {"name_fr": "Ouest Corse"},
+            {"$set": {
+                "availabilities": cruises_8_days_availabilities,
+                "pricing": {"cabin_price": 1470, "private_price": 11760, "currency": "EUR"},
+                "updated_at": datetime.utcnow()
+            }}
+        )
+        results["updated"].append("Ouest Corse")
+    except Exception as e:
+        results["errors"].append(f"Ouest Corse: {str(e)}")
     
     # Update Sardaigne & Corse du Sud
-    await db.cruises.update_one(
-        {"name_fr": "Sardaigne & Corse du Sud"},
-        {"$set": {
-            "availabilities": sardaigne_availabilities,
-            "pricing": {"cabin_price": 1470, "private_price": 11900, "currency": "EUR"},
-            "updated_at": datetime.utcnow()
-        }}
-    )
+    try:
+        await db.cruises.update_one(
+            {"name_fr": {"$in": ["Sardaigne & Corse du Sud", "Sardaigne et Corse du Sud"]}},
+            {"$set": {
+                "availabilities": cruises_8_days_availabilities,
+                "pricing": {"cabin_price": 1470, "private_price": 11760, "currency": "EUR"},
+                "updated_at": datetime.utcnow()
+            }}
+        )
+        results["updated"].append("Sardaigne & Corse du Sud")
+    except Exception as e:
+        results["errors"].append(f"Sardaigne: {str(e)}")
     
-    return {"message": "Cruises updated with detailed data successfully"}
+    return {
+        "success": len(results["errors"]) == 0,
+        "message": "Data updated successfully" if len(results["errors"]) == 0 else "Some errors occurred",
+        "details": results
+    }
+
+# ============= CONTACT INFO =============
+
+@api_router.get("/contact")
+async def get_contact_info():
+    """Get contact information"""
+    return {
+        "phone": "04 95 72 90 28",
+        "email": "contact@sognudimare-catamarans.com",
+        "address": "Port Tino Rossi - 20000 AJACCIO",
+        "social": {
+            "instagram": "https://www.instagram.com/sognudimare/",
+            "facebook": "https://www.facebook.com/sognudimare",
+            "youtube": "https://www.youtube.com/@sognudimare7470",
+            "tripadvisor": "https://www.tripadvisor.fr/Attraction_Review-g187140-d27478751-Reviews-Sognudimare"
+        }
+    }
 
 # ============= SQUARE PAYMENT MODELS =============
 
