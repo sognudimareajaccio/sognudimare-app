@@ -29,22 +29,26 @@ const PORTFOLIO_PHOTOS = [
   { 
     url: 'https://static.wixstatic.com/media/ce6ce7_0ce032b8fe2e4bf58652c8d18e897478~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/SOGNUDIMARE%20CROISIERE%20CATAMARAN%20DEPUIS%20AJACCIO%20copie.jpg',
     label_fr: 'Tour de Corse',
-    label_en: 'Tour of Corsica'
+    label_en: 'Tour of Corsica',
+    cruiseName: 'Tour de Corse'
   },
   { 
     url: 'https://static.wixstatic.com/media/ce6ce7_f3bee630d0c549388bbc71c0e58fb9ea~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/sognudimare%20a%20scandola_edited.jpg',
     label_fr: 'Scandola',
-    label_en: 'Scandola'
+    label_en: 'Scandola',
+    cruiseName: 'Ouest Corse'
   },
   { 
     url: 'https://static.wixstatic.com/media/ce6ce7_9e15d4c9779b4d48ad56a689ab2fe02b~mv2.avif/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/LAGOON%2043%20SOGNUDIMARE.avif',
-    label_fr: 'Notre Catamaran',
-    label_en: 'Our Catamaran'
+    label_fr: 'Les Catamarans',
+    label_en: 'The Catamarans',
+    link: '/catamarans'
   },
   { 
     url: 'https://static.wixstatic.com/media/ce6ce7_1872feb30a584c1da72e05ee7d37fb22~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/ce6ce7_1872feb30a584c1da72e05ee7d37fb22~mv2.jpg',
     label_fr: 'Îles Lavezzi',
-    label_en: 'Lavezzi Islands'
+    label_en: 'Lavezzi Islands',
+    cruiseName: 'Corse du Sud'
   },
   { 
     url: 'https://static.wixstatic.com/media/ce6ce7_7f55aceeb39542168e40d1384ab96e09~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/ce6ce7_7f55aceeb39542168e40d1384ab96e09~mv2.jpg',
@@ -57,14 +61,16 @@ const PORTFOLIO_PHOTOS = [
     label_en: 'Crystal waters'
   },
   { 
-    url: 'https://static.wixstatic.com/media/ce6ce7_d9f82f1b7c874908a2b4e92a82d98086~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/cala-orzu.jpg',
-    label_fr: 'Cala d\'Orzu',
-    label_en: 'Cala d\'Orzu'
+    url: 'https://customer-assets.emergentagent.com/job_fe2730ba-35c4-4eb7-98c9-325cf295cc88/artifacts/c45b6sng_maddalena.jpg',
+    label_fr: 'Archipel la Maddalena',
+    label_en: 'Maddalena Archipelago',
+    cruiseName: 'Sardaigne'
   },
   { 
     url: 'https://static.wixstatic.com/media/ce6ce7_322d9b6fa5b1489689b338b8367512ef~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/team.jpg',
     label_fr: 'L\'équipage',
-    label_en: 'The crew'
+    label_en: 'The crew',
+    link: '/equipage'
   },
   { 
     url: 'https://static.wixstatic.com/media/ce6ce7_33c3f5377f8546a68ad7377405f13f95~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/PHOTO-2025-08-02-23-15-20%204.jpg',
@@ -107,6 +113,7 @@ const LOCAL_PARTNERS = [
 const ALL_INCLUSIVE_FEATURES = [
   { 
     icon: 'bed', 
+    iconType: 'ionicons',
     title_fr: 'HÉBERGEMENT', 
     title_en: 'ACCOMMODATION',
     desc_fr: 'Cabine double tout confort avec salle d\'eau et WC indépendants. Draps, serviettes et foutas fournis.',
@@ -116,6 +123,7 @@ const ALL_INCLUSIVE_FEATURES = [
   },
   { 
     icon: 'restaurant', 
+    iconType: 'ionicons',
     title_fr: 'REPAS', 
     title_en: 'MEALS',
     desc_fr: 'Tous les repas préparés et servis à bord. Cuisine avec des produits locaux de producteurs passionnés.',
@@ -125,6 +133,7 @@ const ALL_INCLUSIVE_FEATURES = [
   },
   { 
     icon: 'wine', 
+    iconType: 'ionicons',
     title_fr: 'BOISSONS', 
     title_en: 'DRINKS',
     desc_fr: 'Toutes les boissons (softs & alcools). Vins issus exclusivement de vignobles locaux.',
@@ -134,45 +143,47 @@ const ALL_INCLUSIVE_FEATURES = [
   },
   { 
     icon: 'sail-boat', 
-    iconType: 'material-community',
+    iconType: 'material',
     title_fr: 'CATAMARAN', 
     title_en: 'CATAMARAN',
-    desc_fr: 'Bateaux modernes et confortables vers des criques confidentielles accessibles uniquement par la mer.',
-    desc_en: 'Modern and comfortable boats to secluded coves accessible only by sea.',
+    desc_fr: 'Embarquez pour une escapade en mer à bord de nos bateaux modernes et confortables, pensés pour la détente et l\'exploration en douceur.',
+    desc_en: 'Embark on a sea getaway aboard our modern and comfortable boats, designed for relaxation and gentle exploration.',
     petit_plus_fr: 'BATEAUX RÉCENTS',
     petit_plus_en: 'RECENT BOATS'
   },
   { 
     icon: 'fish', 
+    iconType: 'ionicons',
     title_fr: 'MATÉRIELS DE PÊCHE', 
     title_en: 'FISHING GEAR',
-    desc_fr: 'Cannes à pêche à disposition. Moment privilégié pour se reconnecter à la mer.',
-    desc_en: 'Fishing rods available. A special moment to reconnect with the sea.',
+    desc_fr: 'Tout au long de votre croisière en catamaran, des cannes à pêche sont mises à disposition des passagers. Libre à vous de tenter votre chance, que ce soit au lever du soleil.',
+    desc_en: 'Throughout your catamaran cruise, fishing rods are available for passengers. Feel free to try your luck, whether at sunrise.',
     petit_plus_fr: 'DU POISSON FRAIS',
     petit_plus_en: 'FRESH FISH'
   },
   { 
     icon: 'rowing', 
-    iconType: 'material-community',
+    iconType: 'material',
     title_fr: 'PADDLE', 
     title_en: 'PADDLE',
-    desc_fr: 'Glissez dans une crique sauvage ou profitez d\'un moment de détente au coucher du soleil.',
-    desc_en: 'Glide into a wild cove or enjoy a relaxing moment at sunset.',
+    desc_fr: 'Le paddle est l\'activité idéale pour s\'évader et se ressourcer. Accessible à tous, il permet de se reconnecter à la nature en douceur, de vivre la mer autrement et de prolonger l\'esprit du slow tourisme.',
+    desc_en: 'Paddleboarding is the ideal activity to escape and recharge. Accessible to all, it allows you to gently reconnect with nature, experience the sea differently and extend the spirit of slow tourism.',
     petit_plus_fr: 'FORMATION DU CAPITAINE ;)',
     petit_plus_en: 'CAPTAIN TRAINING ;)'
   },
   { 
     icon: 'kayaking', 
-    iconType: 'material-community',
+    iconType: 'material',
     title_fr: 'CANOË', 
     title_en: 'CANOE',
-    desc_fr: 'Naviguer en douceur au rythme des pagaies, dans le respect de la nature.',
-    desc_en: 'Navigate gently at the rhythm of the paddles, respecting nature.',
+    desc_fr: 'Facile d\'accès et convivial, le canoë invite à prendre le temps de naviguer en douceur, au rythme des pagaies, dans le respect de la nature et loin de l\'agitation.',
+    desc_en: 'Easy to access and friendly, the canoe invites you to take the time to navigate gently, at the rhythm of the paddles, respecting nature and away from the hustle.',
     petit_plus_fr: 'POUR DÉCOUVRIR EN COUPLE',
     petit_plus_en: 'FOR COUPLES TO DISCOVER'
   },
   { 
     icon: 'car', 
+    iconType: 'ionicons',
     title_fr: 'TRANSFERT', 
     title_en: 'TRANSFER',
     desc_fr: 'Transfert aéroport / port d\'embarquement inclus à l\'aller et au retour. Navette privative.',
@@ -182,11 +193,11 @@ const ALL_INCLUSIVE_FEATURES = [
   },
   { 
     icon: 'account-group', 
-    iconType: 'material-community',
+    iconType: 'material',
     title_fr: 'ÉQUIPAGE', 
     title_en: 'CREW',
-    desc_fr: 'Équipe professionnelle et passionnée, dédiée à votre confort et sécurité.',
-    desc_en: 'Professional and passionate team, dedicated to your comfort and safety.',
+    desc_fr: 'Vous êtes accompagnés par une équipe professionnelle et passionnée, entièrement dédiée à votre confort et à votre sécurité tout au long de la croisière.',
+    desc_en: 'You are accompanied by a professional and passionate team, entirely dedicated to your comfort and safety throughout the cruise.',
     petit_plus_fr: 'L\'ÉQUIPAGE EST UN COUPLE',
     petit_plus_en: 'THE CREW IS A COUPLE'
   },
@@ -264,13 +275,29 @@ export default function HomeScreen() {
             {language === 'fr' ? 'Découvrez nos croisières en images' : 'Discover our cruises in pictures'}
           </Text>
           <View style={styles.portfolioGrid}>
-            {PORTFOLIO_PHOTOS.slice(0, 6).map((photo, index) => (
-              <TouchableOpacity key={index} style={styles.portfolioItem}>
+            {PORTFOLIO_PHOTOS.slice(0, 4).map((photo, index) => (
+              <TouchableOpacity 
+                key={index} 
+                style={styles.portfolioItem}
+                onPress={() => {
+                  if ((photo as any).link) {
+                    router.push((photo as any).link);
+                  } else if ((photo as any).cruiseName && cruises.length > 0) {
+                    const cruise = cruises.find(c => c.name_fr.includes((photo as any).cruiseName));
+                    if (cruise) {
+                      router.push(`/cruise/${cruise.id}`);
+                    }
+                  }
+                }}
+              >
                 <Image source={{ uri: photo.url }} style={styles.portfolioImage} />
                 <View style={styles.portfolioOverlay}>
                   <Text style={styles.portfolioLabel}>
                     {language === 'fr' ? photo.label_fr : photo.label_en}
                   </Text>
+                  {((photo as any).link || (photo as any).cruiseName) && (
+                    <Ionicons name="arrow-forward-circle" size={24} color={COLORS.white} style={{ marginTop: 4 }} />
+                  )}
                 </View>
               </TouchableOpacity>
             ))}
@@ -282,12 +309,28 @@ export default function HomeScreen() {
             style={styles.portfolioScroll}
           >
             {PORTFOLIO_PHOTOS.slice(6).map((photo, index) => (
-              <TouchableOpacity key={index} style={styles.portfolioScrollItem}>
+              <TouchableOpacity 
+                key={index} 
+                style={styles.portfolioScrollItem}
+                onPress={() => {
+                  if ((photo as any).link) {
+                    router.push((photo as any).link);
+                  } else if ((photo as any).cruiseName && cruises.length > 0) {
+                    const cruise = cruises.find(c => c.name_fr.includes((photo as any).cruiseName));
+                    if (cruise) {
+                      router.push(`/cruise/${cruise.id}`);
+                    }
+                  }
+                }}
+              >
                 <Image source={{ uri: photo.url }} style={styles.portfolioScrollImage} />
                 <View style={styles.portfolioScrollOverlay}>
                   <Text style={styles.portfolioScrollLabel}>
                     {language === 'fr' ? photo.label_fr : photo.label_en}
                   </Text>
+                  {((photo as any).link || (photo as any).cruiseName) && (
+                    <Ionicons name="arrow-forward-circle" size={18} color={COLORS.white} style={{ marginTop: 2 }} />
+                  )}
                 </View>
               </TouchableOpacity>
             ))}
@@ -313,19 +356,19 @@ export default function HomeScreen() {
         <View style={styles.statsSection}>
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>2021</Text>
-            <Text style={styles.statLabel}>{language === 'fr' ? 'Création' : 'Created'}</Text>
+            <Text style={styles.statLabel}>{language === 'fr' ? 'Date\nde création' : 'Creation\ndate'}</Text>
           </View>
           <View style={styles.statItem}>
-            <Text style={styles.statNumber}>6</Text>
-            <Text style={styles.statLabel}>{language === 'fr' ? 'Destinations' : 'Destinations'}</Text>
+            <Text style={styles.statNumber}>4</Text>
+            <Text style={styles.statLabel}>{language === 'fr' ? 'Destinations\nSlow tourisme' : 'Slow tourism\ndestinations'}</Text>
           </View>
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>13-26</Text>
-            <Text style={styles.statLabel}>{language === 'fr' ? 'Repas frais' : 'Fresh meals'}</Text>
+            <Text style={styles.statLabel}>{language === 'fr' ? 'Repas frais\nservis à bord' : 'Fresh meals\nserved on board'}</Text>
           </View>
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>11</Text>
-            <Text style={styles.statLabel}>{language === 'fr' ? 'Partenaires' : 'Partners'}</Text>
+            <Text style={styles.statLabel}>{language === 'fr' ? 'Partenaires\nlocaux' : 'Local\npartners'}</Text>
           </View>
         </View>
 
@@ -367,7 +410,7 @@ export default function HomeScreen() {
             {ALL_INCLUSIVE_FEATURES.map((feature, index) => (
               <View key={index} style={styles.inclusiveCard}>
                 <View style={styles.inclusiveHeader}>
-                  {feature.iconType === 'material-community' ? (
+                  {feature.iconType === 'material' ? (
                     <MaterialCommunityIcons name={feature.icon as any} size={32} color={COLORS.accent} />
                   ) : (
                     <Ionicons name={feature.icon as any} size={32} color={COLORS.accent} />
@@ -476,6 +519,39 @@ export default function HomeScreen() {
           </View>
           <TouchableOpacity style={styles.clubButton} onPress={() => router.push('/club')}>
             <Text style={styles.clubButtonText}>{t('joinClub')}</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Engagements Section */}
+        <View style={styles.engagementsSection}>
+          <View style={styles.engagementsIconRow}>
+            <Ionicons name="leaf" size={28} color={COLORS.accent} />
+            <Text style={styles.engagementsBadge}>1%</Text>
+            <Ionicons name="heart" size={28} color={COLORS.accent} />
+          </View>
+          <Text style={styles.engagementsTitle}>
+            {language === 'fr' ? 'Nos engagements écoresponsables' : 'Our eco-responsible commitments'}
+          </Text>
+          <Text style={styles.engagementsText}>
+            {language === 'fr' 
+              ? 'Tourisme durable, circuits courts, protection de la biodiversité marine... 1% de notre CA est reversé à des associations locales qui œuvrent pour la préservation de la Méditerranée.'
+              : 'Sustainable tourism, short supply chains, marine biodiversity protection... 1% of our revenue is donated to local associations working to preserve the Mediterranean.'}
+          </Text>
+          <View style={styles.engagementsAssociations}>
+            <View style={styles.engagementAssocItem}>
+              <Ionicons name="checkmark-circle" size={18} color={COLORS.secondary} />
+              <Text style={styles.engagementAssocName}>Mare Vivu</Text>
+            </View>
+            <View style={styles.engagementAssocItem}>
+              <Ionicons name="checkmark-circle" size={18} color={COLORS.secondary} />
+              <Text style={styles.engagementAssocName}>La Girelle</Text>
+            </View>
+          </View>
+          <TouchableOpacity style={styles.engagementsButton} onPress={() => router.push('/engagements')}>
+            <Text style={styles.engagementsButtonText}>
+              {language === 'fr' ? 'Découvrir nos engagements' : 'Discover our commitments'}
+            </Text>
+            <Ionicons name="arrow-forward" size={18} color={COLORS.primary} />
           </TouchableOpacity>
         </View>
 
@@ -672,6 +748,8 @@ const styles = StyleSheet.create({
   },
   statItem: {
     alignItems: 'center',
+    flex: 1,
+    paddingHorizontal: 4,
   },
   statNumber: {
     fontSize: FONT_SIZES.xxl,
@@ -679,10 +757,11 @@ const styles = StyleSheet.create({
     color: COLORS.secondary,
   },
   statLabel: {
-    fontSize: FONT_SIZES.xs,
+    fontSize: 10,
     color: COLORS.white,
-    opacity: 0.8,
+    opacity: 0.9,
     marginTop: 2,
+    textAlign: 'center',
   },
   section: {
     padding: SPACING.lg,
@@ -984,5 +1063,71 @@ const styles = StyleSheet.create({
     color: COLORS.accent,
     fontWeight: '600',
     fontStyle: 'italic',
+  },
+  // Engagements Section styles
+  engagementsSection: {
+    backgroundColor: COLORS.primary,
+    padding: SPACING.xl,
+    marginHorizontal: SPACING.lg,
+    marginBottom: SPACING.lg,
+    borderRadius: BORDER_RADIUS.xl,
+    alignItems: 'center',
+  },
+  engagementsIconRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.md,
+  },
+  engagementsBadge: {
+    backgroundColor: COLORS.accent,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.xs,
+    borderRadius: BORDER_RADIUS.full,
+    marginHorizontal: SPACING.md,
+  },
+  engagementsTitle: {
+    fontSize: FONT_SIZES.lg,
+    fontWeight: '700',
+    color: COLORS.secondary,
+    textAlign: 'center',
+    marginBottom: SPACING.sm,
+  },
+  engagementsText: {
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.white,
+    textAlign: 'center',
+    lineHeight: 22,
+    opacity: 0.9,
+    marginBottom: SPACING.md,
+  },
+  engagementsAssociations: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: SPACING.lg,
+  },
+  engagementAssocItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginHorizontal: SPACING.sm,
+  },
+  engagementAssocName: {
+    fontSize: FONT_SIZES.sm,
+    fontWeight: '600',
+    color: COLORS.secondary,
+    marginLeft: SPACING.xs,
+  },
+  engagementsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.secondary,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
+    borderRadius: BORDER_RADIUS.full,
+  },
+  engagementsButtonText: {
+    fontSize: FONT_SIZES.sm,
+    fontWeight: '700',
+    color: COLORS.primary,
+    marginRight: SPACING.sm,
   },
 });

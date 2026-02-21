@@ -88,6 +88,24 @@ export default function TabLayout() {
           href: null,
         }}
       />
+      <Tabs.Screen
+        name="engagements"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="catamarans"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="equipage"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }
