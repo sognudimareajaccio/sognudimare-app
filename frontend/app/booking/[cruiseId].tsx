@@ -153,37 +153,44 @@ export default function BookingScreen() {
     }
   };
 
-  const calculatePriceDetails = () => {
-    if (!cruise) return { basePrice: 0, discount: 0, clubCardTotal: 0, total: 0, passengersWithDiscount: 0 };
+ const calculatePriceDetails = () => {
+    if (!cruise) return { basePrice: 0, discount: 0, clubCardTotal: 0, total: 0, passengersWithDiscount: 0, pricePerPerson: 0 };
+    
+    // Get price from selected date availability, fallback to base price
+    let pricePerPerson = cruise.pricing.cabin_price || 0;
+    
+    // Find the selected date in availabilities to get the correct price
+    if (chosenDate && cruise.availabilities && cruise.availabilities.length > 0) {
+      const selectedAvailability = cruise.availabilities.find(a => a.date_range === chosenDate);
+      if (selectedAvailability && selectedAvailability.price) {
+        pricePerPerson = selectedAvailability.price;
+      }
+    }
     
     // Base cruise price
     let basePrice = 0;
-    const pricePerPerson = cruise.pricing.cabin_price || 0;
     
     if (bookingType === 'private') {
-      basePrice = cruise.pricing.private_price || 0;
+      // Privatisation = prix par personne × 8
+      basePrice = pricePerPerson * 8;
     } else {
       basePrice = pricePerPerson * passengers;
     }
     
-    // Club card discount - applies PER PASSENGER for BOTH cabin AND private
-    // Each card gives discount on ONE passenger's cabin price
+    // Club card discount
     const discountPercentage = selectedClubCard.discount;
     let discountAmount = 0;
-    
-    // Same logic for both cabin and private:
-    // Discount is calculated on (cabin price per person × number of cards)
     const passengersWithDiscount = Math.min(clubCardQuantity, passengers);
     const discountableAmount = pricePerPerson * passengersWithDiscount;
     discountAmount = Math.round(discountableAmount * discountPercentage / 100);
     
-    // Club card cost (price × quantity)
+    // Club card cost
     const clubCardTotal = selectedClubCard.price * clubCardQuantity;
     
-    // Total = base price - discount + club cards
+    // Total
     const total = basePrice - discountAmount + clubCardTotal;
     
-    return { basePrice, discount: discountAmount, clubCardTotal, total, passengersWithDiscount };
+    return { basePrice, discount: discountAmount, clubCardTotal, total, passengersWithDiscount, pricePerPerson };
   };
 
   const calculateTotal = () => {
@@ -349,7 +356,7 @@ export default function BookingScreen() {
                 Réservation Cabine
               </Text>
               <Text style={styles.bookingTypePrice}>
-                {cruise.pricing.cabin_price}€ / personne
+                {calculatePriceDetails().pricePerPerson || cruise.pricing.cabin_price}€ / personne
               </Text>
               <Text style={styles.bookingTypeDescription}>
                 Partagez le catamaran avec d'autres passagers
@@ -384,7 +391,7 @@ export default function BookingScreen() {
                 Privatisation Complète
               </Text>
               <Text style={[styles.bookingTypePrice, { color: COLORS.secondary }]}>
-                {cruise.pricing.private_price?.toLocaleString('fr-FR')}€
+                {((calculatePriceDetails().pricePerPerson || cruise.pricing.cabin_price || 0) * 8).toLocaleString('fr-FR')}€
               </Text>
               <Text style={styles.bookingTypeDescription}>
                 Le catamaran rien que pour vous (jusqu'à 8 personnes)
@@ -426,7 +433,7 @@ export default function BookingScreen() {
           
           {bookingType === 'cabin' && (
             <Text style={styles.passengerNote}>
-              Prix par passager : {cruise.pricing.cabin_price}€ × {passengers} = {cruise.pricing.cabin_price * passengers}€
+              Prix par passager : {calculatePriceDetails().pricePerPerson}€ × {passengers} = {(calculatePriceDetails().pricePerPerson * passengers).toLocaleString('fr-FR')}€
             </Text>
           )}
         </View>
