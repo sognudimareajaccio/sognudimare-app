@@ -360,7 +360,7 @@ export default function BookingScreen() {
                 Réservation Cabine
               </Text>
               <Text style={styles.bookingTypePrice}>
-                {cruise.pricing.cabin_price}€ / personne
+                {calculatePriceDetails().pricePerPerson || cruise.pricing.cabin_price}€ / personne
               </Text>
               <Text style={styles.bookingTypeDescription}>
                 Partagez le catamaran avec d'autres passagers
