@@ -14,7 +14,7 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS, SHADOWS } from '../src/constants/theme';
 import { useTranslation } from '../src/hooks/useTranslation';
 
-const PHONE_NUMBER = '+33762457442';
+const PHONE_NUMBER = '+33495729028';
 const EMAIL = 'contact@sognudimare-catamarans.com';
 const WEBSITE_URL = 'https://www.sognudimare.com';
 const LOGO_URL = 'https://static.wixstatic.com/media/ce6ce7_a82e3e86741143d6ab7acd99c121af7b~mv2.png/v1/fill/w_317,h_161,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/croisieres%20catamaran%20corse%20sognudimare.png';
@@ -72,7 +72,7 @@ export default function ContactScreen() {
           </View>
           <View style={styles.contactInfo}>
             <Text style={styles.contactLabel}>{t('callUs')}</Text>
-            <Text style={styles.contactValue}>07 62 45 74 42</Text>
+            <Text style={styles.contactValue}>04 95 72 90 28</Text>
           </View>
           <Ionicons name="chevron-forward" size={24} color={COLORS.textLight} />
         </TouchableOpacity>

@@ -29,7 +29,7 @@
     "plugins": [
       "expo-router"
     ],
-    extra": {
+    "extra": {
       "backendUrl": "https://sognudimare-app-production.up.railway.app",
       "eas": {
         "projectId": "b7a9c1d8-ab6b-4ae4-8b4e-3f0cde55d8f0"

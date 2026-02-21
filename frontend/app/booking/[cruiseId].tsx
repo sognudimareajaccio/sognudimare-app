@@ -154,36 +154,32 @@ export default function BookingScreen() {
   };
 
   const calculatePriceDetails = () => {
-    if (!cruise) return { basePrice: 0, discount: 0, clubCardTotal: 0, total: 0, passengersWithDiscount: 0 };
+    if (!cruise) return { basePrice: 0, discount: 0, clubCardTotal: 0, total: 0, passengersWithDiscount: 0, pricePerPerson: 0 };
     
-    // Base cruise price
+    let pricePerPerson = cruise.pricing.cabin_price || 0;
+    
+    if (chosenDate && cruise.availabilities && cruise.availabilities.length > 0) {
+      const selectedAvailability = cruise.availabilities.find(a => a.date_range === chosenDate);
+      if (selectedAvailability && selectedAvailability.price) {
+        pricePerPerson = selectedAvailability.price;
+      }
+    }
+    
     let basePrice = 0;
-    const pricePerPerson = cruise.pricing.cabin_price || 0;
-    
     if (bookingType === 'private') {
-      basePrice = cruise.pricing.private_price || 0;
+      basePrice = pricePerPerson * 8;
     } else {
       basePrice = pricePerPerson * passengers;
     }
     
-    // Club card discount - applies PER PASSENGER for BOTH cabin AND private
-    // Each card gives discount on ONE passenger's cabin price
     const discountPercentage = selectedClubCard.discount;
-    let discountAmount = 0;
-    
-    // Same logic for both cabin and private:
-    // Discount is calculated on (cabin price per person × number of cards)
     const passengersWithDiscount = Math.min(clubCardQuantity, passengers);
     const discountableAmount = pricePerPerson * passengersWithDiscount;
-    discountAmount = Math.round(discountableAmount * discountPercentage / 100);
-    
-    // Club card cost (price × quantity)
+    const discountAmount = Math.round(discountableAmount * discountPercentage / 100);
     const clubCardTotal = selectedClubCard.price * clubCardQuantity;
-    
-    // Total = base price - discount + club cards
     const total = basePrice - discountAmount + clubCardTotal;
     
-    return { basePrice, discount: discountAmount, clubCardTotal, total, passengersWithDiscount };
+    return { basePrice, discount: discountAmount, clubCardTotal, total, passengersWithDiscount, pricePerPerson };
   };
 
   const calculateTotal = () => {
