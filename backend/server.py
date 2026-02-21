@@ -1159,12 +1159,23 @@ async def update_cruises_with_detailed_data():
         "message": "Data updated successfully" if len(results["errors"]) == 0 else "Some errors occurred",
         "details": results
     }
-            "pricing": {"cabin_price": 1470, "private_price": 11900, "currency": "EUR"},
-            "updated_at": datetime.utcnow()
-        }}
-    )
-    
-    return {"message": "Cruises updated with detailed data successfully"}
+
+# ============= CONTACT INFO =============
+
+@api_router.get("/contact")
+async def get_contact_info():
+    """Get contact information"""
+    return {
+        "phone": "04 95 72 90 28",
+        "email": "contact@sognudimare-catamarans.com",
+        "address": "Port Tino Rossi - 20000 AJACCIO",
+        "social": {
+            "instagram": "https://www.instagram.com/sognudimare/",
+            "facebook": "https://www.facebook.com/sognudimare",
+            "youtube": "https://www.youtube.com/@sognudimare7470",
+            "tripadvisor": "https://www.tripadvisor.fr/Attraction_Review-g187140-d27478751-Reviews-Sognudimare"
+        }
+    }
 
 # ============= SQUARE PAYMENT MODELS =============
 
