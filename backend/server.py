@@ -1057,23 +1057,45 @@ async def apply_cruise_corrections():
         "details": results
     }
 
-# ============= UPDATE WITH DETAILED DATA =============
+# ============= UPDATE WITH DETAILED DATA (FÉVRIER 2026) =============
 
 @api_router.post("/update-detailed-data")
 async def update_cruises_with_detailed_data():
-    """Update cruises with detailed availability and program data"""
+    """Update cruises with detailed availability, pricing and contact info - Feb 2026"""
     
-    # Tour de Corse - Detailed Data
+    results = {"updated": [], "errors": []}
+    
+    # Tour de Corse - Availabilities 2026
     tour_de_corse_availabilities = [
-        {"date_range": "du 23 mai au 6 juin 2026", "price": 2560, "status": "available", "remaining_places": 8, "status_label": "Reste 8 places"},
-        {"date_range": "du 13 au 27 juin 2026", "price": 2560, "status": "limited", "remaining_places": 4, "status_label": "Reste 4 places"},
-        {"date_range": "du 27 juin au 11 juillet 2026", "price": 3150, "status": "available", "remaining_places": 8, "status_label": "Reste 8 places"},
-        {"date_range": "du 11 au 25 juillet 2026", "price": 3150, "status": "available", "remaining_places": 8, "status_label": "Reste 8 places"},
+        {"date_range": "du 23 mai au 6 juin 2026", "price": 2560, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 13 au 27 juin 2026", "price": 2560, "status": "limited", "remaining_places": 4, "status_label": "Quelques places"},
+        {"date_range": "du 27 juin au 11 juillet 2026", "price": 3150, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 11 au 25 juillet 2026", "price": 3150, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
         {"date_range": "du 25 juillet au 8 août 2026", "price": 3450, "status": "full", "remaining_places": 0, "status_label": "COMPLET"},
         {"date_range": "du 8 au 22 août 2026", "price": 3450, "status": "full", "remaining_places": 0, "status_label": "COMPLET"},
-        {"date_range": "du 22 août au 5 septembre 2026", "price": 3450, "status": "available", "remaining_places": 8, "status_label": "Reste 8 places"},
-        {"date_range": "du 5 au 19 septembre 2026", "price": 3150, "status": "available", "remaining_places": 8, "status_label": "Reste 8 places"},
-        {"date_range": "du 19 septembre au 3 octobre 2026", "price": 2660, "status": "available", "remaining_places": 8, "status_label": "Reste 8 places"},
+        {"date_range": "du 22 août au 5 septembre 2026", "price": 3450, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 5 au 19 septembre 2026", "price": 3150, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 19 septembre au 3 octobre 2026", "price": 2660, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+    ]
+    
+    # Ouest Corse / Corse du Sud / Sardaigne - Availabilities 2026 (same dates)
+    cruises_8_days_availabilities = [
+        {"date_range": "du 2 au 9 mai 2026", "price": 1470, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 9 au 16 mai 2026", "price": 1470, "status": "full", "remaining_places": 0, "status_label": "COMPLET"},
+        {"date_range": "du 6 au 13 juin 2026", "price": 1670, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 27 juin au 4 juillet 2026", "price": 1970, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 4 au 11 juillet 2026", "price": 1970, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 11 au 18 juillet 2026", "price": 1970, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 25 juillet au 1er août 2026", "price": 2070, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 1er au 8 août 2026", "price": 2070, "status": "limited", "remaining_places": 4, "status_label": "Quelques places"},
+        {"date_range": "du 8 au 15 août 2026", "price": 2070, "status": "full", "remaining_places": 0, "status_label": "COMPLET"},
+        {"date_range": "du 15 au 22 août 2026", "price": 2170, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 22 au 29 août 2026", "price": 2170, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 29 août au 5 septembre 2026", "price": 2070, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 5 au 12 septembre 2026", "price": 1870, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 12 au 19 septembre 2026", "price": 1770, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 19 au 26 septembre 2026", "price": 1770, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
+        {"date_range": "du 26 septembre au 3 octobre 2026", "price": 1470, "status": "available", "remaining_places": 8, "status_label": "Disponible"},
     ]
     
     tour_de_corse_program = [
