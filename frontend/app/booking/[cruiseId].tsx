@@ -154,14 +154,25 @@ export default function BookingScreen() {
   };
 
   const calculatePriceDetails = () => {
-    if (!cruise) return { basePrice: 0, discount: 0, clubCardTotal: 0, total: 0, passengersWithDiscount: 0 };
+    if (!cruise) return { basePrice: 0, discount: 0, clubCardTotal: 0, total: 0, passengersWithDiscount: 0, pricePerPerson: 0 };
+    
+    // Get price from selected date availability, fallback to base price
+    let pricePerPerson = cruise.pricing.cabin_price || 0;
+    
+    // Find the selected date in availabilities to get the correct price
+    if (chosenDate && cruise.availabilities && cruise.availabilities.length > 0) {
+      const selectedAvailability = cruise.availabilities.find(a => a.date_range === chosenDate);
+      if (selectedAvailability && selectedAvailability.price) {
+        pricePerPerson = selectedAvailability.price;
+      }
+    }
     
     // Base cruise price
     let basePrice = 0;
-    const pricePerPerson = cruise.pricing.cabin_price || 0;
     
     if (bookingType === 'private') {
-      basePrice = cruise.pricing.private_price || 0;
+      // Privatisation = prix par personne × 8
+      basePrice = pricePerPerson * 8;
     } else {
       basePrice = pricePerPerson * passengers;
     }
@@ -183,7 +194,7 @@ export default function BookingScreen() {
     // Total = base price - discount + club cards
     const total = basePrice - discountAmount + clubCardTotal;
     
-    return { basePrice, discount: discountAmount, clubCardTotal, total, passengersWithDiscount };
+    return { basePrice, discount: discountAmount, clubCardTotal, total, passengersWithDiscount, pricePerPerson };
   };
 
   const calculateTotal = () => {
