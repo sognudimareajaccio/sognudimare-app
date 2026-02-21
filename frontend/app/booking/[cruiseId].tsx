@@ -641,16 +641,24 @@ export default function BookingScreen() {
                       ]}>
                         {avail.date_range}
                       </Text>
-                      <Text style={[
-                        styles.dateOptionStatus,
-                        avail.status === 'available' && { color: COLORS.success },
-                        avail.status === 'limited' && { color: COLORS.secondary },
-                        avail.status === 'full' && { color: COLORS.error }
-                      ]}>
-                        {avail.status === 'available' && 'Disponible'}
-                        {avail.status === 'limited' && avail.status_label}
-                        {avail.status === 'full' && 'COMPLET'}
-                      </Text>
+                      <View style={styles.dateOptionPriceRow}>
+                        <Text style={[
+                          styles.dateOptionPrice,
+                          avail.status === 'full' && styles.dateOptionTextDisabled
+                        ]}>
+                          {avail.price}€/pers
+                        </Text>
+                        <Text style={[
+                          styles.dateOptionStatus,
+                          avail.status === 'available' && { color: COLORS.success },
+                          avail.status === 'limited' && { color: COLORS.secondary },
+                          avail.status === 'full' && { color: COLORS.error }
+                        ]}>
+                          {avail.status === 'available' && 'Disponible'}
+                          {avail.status === 'limited' && avail.status_label}
+                          {avail.status === 'full' && 'COMPLET'}
+                        </Text>
+                      </View>
                     </View>
                     {chosenDate === avail.date_range && (
                       <Ionicons name="checkmark-circle" size={24} color={COLORS.primary} />
