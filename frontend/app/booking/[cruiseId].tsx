@@ -345,7 +345,7 @@ export default function BookingScreen() {
                 Réservation Cabine
               </Text>
               <Text style={styles.bookingTypePrice}>
-                {cruise.pricing.cabin_price}€ / personne
+                {calculatePriceDetails().pricePerPerson}€ / personne
               </Text>
               <Text style={styles.bookingTypeDescription}>
                 Partagez le catamaran avec d'autres passagers
@@ -380,7 +380,7 @@ export default function BookingScreen() {
                 Privatisation Complète
               </Text>
               <Text style={[styles.bookingTypePrice, { color: COLORS.secondary }]}>
-                {cruise.pricing.private_price?.toLocaleString('fr-FR')}€
+                {(calculatePriceDetails().pricePerPerson * 8).toLocaleString('fr-FR')}€
               </Text>
               <Text style={styles.bookingTypeDescription}>
                 Le catamaran rien que pour vous (jusqu'à 8 personnes)
@@ -422,7 +422,7 @@ export default function BookingScreen() {
           
           {bookingType === 'cabin' && (
             <Text style={styles.passengerNote}>
-              Prix par passager : {cruise.pricing.cabin_price}€ × {passengers} = {cruise.pricing.cabin_price * passengers}€
+              Prix par passager : {calculatePriceDetails().pricePerPerson}€ × {passengers} = {(calculatePriceDetails().pricePerPerson * passengers).toLocaleString('fr-FR')}€
             </Text>
           )}
         </View>
