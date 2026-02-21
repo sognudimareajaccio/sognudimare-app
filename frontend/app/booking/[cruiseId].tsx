@@ -437,7 +437,7 @@ export default function BookingScreen() {
           
           {bookingType === 'cabin' && (
             <Text style={styles.passengerNote}>
-              Prix par passager : {cruise.pricing.cabin_price}€ × {passengers} = {cruise.pricing.cabin_price * passengers}€
+              Prix par passager : {calculatePriceDetails().pricePerPerson}€ × {passengers} = {(calculatePriceDetails().pricePerPerson * passengers).toLocaleString('fr-FR')}€
             </Text>
           )}
         </View>
