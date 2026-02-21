@@ -1170,6 +1170,17 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.sm,
     marginTop: SPACING.xs,
   },
+  dateOptionPriceRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: SPACING.xs,
+  },
+  dateOptionPrice: {
+    fontSize: FONT_SIZES.md,
+    fontWeight: '700',
+    color: COLORS.primary,
+  },
   noDateText: {
     textAlign: 'center',
     fontSize: FONT_SIZES.md,
