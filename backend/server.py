@@ -911,7 +911,7 @@ async def seed_database():
 
 @api_router.post("/apply-corrections")
 async def apply_cruise_corrections():
-    """Apply all user-requested corrections: fix programs, images, prices and delete unwanted cruises"""
+    """Apply all corrections: programs, IMAGES, prices"""
     
     results = {
         "programs_updated": [],
@@ -921,128 +921,124 @@ async def apply_cruise_corrections():
         "errors": []
     }
     
-    # 1. Delete "Grèce Authentique" and "Îles Grenadines" cruises
+    # 1. Delete Greece and Grenadines
     try:
         delete_result = await db.cruises.delete_many({
             "name_fr": {"$in": ["Grèce Authentique", "Îles Grenadines"]}
         })
-        results["cruises_deleted"].append(f"Deleted {delete_result.deleted_count} cruises (Grèce and Caraïbes)")
+        results["cruises_deleted"].append(f"Deleted {delete_result.deleted_count} cruises")
     except Exception as e:
         results["errors"].append(f"Error deleting cruises: {str(e)}")
     
-    # 2. Update Tour de Corse - Program, Price (20480€ privatisation)
-    tour_de_corse_program = [
-        "JOUR 1 : AJACCIO & LES ÎLES SANGUINAIRES",
-        "JOUR 2 : CARGÈSE",
-        "JOUR 3 : LES CALANQUES DE PIANA & LE GOLFE DE PORTO",
-        "JOUR 4 : LE PETIT VILLAGE DE GIROLATA",
-        "JOUR 5 : LA RÉSERVE NATURELLE DE SCANDOLA & GALÉRIA",
-        "JOUR 6 : LE GOLFE DE LA REVELATTA & CALVI",
-        "JOUR 7 : LES PLAGES DE SALECCIA ET LE PORT DE SAINT FLORENT",
-        "JOUR 8 : LA PLAGE DE NONZA & LE PORT DE CENTURI",
-        "JOUR 9 : CAP CORSE, ERBALUNGA & BASTIA",
-        "JOUR 10 : SOLENZARA",
-        "JOUR 11 : PORTO VECCHIO & SANTA GIULIA",
-        "JOUR 12 : BONIFACIO",
-        "JOUR 13 : LA PLAGE DE ROCCAPINA & TIZZANO",
-        "JOUR 14 : RETOUR SUR AJACCIO AVEC ARRÊT SUR CALA DI CONCA",
-        "JOUR 15 : DEBARQUEMENT PORT TINO ROSSI À AJACCIO"
-    ]
-    
+    # 2. Update Tour de Corse
     try:
         result = await db.cruises.update_one(
             {"name_fr": "Tour de Corse"},
             {"$set": {
-                "program_fr": tour_de_corse_program,
+                "program_fr": [
+                    "JOUR 1 : AJACCIO & LES ÎLES SANGUINAIRES",
+                    "JOUR 2 : CARGÈSE",
+                    "JOUR 3 : LES CALANQUES DE PIANA & LE GOLFE DE PORTO",
+                    "JOUR 4 : LE PETIT VILLAGE DE GIROLATA",
+                    "JOUR 5 : LA RÉSERVE NATURELLE DE SCANDOLA & GALÉRIA",
+                    "JOUR 6 : LE GOLFE DE LA REVELATTA & CALVI",
+                    "JOUR 7 : LES PLAGES DE SALECCIA ET LE PORT DE SAINT FLORENT",
+                    "JOUR 8 : LA PLAGE DE NONZA & LE PORT DE CENTURI",
+                    "JOUR 9 : CAP CORSE, ERBALUNGA & BASTIA",
+                    "JOUR 10 : SOLENZARA",
+                    "JOUR 11 : PORTO VECCHIO & SANTA GIULIA",
+                    "JOUR 12 : BONIFACIO",
+                    "JOUR 13 : LA PLAGE DE ROCCAPINA & TIZZANO",
+                    "JOUR 14 : RETOUR SUR AJACCIO AVEC ARRÊT SUR CALA DI CONCA",
+                    "JOUR 15 : DEBARQUEMENT PORT TINO ROSSI À AJACCIO"
+                ],
                 "pricing.private_price": 20480,
+                "image_url": "https://static.wixstatic.com/media/ce6ce7_0ce032b8fe2e4bf58652c8d18e897478~mv2.jpg/v1/fill/w_800,h_600,al_c,q_80,enc_avif,quality_auto/SOGNUDIMARE%20CROISIERE%20CATAMARAN%20DEPUIS%20AJACCIO%20copie.jpg",
                 "boarding_pass_image": "https://static.wixstatic.com/media/ce6ce7_170fb96af2764aecb7eb7c526a48eb27~mv2.png/v1/fill/w_400,h_267,al_c,q_85,enc_avif,quality_auto/croisiere%20catamaran%20le%20tour%20de%20Corse%20sognudimare.png",
                 "updated_at": datetime.utcnow()
             }}
         )
         if result.modified_count > 0:
             results["programs_updated"].append("Tour de Corse")
-            results["prices_updated"].append("Tour de Corse (privatisation: 20480€)")
+            results["images_updated"].append("Tour de Corse")
     except Exception as e:
         results["errors"].append(f"Error updating Tour de Corse: {str(e)}")
     
-    # 3. Update Ouest Corse - Program and boarding pass image
-    ouest_corse_program = [
-        "JOUR 1 : AJACCIO & LES ÎLES SANGUINAIRES",
-        "JOUR 2 : CARGÈSE & CALA DI PALU",
-        "JOUR 3 : LES CALANQUES DE PIANA & FICAJOLA",
-        "JOUR 4 : LE GOLFE DE PORTO & LE PETIT VILLAGE DE GIROLATA",
-        "JOUR 5 : LA RÉSERVE NATURELLE DE SCANDOLA & GALÉRIA",
-        "JOUR 6 : LE GOLFE DE LA REVELATTA & CALVI",
-        "JOUR 7 : RETOUR SUR AJACCIO AVEC ARRÊT SUR LA PLAGE D'ARONE",
-        "JOUR 8 : DEBARQUEMENT PORT TINO ROSSI À AJACCIO"
-    ]
-    
+    # 3. Update Ouest Corse
     try:
         result = await db.cruises.update_one(
             {"name_fr": "Ouest Corse"},
             {"$set": {
-                "program_fr": ouest_corse_program,
+                "program_fr": [
+                    "JOUR 1 : AJACCIO & LES ÎLES SANGUINAIRES",
+                    "JOUR 2 : CARGÈSE & CALA DI PALU",
+                    "JOUR 3 : LES CALANQUES DE PIANA & FICAJOLA",
+                    "JOUR 4 : LE GOLFE DE PORTO & LE PETIT VILLAGE DE GIROLATA",
+                    "JOUR 5 : LA RÉSERVE NATURELLE DE SCANDOLA & GALÉRIA",
+                    "JOUR 6 : LE GOLFE DE LA REVELATTA & CALVI",
+                    "JOUR 7 : RETOUR SUR AJACCIO AVEC ARRÊT SUR LA PLAGE D'ARONE",
+                    "JOUR 8 : DEBARQUEMENT PORT TINO ROSSI À AJACCIO"
+                ],
+                "image_url": "https://static.wixstatic.com/media/ce6ce7_f3bee630d0c549388bbc71c0e58fb9ea~mv2.jpg/v1/fill/w_800,h_600,al_c,q_80,enc_avif,quality_auto/sognudimare%20a%20scandola_edited.jpg",
                 "boarding_pass_image": "https://static.wixstatic.com/media/ce6ce7_bdc5406402ea4be3b94eeeb747d2da1a~mv2.png/v1/fill/w_400,h_267,al_c,q_85,enc_avif,quality_auto/croisiere%20catamaran%20ouest%20corse%20sognudimare.png",
                 "updated_at": datetime.utcnow()
             }}
         )
         if result.modified_count > 0:
             results["programs_updated"].append("Ouest Corse")
-            results["images_updated"].append("Ouest Corse boarding pass")
+            results["images_updated"].append("Ouest Corse")
     except Exception as e:
         results["errors"].append(f"Error updating Ouest Corse: {str(e)}")
     
-    # 4. Update Corse du Sud - Program and boarding pass image
-    corse_sud_program = [
-        "JOUR 1 : AJACCIO & ANSE DE CACALU",
-        "JOUR 2 : CAMPOMORO & ROCCAPINA",
-        "JOUR 3 : ANSE D'ARBITRU (PLAGE D'ARGENT) & BONIFACIO",
-        "JOUR 4 : SANT' AMANZA & CAVALLO",
-        "JOUR 5 : LES ÎLES LAVEZZI",
-        "JOUR 6 : GOLFE DE MURTOLI & TIZZANO",
-        "JOUR 7 : RETOUR SUR AJACCIO AVEC ARRÊT SUR CALA DI CONCA",
-        "JOUR 8 : DEBARQUEMENT PORT TINO ROSSI À AJACCIO"
-    ]
-    
+    # 4. Update Corse du Sud
     try:
         result = await db.cruises.update_one(
             {"name_fr": "Corse du Sud"},
             {"$set": {
-                "program_fr": corse_sud_program,
+                "program_fr": [
+                    "JOUR 1 : AJACCIO & ANSE DE CACALU",
+                    "JOUR 2 : CAMPOMORO & ROCCAPINA",
+                    "JOUR 3 : ANSE D'ARBITRU (PLAGE D'ARGENT) & BONIFACIO",
+                    "JOUR 4 : SANT' AMANZA & CAVALLO",
+                    "JOUR 5 : LES ÎLES LAVEZZI",
+                    "JOUR 6 : GOLFE DE MURTOLI & TIZZANO",
+                    "JOUR 7 : RETOUR SUR AJACCIO AVEC ARRÊT SUR CALA DI CONCA",
+                    "JOUR 8 : DEBARQUEMENT PORT TINO ROSSI À AJACCIO"
+                ],
+                "image_url": "https://static.wixstatic.com/media/ce6ce7_98fe44ee0ba0419794505afe2c70aa95~mv2.jpg/v1/fill/w_800,h_600,al_c,q_80,enc_avif,quality_auto/SOGNUDIMARE%20CROISIERE%20CATAMARAN%20DEPUIS%20AJACCIO.jpg",
                 "boarding_pass_image": "https://static.wixstatic.com/media/ce6ce7_2c02fe160efb49b6930f0c695a53e34f~mv2.png/v1/fill/w_400,h_267,al_c,q_85,enc_avif,quality_auto/croisiere%20catamaran%20la%20corse%20du%20sud%20sognudimare.png",
                 "updated_at": datetime.utcnow()
             }}
         )
         if result.modified_count > 0:
             results["programs_updated"].append("Corse du Sud")
-            results["images_updated"].append("Corse du Sud boarding pass")
+            results["images_updated"].append("Corse du Sud")
     except Exception as e:
         results["errors"].append(f"Error updating Corse du Sud: {str(e)}")
     
-    # 5. Update Sardaigne & Corse du Sud - Program and boarding pass image
-    sardaigne_program = [
-        "JOUR 1 : AJACCIO & ANSE DE CACALU",
-        "JOUR 2 : ROCCAPINA & BONIFACIO",
-        "JOUR 3 : LES ÎLES LAVEZZI, L'ARCHIPEL DE LA MADDALENA & CALA GAVETTA",
-        "JOUR 4 : CALA CRIS - CALA GRANU & PORTO CERVO (SARDAIGNE)",
-        "JOUR 5 : L'ÎLE DE CAPRERA, CALA DI COTICCIO",
-        "JOUR 6 : GOLFE DE MURTOLI & TIZZANO",
-        "JOUR 7 : CALA DI CONCA & PROPRIANO",
-        "JOUR 8 : DEBARQUEMENT PORT TINO ROSSI À AJACCIO"
-    ]
-    
+    # 5. Update Sardaigne
     try:
         result = await db.cruises.update_one(
-            {"name_fr": "Sardaigne & Corse du Sud"},
+            {"name_fr": {"$in": ["Sardaigne & Corse du Sud", "Sardaigne et Corse du Sud"]}},
             {"$set": {
-                "program_fr": sardaigne_program,
+                "program_fr": [
+                    "JOUR 1 : AJACCIO & ANSE DE CACALU",
+                    "JOUR 2 : ROCCAPINA & BONIFACIO",
+                    "JOUR 3 : LES ÎLES LAVEZZI, L'ARCHIPEL DE LA MADDALENA & CALA GAVETTA",
+                    "JOUR 4 : CALA CRIS - CALA GRANU & PORTO CERVO (SARDAIGNE)",
+                    "JOUR 5 : L'ÎLE DE CAPRERA, CALA DI COTICCIO",
+                    "JOUR 6 : GOLFE DE MURTOLI & TIZZANO",
+                    "JOUR 7 : CALA DI CONCA & PROPRIANO",
+                    "JOUR 8 : DEBARQUEMENT PORT TINO ROSSI À AJACCIO"
+                ],
+                "image_url": "https://customer-assets.emergentagent.com/job_afa5a00c-4a00-46ec-8226-a02b125f14ef/artifacts/ilw3qnwh_maddalena.jpg",
                 "boarding_pass_image": "https://static.wixstatic.com/media/ce6ce7_68a8fb4c934c44cb909dfc0075f36d83~mv2.png/v1/fill/w_400,h_267,al_c,q_85,enc_avif,quality_auto/croisiere%20catamaran%20la%20sardaigne%20et%20la%20corse%20du%20sud%20sognudimare.png",
                 "updated_at": datetime.utcnow()
             }}
         )
         if result.modified_count > 0:
             results["programs_updated"].append("Sardaigne & Corse du Sud")
-            results["images_updated"].append("Sardaigne boarding pass")
+            results["images_updated"].append("Sardaigne & Corse du Sud")
     except Exception as e:
         results["errors"].append(f"Error updating Sardaigne: {str(e)}")
     
