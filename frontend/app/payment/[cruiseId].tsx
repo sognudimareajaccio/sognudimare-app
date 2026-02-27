@@ -13,7 +13,15 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { apiService, Cruise } from '../../src/services/api';
+import Constants from 'expo-constants';
+import { cruiseApi, Cruise } from '../../src/services/api';
+
+// Get backend URL from config
+const getBackendUrl = () => {
+  return Constants.expoConfig?.extra?.backendUrl || 
+         process.env.EXPO_PUBLIC_BACKEND_URL ||
+         '';
+};
 
 // Design tokens
 const COLORS = {
