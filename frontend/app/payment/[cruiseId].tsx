@@ -13,7 +13,15 @@ import {
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { apiService, Cruise } from '../../src/services/api';
+import Constants from 'expo-constants';
+import { cruiseApi, Cruise } from '../../src/services/api';
+
+// Get backend URL from config
+const getBackendUrl = () => {
+  return Constants.expoConfig?.extra?.backendUrl || 
+         process.env.EXPO_PUBLIC_BACKEND_URL ||
+         '';
+};
 
 // Design tokens
 const COLORS = {
@@ -92,10 +100,18 @@ export default function PaymentScreen() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [cruiseData, configData] = await Promise.all([
-        apiService.cruises.getById(cruiseId as string),
-        fetch('/api/payments/config').then(r => r.json())
+      const backendUrl = getBackendUrl();
+      
+      const [cruiseData, configResponse] = await Promise.all([
+        cruiseApi.getById(cruiseId as string),
+        fetch(`${backendUrl}/api/payments/config`)
       ]);
+      
+      if (!configResponse.ok) {
+        throw new Error('Failed to load payment config');
+      }
+      
+      const configData = await configResponse.json();
       setCruise(cruiseData);
       setPaymentConfig(configData);
     } catch (error) {
@@ -134,6 +150,7 @@ export default function PaymentScreen() {
     if (!cruise) return;
     
     setProcessing(true);
+    const backendUrl = getBackendUrl();
     
     try {
       // In sandbox mode, we use a test nonce
@@ -146,7 +163,7 @@ export default function PaymentScreen() {
           : cruise.pricing.cabin_price * parseInt(passengers as string || '2') * 100
       );
       
-      const response = await fetch('/api/payments/create', {
+      const response = await fetch(`${backendUrl}/api/payments/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
