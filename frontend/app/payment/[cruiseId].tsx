@@ -100,10 +100,18 @@ export default function PaymentScreen() {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [cruiseData, configData] = await Promise.all([
-        apiService.cruises.getById(cruiseId as string),
-        fetch('/api/payments/config').then(r => r.json())
+      const backendUrl = getBackendUrl();
+      
+      const [cruiseData, configResponse] = await Promise.all([
+        cruiseApi.getById(cruiseId as string),
+        fetch(`${backendUrl}/api/payments/config`)
       ]);
+      
+      if (!configResponse.ok) {
+        throw new Error('Failed to load payment config');
+      }
+      
+      const configData = await configResponse.json();
       setCruise(cruiseData);
       setPaymentConfig(configData);
     } catch (error) {
