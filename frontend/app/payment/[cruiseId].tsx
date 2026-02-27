@@ -152,6 +152,8 @@ export default function PaymentScreen() {
     setProcessing(true);
     
     try {
+      const backendUrl = getBackendUrl();
+      
       // In sandbox mode, we use a test nonce
       // In production, you would use Square Web Payments SDK to generate the nonce
       const testNonce = 'cnon:card-nonce-ok'; // Square sandbox test nonce
@@ -162,7 +164,7 @@ export default function PaymentScreen() {
           : cruise.pricing.cabin_price * parseInt(passengers as string || '2') * 100
       );
       
-      const response = await fetch('/api/payments/create', {
+      const response = await fetch(`${backendUrl}/api/payments/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
