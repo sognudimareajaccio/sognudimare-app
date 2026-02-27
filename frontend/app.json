@@ -2,7 +2,7 @@
   "expo": {
     "name": "Sognudimare",
     "slug": "sognudimare",
-    "version": "1.2.0",
+    "version": "1.7.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "sognudimare",
@@ -11,7 +11,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.sognudimare.app",
-      "buildNumber": "2",
+      "buildNumber": "8",
       "infoPlist": {
         "NSCameraUsageDescription": "Prendre des photos pour partager vos moments en mer",
         "NSPhotoLibraryUsageDescription": "Partager vos photos de croisière"
@@ -24,7 +24,7 @@
       },
       "edgeToEdgeEnabled": true,
       "package": "com.sognudimare.app",
-      "versionCode": 2
+      "versionCode": 8
     },
     "web": {
       "bundler": "metro",
