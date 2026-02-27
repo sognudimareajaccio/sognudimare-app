@@ -2,7 +2,7 @@
   "expo": {
     "name": "Sognudimare",
     "slug": "sognudimare",
-    "version": "1.7.0",
+    "version": "1.7.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "sognudimare",
@@ -15,6 +15,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.sognudimare.app",
+      "buildNumber": "8",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -24,6 +25,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#0e1c40"
       },
+      "versionCode": 8,
       "package": "com.sognudimare.app"
     },
     "plugins": [
