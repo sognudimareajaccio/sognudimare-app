@@ -50,6 +50,11 @@ Application mobile de croisières en catamaran (Corse, Sardaigne, Grèce, Caraï
 - [x] Portfolio "Destinations authentiques" avec 6 photos + flèches de lien (Tour de Corse, Scandola, Îles Lavezzi, Archipel Maddalena, Les Catamarans, L'équipage)
 - [x] Section À propos : traits décoratifs supprimés
 - [x] Page croisière redesignée : hero moderne, carte "PROCHAIN DÉPART" en avant, tarifs élégants, sections repliables, barre fixe réservation
+- [x] Section About : nouveau texte (DAY CHARTER / CONVOYAGE) + encart Blu Sognu avec logo et badge App Store
+- [x] Page Destinations redesignée : cards premium avec prochain départ et prix
+- [x] Page La Flotte redesignée : catamarans Lagoon 38/43/46 avec specs et modal détail
+- [x] Page L'Équipage redesignée : hero, section "Rêve de mer", fiches équipage, valeurs
+- [x] Page Club modernisée : header marine, tabs dorés, style cohérent
 
 ## Pending / Next Steps
 

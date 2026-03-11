@@ -9,6 +9,7 @@ import {
   Dimensions,
   ActivityIndicator,
   Animated,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -588,6 +589,28 @@ export default function HomeScreen() {
           </View>
           <Image source={{ uri: LOGO_FULL_URL }} style={styles.aboutLogoImage} resizeMode="contain" />
           <Text style={styles.aboutTextNew}>{t('aboutText')}</Text>
+
+          {/* Blu Sognu App Promo */}
+          <Text style={styles.aboutBluSognuIntro}>
+            {language === 'fr' 
+              ? 'Pour cela, téléchargez l\'appli' 
+              : 'For that, download the app'}
+          </Text>
+          <TouchableOpacity 
+            style={styles.bluSognuCard}
+            onPress={() => Linking.openURL('https://apps.apple.com/fr/app/blu-sognu/id6759647632')}
+          >
+            <Image 
+              source={{ uri: 'https://customer-assets.emergentagent.com/job_9595dfad-24f9-4c7d-8c80-c7800213d8b6/artifacts/vwnb6fa9_blu%20sognu.png' }}
+              style={styles.bluSognuLogo}
+              resizeMode="contain"
+            />
+            <Image 
+              source={{ uri: 'https://customer-assets.emergentagent.com/job_9595dfad-24f9-4c7d-8c80-c7800213d8b6/artifacts/b8m5psw2_Download_on_the_App_Store_Badge_FRCA_RGB_blk.svg.png' }}
+              style={styles.appStoreBadge}
+              resizeMode="contain"
+            />
+          </TouchableOpacity>
           <View style={styles.aboutHighlightBox}>
             <Ionicons name="trophy" size={28} color={COLORS.secondary} />
             <Text style={styles.aboutHighlightNew}>
@@ -1790,7 +1813,32 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.8)',
     textAlign: 'center',
     lineHeight: 22,
+    marginBottom: SPACING.sm,
+  },
+  aboutBluSognuIntro: {
+    fontSize: FONT_SIZES.sm,
+    color: 'rgba(255,255,255,0.7)',
+    textAlign: 'center',
+    marginBottom: SPACING.md,
+    fontWeight: '600',
+  },
+  bluSognuCard: {
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderRadius: BORDER_RADIUS.xl,
+    padding: SPACING.lg,
     marginBottom: SPACING.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.15)',
+  },
+  bluSognuLogo: {
+    width: 200,
+    height: 120,
+    marginBottom: SPACING.md,
+  },
+  appStoreBadge: {
+    width: 160,
+    height: 48,
   },
   aboutHighlightBox: {
     backgroundColor: 'rgba(255,255,255,0.1)',

@@ -24,12 +24,12 @@ import { useAppStore } from '../src/store/appStore';
 const COLORS = {
   primary: '#0e1c40',
   secondary: '#ebd0a9',
-  accent: '#7ad2d4',
-  background: '#F8F9FA',
+  accent: '#ebd0a9',
+  background: '#F8F6F3',
   surface: '#FFFFFF',
-  surfaceLight: '#F1F5F9',
+  surfaceLight: '#F0EDE8',
   text: '#1F2937',
-  textSecondary: '#6B7280',
+  textSecondary: '#8A8478',
   white: '#FFFFFF',
   black: '#000000',
   error: '#EF4444',
@@ -37,7 +37,7 @@ const COLORS = {
   warning: '#F59E0B',
   info: '#3B82F6',
   gray: '#919191',
-  border: '#E5E7EB',
+  border: '#EDE9E4',
 };
 
 const SPACING = {
@@ -634,7 +634,7 @@ export default function ClubScreen() {
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
+          <Ionicons name="arrow-back" size={24} color={COLORS.white} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{t('clubTitle')}</Text>
         <View style={{ width: 40 }} />
@@ -702,23 +702,21 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.sm,
-    backgroundColor: COLORS.white,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    backgroundColor: COLORS.primary,
   },
   backButton: {
     padding: SPACING.xs,
   },
   headerTitle: {
-    fontSize: FONT_SIZES.lg,
-    fontWeight: '700',
-    color: COLORS.primary,
+    fontSize: 17,
+    fontWeight: '600',
+    color: COLORS.secondary,
   },
   tabsContainer: {
     flexDirection: 'row',
-    backgroundColor: COLORS.white,
+    backgroundColor: COLORS.primary,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: 'rgba(255,255,255,0.1)',
   },
   tab: {
     flex: 1,
@@ -730,14 +728,14 @@ const styles = StyleSheet.create({
   },
   tabActive: {
     borderBottomWidth: 2,
-    borderBottomColor: COLORS.primary,
+    borderBottomColor: COLORS.secondary,
   },
   tabText: {
     fontSize: FONT_SIZES.sm,
-    color: COLORS.textSecondary,
+    color: 'rgba(255,255,255,0.5)',
   },
   tabTextActive: {
-    color: COLORS.primary,
+    color: COLORS.secondary,
     fontWeight: '600',
   },
   tabContent: {

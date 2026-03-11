@@ -126,7 +126,7 @@ export const translations = {
     
     // About
     aboutTitle: "À propos de Sognudimare",
-    aboutText: "Sognudimare signifie \"rêve de mer\" en corse. Créée en 2021 par Nicolas, un capitaine passionné, notre entreprise vous offre des croisières authentiques en Corse, Sardaigne, Grèce et aux Caraïbes.",
+    aboutText: "Sognudimare signifie \"rêve de mer\" en corse. Créée en 2021 par Nicolas, un capitaine passionné, l'entreprise à taille humaine vous offre des croisières authentiques en Corse, Sardaigne. Vous pouvez également faire appel à ces services pour du DAY CHARTER ou CONVOYAGE.",
     createdIn: "Créée en 2021",
     destinations: "6 destinations",
     localPartners: "11 partenaires locaux",
@@ -259,7 +259,7 @@ export const translations = {
     
     // About
     aboutTitle: "About Sognudimare",
-    aboutText: "Sognudimare means \"dream of the sea\" in Corsican. Created in 2021 by Nicolas, a passionate captain, our company offers authentic cruises in Corsica, Sardinia, Greece and the Caribbean.",
+    aboutText: "Sognudimare means \"dream of the sea\" in Corsican. Created in 2021 by Nicolas, a passionate captain, this boutique company offers authentic cruises in Corsica and Sardinia. You can also use their services for DAY CHARTER or CONVOYAGE.",
     createdIn: "Created in 2021",
     destinations: "6 destinations",
     localPartners: "11 local partners",
