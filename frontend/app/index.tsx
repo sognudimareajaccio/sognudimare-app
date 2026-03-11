@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Dimensions,
   ActivityIndicator,
+  Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -19,7 +20,15 @@ import { cruiseApi, Cruise, seedDatabase } from '../src/services/api';
 
 const { width } = Dimensions.get('window');
 
-// Images from sognudimare website
+// Hero carousel images
+const HERO_CAROUSEL_IMAGES = [
+  'https://customer-assets.emergentagent.com/job_5ba811cf-02a8-4655-b752-0019730eddad/artifacts/qyrn5qct_1741880477430-dji0149-0196-processed-1-e1744794238742.jpg',
+  'https://customer-assets.emergentagent.com/job_5ba811cf-02a8-4655-b752-0019730eddad/artifacts/oxvhoibd_1741880477434-zoanls12-processed-1282x855-c-default.webp',
+  'https://customer-assets.emergentagent.com/job_5ba811cf-02a8-4655-b752-0019730eddad/artifacts/edw900fs_1741880477436-zoanls34-processed-1282x855-c-default.webp',
+  'https://customer-assets.emergentagent.com/job_5ba811cf-02a8-4655-b752-0019730eddad/artifacts/xd5y7qna_1741880477435-zoanls22-processed-1282x855-c-default.webp',
+];
+
+// Images from sognudimare website (keep for backup)
 const HERO_IMAGE = 'https://static.wixstatic.com/media/ce6ce7_d0178804b62b4c56802db975ade4e29ff000.jpg/v1/fill/w_1904,h_1008,al_c,q_85,usm_0.33_1.00_0.00,enc_avif,quality_auto/ce6ce7_d0178804b62b4c56802db975ade4e29ff000.jpg';
 const LOGO_URL = 'https://static.wixstatic.com/media/ce6ce7_a82e3e86741143d6ab7acd99c121af7b~mv2.png/v1/fill/w_317,h_161,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/croisieres%20catamaran%20corse%20sognudimare.png';
 const BOARDING_CARDS_IMAGE = 'https://customer-assets.emergentagent.com/job_sognudi-app/artifacts/b4ya6cm8_15.jpg';
@@ -209,10 +218,37 @@ export default function HomeScreen() {
   const { setLanguage } = useAppStore();
   const [cruises, setCruises] = useState<Cruise[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Hero carousel state
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const fadeAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     loadData();
   }, []);
+  
+  // Hero carousel auto-animation
+  useEffect(() => {
+    const interval = setInterval(() => {
+      // Fade out
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: true,
+      }).start(() => {
+        // Change image
+        setCurrentImageIndex((prev) => (prev + 1) % HERO_CAROUSEL_IMAGES.length);
+        // Fade in
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }).start();
+      });
+    }, 4000); // Change every 4 seconds
+    
+    return () => clearInterval(interval);
+  }, [fadeAnim]);
 
   const loadData = async () => {
     try {
@@ -256,9 +292,12 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Hero Section */}
+        {/* Hero Section with Animated Carousel */}
         <View style={styles.heroContainer}>
-          <Image source={{ uri: HERO_IMAGE }} style={styles.heroImage} />
+          <Animated.Image 
+            source={{ uri: HERO_CAROUSEL_IMAGES[currentImageIndex] }} 
+            style={[styles.heroImage, { opacity: fadeAnim }]} 
+          />
           <View style={styles.heroOverlay}>
             <Text style={styles.heroTitle}>{t('heroTitle')}</Text>
             <Text style={styles.heroSubtitle}>{t('heroSubtitle')}</Text>
@@ -266,6 +305,18 @@ export default function HomeScreen() {
               <Text style={styles.heroButtonText}>{t('discoverCruises')}</Text>
               <Ionicons name="arrow-forward" size={20} color={COLORS.primary} />
             </TouchableOpacity>
+          </View>
+          {/* Carousel Indicators */}
+          <View style={styles.carouselIndicators}>
+            {HERO_CAROUSEL_IMAGES.map((_, index) => (
+              <View 
+                key={index} 
+                style={[
+                  styles.carouselDot, 
+                  currentImageIndex === index && styles.carouselDotActive
+                ]} 
+              />
+            ))}
           </View>
         </View>
 
@@ -628,6 +679,26 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: SPACING.lg,
+  },
+  carouselIndicators: {
+    position: 'absolute',
+    bottom: 20,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  carouselDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: 'rgba(255,255,255,0.5)',
+    marginHorizontal: 4,
+  },
+  carouselDotActive: {
+    backgroundColor: COLORS.secondary,
+    width: 24,
   },
   heroTitle: {
     fontSize: FONT_SIZES.xxxl,
