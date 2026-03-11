@@ -369,20 +369,27 @@ export default function HomeScreen() {
         </View>
 
         {/* CE QUI FAIT VRAIMENT NOTRE DIFFÉRENCE */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            {language === 'fr' ? 'Ce qui fait vraiment notre différence...' : 'What really makes us different...'}
-          </Text>
-          <View style={styles.differenceGrid}>
+        <View style={styles.differenceSection}>
+          <View style={styles.differenceTitleContainer}>
+            <View style={styles.differenceLine} />
+            <Text style={styles.differenceMainTitle}>
+              {language === 'fr' ? 'Ce qui fait vraiment' : 'What really makes'}
+            </Text>
+            <Text style={styles.differenceAccentTitle}>
+              {language === 'fr' ? 'notre différence' : 'us different'}
+            </Text>
+            <View style={styles.differenceLine} />
+          </View>
+          <View style={styles.differenceGridNew}>
             {differenceItems.map((item, index) => (
-              <View key={index} style={styles.differenceCard}>
-                <View style={styles.differenceIconContainer}>
-                  <Ionicons name={item.icon as any} size={28} color={COLORS.accent} />
+              <View key={index} style={styles.differenceCardNew}>
+                <View style={styles.differenceIconNew}>
+                  <Ionicons name={item.icon as any} size={24} color={COLORS.white} />
                 </View>
-                <Text style={styles.differenceLabel}>
+                <Text style={styles.differenceLabelNew}>
                   {language === 'fr' ? item.label_fr : item.label_en}
                 </Text>
-                <Text style={styles.differenceDesc}>
+                <Text style={styles.differenceDescNew}>
                   {language === 'fr' ? item.desc_fr : item.desc_en}
                 </Text>
               </View>
@@ -1160,5 +1167,68 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontWeight: '600',
     marginTop: 4,
+  },
+  // Elegant Difference Section
+  differenceSection: {
+    backgroundColor: COLORS.primary,
+    paddingVertical: SPACING.xxl,
+    paddingHorizontal: SPACING.lg,
+  },
+  differenceTitleContainer: {
+    alignItems: 'center',
+    marginBottom: SPACING.xl,
+  },
+  differenceLine: {
+    width: 60,
+    height: 2,
+    backgroundColor: COLORS.secondary,
+    marginVertical: SPACING.sm,
+  },
+  differenceMainTitle: {
+    fontSize: FONT_SIZES.lg,
+    color: COLORS.white,
+    fontWeight: '300',
+    letterSpacing: 1,
+  },
+  differenceAccentTitle: {
+    fontSize: FONT_SIZES.xxl,
+    color: COLORS.secondary,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  differenceGridNew: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  differenceCardNew: {
+    width: '48%',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: BORDER_RADIUS.lg,
+    padding: SPACING.md,
+    marginBottom: SPACING.md,
+    alignItems: 'center',
+  },
+  differenceIconNew: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: COLORS.secondary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: SPACING.sm,
+  },
+  differenceLabelNew: {
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.white,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  differenceDescNew: {
+    fontSize: FONT_SIZES.xs,
+    color: 'rgba(255,255,255,0.7)',
+    textAlign: 'center',
+    lineHeight: 16,
   },
 });
