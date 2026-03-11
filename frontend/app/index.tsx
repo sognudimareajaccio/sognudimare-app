@@ -1832,10 +1832,10 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.15)',
   },
   bluSognuLogo: {
-    width: 200,
-    height: 120,
+    width: 140,
+    height: 140,
     marginBottom: SPACING.md,
-    borderRadius: BORDER_RADIUS.xl,
+    borderRadius: 24,
     borderWidth: 2,
     borderColor: 'rgba(255,255,255,0.5)',
   },

@@ -282,11 +282,11 @@ export default function ClubScreen() {
     <ScrollView style={styles.tabContent} showsVerticalScrollIndicator={false}>
       {/* Hero Section */}
       <View style={styles.heroSection}>
-        <View style={styles.heroIcon}>
-          <Ionicons name="people-circle" size={60} color={COLORS.secondary} />
-        </View>
-        <Text style={styles.heroTitle}>{t('clubTitle')}</Text>
+        <View style={styles.heroLine} />
+        <Text style={styles.heroLabel}>Club des</Text>
+        <Text style={styles.heroAccent}>Voyageurs</Text>
         <Text style={styles.heroDescription}>{t('clubDescription')}</Text>
+        <View style={styles.heroLine} />
       </View>
 
       {/* Club Cards Image */}
@@ -298,61 +298,48 @@ export default function ClubScreen() {
         />
       </View>
 
-      {/* How it works */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t('howItWorks')}</Text>
-        <View style={styles.howItWorksCard}>
-          <View style={styles.stepRow}>
-            <View style={styles.stepNumber}><Text style={styles.stepNumberText}>1</Text></View>
-            <Text style={styles.stepText}>
-              {language === 'fr' ? 'Choisissez votre formule (12, 24 ou 36 mois)' : 'Choose your plan (12, 24 or 36 months)'}
-            </Text>
+      {/* How it works - Timeline */}
+      <View style={styles.howSection}>
+        <Text style={styles.howTitle}>{t('howItWorks')}</Text>
+        {[
+          { n: '1', fr: 'Choisissez votre formule (12, 24 ou 36 mois)', en: 'Choose your plan (12, 24 or 36 months)' },
+          { n: '2', fr: 'Réglez votre carte Club', en: 'Pay for your Club card' },
+          { n: '3', fr: 'Profitez immédiatement des réductions !', en: 'Immediately enjoy discounts!' },
+        ].map((step, i) => (
+          <View key={i} style={styles.stepItem}>
+            <View style={styles.stepDot}><Text style={styles.stepDotText}>{step.n}</Text></View>
+            {i < 2 && <View style={styles.stepLine} />}
+            <Text style={styles.stepText}>{language === 'fr' ? step.fr : step.en}</Text>
           </View>
-          <View style={styles.stepRow}>
-            <View style={styles.stepNumber}><Text style={styles.stepNumberText}>2</Text></View>
-            <Text style={styles.stepText}>
-              {language === 'fr' ? 'Réglez votre carte Club' : 'Pay for your Club card'}
-            </Text>
-          </View>
-          <View style={styles.stepRow}>
-            <View style={styles.stepNumber}><Text style={styles.stepNumberText}>3</Text></View>
-            <Text style={styles.stepText}>
-              {language === 'fr' ? 'Profitez immédiatement des réductions !' : 'Immediately enjoy discounts!'}
-            </Text>
-          </View>
-        </View>
+        ))}
       </View>
 
       {/* Formulas */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t('ourFormulas')}</Text>
-        <View style={styles.formulasContainer}>
-          {CLUB_FORMULAS.map((formula) => (
-            <View key={formula.id} style={styles.formulaCard}>
-              <View style={styles.formulaHeader}>
-                <Text style={styles.formulaMonths}>{formula.months}</Text>
-                <Text style={styles.formulaMonthsLabel}>{language === 'fr' ? 'mois' : 'months'}</Text>
+      <View style={styles.formulasSection}>
+        <Text style={styles.formulasSectionTitle}>{t('ourFormulas')}</Text>
+        <View style={styles.formulasRow}>
+          {CLUB_FORMULAS.map((formula, i) => (
+            <View key={formula.id} style={[styles.formulaCard, i === 1 && styles.formulaCardHighlight]}>
+              <Text style={[styles.formulaDuration, i === 1 && styles.formulaDurationHL]}>{formula.months}</Text>
+              <Text style={[styles.formulaDurationLabel, i === 1 && styles.formulaDurationLabelHL]}>{language === 'fr' ? 'mois' : 'months'}</Text>
+              <View style={[styles.formulaDiscountBadge, i === 1 && styles.formulaDiscountBadgeHL]}>
+                <Text style={[styles.formulaDiscountText, i === 1 && styles.formulaDiscountTextHL]}>-{formula.discount}%</Text>
               </View>
-              <View style={styles.formulaDiscount}>
-                <Text style={styles.formulaDiscountText}>-{formula.discount}%</Text>
-              </View>
-              <Text style={styles.formulaPrice}>{formula.price}€{t('perYear')}</Text>
+              <Text style={[styles.formulaPrice, i === 1 && styles.formulaPriceHL]}>{formula.price}€</Text>
             </View>
           ))}
         </View>
       </View>
 
       {/* Advantages */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t('advantages')}</Text>
-        <View style={styles.advantagesContainer}>
-          {(language === 'fr' ? CLUB_ADVANTAGES_FR : CLUB_ADVANTAGES_EN).map((advantage, index) => (
-            <View key={index} style={styles.advantageRow}>
-              <Ionicons name="checkmark-circle" size={20} color={COLORS.success} />
-              <Text style={styles.advantageText}>{advantage}</Text>
-            </View>
-          ))}
-        </View>
+      <View style={styles.advantagesSection}>
+        <Text style={styles.advantagesTitle}>{t('advantages')}</Text>
+        {(language === 'fr' ? CLUB_ADVANTAGES_FR : CLUB_ADVANTAGES_EN).map((advantage, index) => (
+          <View key={index} style={styles.advantageRow}>
+            <Ionicons name="checkmark-circle" size={18} color={COLORS.secondary} />
+            <Text style={styles.advantageText}>{advantage}</Text>
+          </View>
+        ))}
       </View>
 
       {/* Join Button */}
@@ -741,32 +728,18 @@ const styles = StyleSheet.create({
   tabContent: {
     flex: 1,
   },
-  // Hero Section
+  // Hero Section - Premium
   heroSection: {
     alignItems: 'center',
-    padding: SPACING.xl,
+    paddingVertical: SPACING.xl,
+    paddingHorizontal: SPACING.lg,
     backgroundColor: COLORS.primary,
   },
-  heroIcon: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: COLORS.white,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: SPACING.md,
-  },
-  heroTitle: {
-    fontSize: FONT_SIZES.xxl,
-    fontWeight: '700',
-    color: COLORS.white,
-    marginBottom: SPACING.sm,
-  },
+  heroLine: { width: 50, height: 2, backgroundColor: COLORS.secondary, marginVertical: SPACING.sm },
+  heroLabel: { fontSize: 16, color: COLORS.white, fontWeight: '300', letterSpacing: 1 },
+  heroAccent: { fontSize: 28, color: COLORS.secondary, fontWeight: '700' },
   heroDescription: {
-    fontSize: FONT_SIZES.md,
-    color: COLORS.white,
-    textAlign: 'center',
-    opacity: 0.9,
+    fontSize: 14, color: 'rgba(255,255,255,0.75)', textAlign: 'center', lineHeight: 21, marginTop: SPACING.sm,
   },
   // Club Cards Image
   clubCardsImageContainer: {
@@ -779,126 +752,51 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: BORDER_RADIUS.xl,
   },
-  // Sections
-  section: {
-    padding: SPACING.lg,
-  },
-  sectionTitle: {
-    fontSize: FONT_SIZES.lg,
-    fontWeight: '700',
-    color: COLORS.primary,
-    marginBottom: SPACING.md,
-  },
   // How it works
-  howItWorksCard: {
-    backgroundColor: COLORS.white,
-    borderRadius: BORDER_RADIUS.xl,
-    padding: SPACING.lg,
-    gap: SPACING.md,
+  howSection: { padding: SPACING.lg },
+  howTitle: { fontSize: 18, fontWeight: '700', color: COLORS.primary, marginBottom: SPACING.lg },
+  stepItem: { flexDirection: 'row', alignItems: 'center', marginBottom: SPACING.md, position: 'relative' },
+  stepDot: {
+    width: 36, height: 36, borderRadius: 18, backgroundColor: COLORS.primary,
+    justifyContent: 'center', alignItems: 'center', borderWidth: 3, borderColor: COLORS.secondary, marginRight: SPACING.md, zIndex: 1,
   },
-  stepRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: SPACING.md,
-  },
-  stepNumber: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: COLORS.secondary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  stepNumberText: {
-    fontSize: FONT_SIZES.md,
-    fontWeight: '700',
-    color: COLORS.primary,
-  },
-  stepText: {
-    flex: 1,
-    fontSize: FONT_SIZES.md,
-    color: COLORS.text,
-  },
-  // Formulas
-  formulasContainer: {
-    flexDirection: 'row',
-    gap: SPACING.sm,
-  },
+  stepDotText: { color: COLORS.secondary, fontSize: 14, fontWeight: '800' },
+  stepLine: { position: 'absolute', left: 17, top: 36, width: 2, height: 20, backgroundColor: 'rgba(197,171,110,0.3)' },
+  stepText: { flex: 1, fontSize: 14, color: COLORS.text, fontWeight: '500' },
+  // Formulas - Premium
+  formulasSection: { paddingHorizontal: SPACING.lg, paddingBottom: SPACING.lg },
+  formulasSectionTitle: { fontSize: 18, fontWeight: '700', color: COLORS.primary, marginBottom: SPACING.md },
+  formulasRow: { flexDirection: 'row', gap: 10 },
   formulaCard: {
-    flex: 1,
-    backgroundColor: COLORS.white,
-    borderRadius: BORDER_RADIUS.xl,
-    padding: SPACING.md,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: COLORS.border,
+    flex: 1, backgroundColor: '#FFF', borderRadius: 16, padding: SPACING.md, alignItems: 'center',
+    borderWidth: 2, borderColor: '#EDE9E4',
   },
-  formulaHeader: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    marginBottom: SPACING.xs,
-  },
-  formulaMonths: {
-    fontSize: FONT_SIZES.xxl,
-    fontWeight: '700',
-    color: COLORS.primary,
-  },
-  formulaMonthsLabel: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.textSecondary,
-    marginLeft: 2,
-  },
-  formulaDiscount: {
-    backgroundColor: COLORS.success,
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: SPACING.xs,
-    borderRadius: BORDER_RADIUS.full,
-    marginBottom: SPACING.xs,
-  },
-  formulaDiscountText: {
-    fontSize: FONT_SIZES.sm,
-    fontWeight: '700',
-    color: COLORS.white,
-  },
-  formulaPrice: {
-    fontSize: FONT_SIZES.md,
-    fontWeight: '600',
-    color: COLORS.secondary,
-  },
+  formulaCardHighlight: { backgroundColor: COLORS.primary, borderColor: COLORS.secondary },
+  formulaDuration: { fontSize: 28, fontWeight: '800', color: COLORS.primary },
+  formulaDurationHL: { color: COLORS.white },
+  formulaDurationLabel: { fontSize: 11, color: COLORS.textSecondary, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 8 },
+  formulaDurationLabelHL: { color: 'rgba(255,255,255,0.6)' },
+  formulaDiscountBadge: { backgroundColor: COLORS.secondary, paddingHorizontal: 12, paddingVertical: 4, borderRadius: 20, marginBottom: 6 },
+  formulaDiscountBadgeHL: { backgroundColor: 'rgba(255,255,255,0.2)' },
+  formulaDiscountText: { fontSize: 14, fontWeight: '800', color: COLORS.primary },
+  formulaDiscountTextHL: { color: COLORS.secondary },
+  formulaPrice: { fontSize: 18, fontWeight: '700', color: COLORS.primary },
+  formulaPriceHL: { color: COLORS.secondary },
   // Advantages
-  advantagesContainer: {
-    backgroundColor: COLORS.white,
-    borderRadius: BORDER_RADIUS.xl,
-    padding: SPACING.lg,
-    gap: SPACING.md,
-  },
+  advantagesSection: { paddingHorizontal: SPACING.lg, paddingBottom: SPACING.lg },
+  advantagesTitle: { fontSize: 18, fontWeight: '700', color: COLORS.primary, marginBottom: SPACING.md },
   advantageRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: SPACING.sm,
+    flexDirection: 'row', alignItems: 'flex-start', gap: 10,
+    backgroundColor: '#FFF', padding: 12, borderRadius: 12, marginBottom: 8,
   },
-  advantageText: {
-    flex: 1,
-    fontSize: FONT_SIZES.md,
-    color: COLORS.text,
-    lineHeight: 22,
-  },
+  advantageText: { flex: 1, fontSize: 14, color: COLORS.text, lineHeight: 20 },
   // Join Button
   joinButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: COLORS.secondary,
-    marginHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
-    borderRadius: BORDER_RADIUS.full,
-    gap: SPACING.sm,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: COLORS.primary, marginHorizontal: SPACING.lg, paddingVertical: 16,
+    borderRadius: 12, gap: 10,
   },
-  joinButtonText: {
-    fontSize: FONT_SIZES.lg,
-    fontWeight: '700',
-    color: COLORS.white,
-  },
+  joinButtonText: { fontSize: 14, fontWeight: '700', color: COLORS.white },
   // Categories
   categoriesScroll: {
     paddingHorizontal: SPACING.md,
