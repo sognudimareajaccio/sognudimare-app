@@ -42,6 +42,7 @@ Application mobile de croisières en catamaran (Corse, Sardaigne, Grèce, Caraï
 - [x] Mise à jour version: 1.7.1 → 1.8.0, buildNumber 8 → 9, versionCode 8 → 9
 - [x] Vérification API backend (4 croisières, admin login OK)
 - [x] Redesign section "Club des Voyageurs" : image des cartes Club ajoutée, "BEST" supprimé, design plus élégant avec pills de tarifs
+- [x] Ajout galerie photo "Instantanés de nos croisières" entre Club et Engagements : 5 photos plein écran + carrousel horizontal avec les photos restantes
 
 ## Pending / Next Steps
 

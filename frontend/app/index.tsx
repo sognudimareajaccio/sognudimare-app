@@ -532,6 +532,57 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
 
+        {/* Portfolio Gallery - Elegant */}
+        <View style={styles.gallerySection}>
+          <View style={styles.galleryTitleContainer}>
+            <View style={styles.galleryLine} />
+            <Text style={styles.galleryMainTitle}>
+              {language === 'fr' ? 'Instantanés' : 'Snapshots'}
+            </Text>
+            <Text style={styles.galleryAccentTitle}>
+              {language === 'fr' ? 'de nos croisières' : 'from our cruises'}
+            </Text>
+            <View style={styles.galleryLine} />
+          </View>
+          {/* Featured photos - full width stacked */}
+          {[PORTFOLIO_PHOTOS[0], PORTFOLIO_PHOTOS[1], PORTFOLIO_PHOTOS[2], PORTFOLIO_PHOTOS[3], PORTFOLIO_PHOTOS[6]].map((photo, index) => (
+            <TouchableOpacity 
+              key={index}
+              style={styles.galleryItemFull}
+              onPress={() => {
+                if (photo.link) {
+                  router.push(photo.link as any);
+                } else if (photo.cruiseName) {
+                  const c = cruises.find(cr => cr.name_fr === photo.cruiseName);
+                  if (c) router.push(`/cruise/${c.id}`);
+                }
+              }}
+            >
+              <Image source={{ uri: photo.url }} style={styles.galleryImage} />
+              <View style={styles.galleryOverlay}>
+                <Text style={styles.galleryLabel}>{language === 'fr' ? photo.label_fr : photo.label_en}</Text>
+              </View>
+            </TouchableOpacity>
+          ))}
+          {/* Scrollable remaining photos */}
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.galleryScroll}>
+            {[PORTFOLIO_PHOTOS[4], PORTFOLIO_PHOTOS[5], PORTFOLIO_PHOTOS[7], PORTFOLIO_PHOTOS[8], PORTFOLIO_PHOTOS[9], PORTFOLIO_PHOTOS[10], PORTFOLIO_PHOTOS[11]].map((photo, index) => (
+              <TouchableOpacity 
+                key={index} 
+                style={styles.galleryScrollItem}
+                onPress={() => {
+                  if (photo.link) router.push(photo.link as any);
+                }}
+              >
+                <Image source={{ uri: photo.url }} style={styles.galleryImage} />
+                <View style={styles.galleryOverlay}>
+                  <Text style={styles.galleryScrollLabel}>{language === 'fr' ? photo.label_fr : photo.label_en}</Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+
         {/* Engagements Section - Elegant */}
         <View style={styles.engagementsSectionNew}>
           <View style={styles.engagementsTitleContainer}>
@@ -1587,6 +1638,75 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.md,
     fontWeight: '700',
     color: COLORS.white,
+  },
+  // Gallery Section Elegant
+  gallerySection: {
+    backgroundColor: '#F5F0EB',
+    paddingVertical: SPACING.xxl,
+  },
+  galleryTitleContainer: {
+    alignItems: 'center',
+    paddingHorizontal: SPACING.lg,
+    marginBottom: SPACING.xl,
+  },
+  galleryLine: {
+    width: 60,
+    height: 2,
+    backgroundColor: COLORS.secondary,
+    marginVertical: SPACING.sm,
+  },
+  galleryMainTitle: {
+    fontSize: FONT_SIZES.lg,
+    color: COLORS.primary,
+    fontWeight: '300',
+    letterSpacing: 1,
+  },
+  galleryAccentTitle: {
+    fontSize: FONT_SIZES.xxl,
+    color: COLORS.secondary,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  galleryItemFull: {
+    height: 200,
+    marginHorizontal: SPACING.md,
+    borderRadius: BORDER_RADIUS.lg,
+    overflow: 'hidden',
+    marginBottom: SPACING.sm,
+  },
+  galleryImage: {
+    width: '100%',
+    height: '100%',
+  },
+  galleryOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(14,28,64,0.35)',
+    justifyContent: 'flex-end',
+    padding: SPACING.md,
+  },
+  galleryLabel: {
+    color: COLORS.white,
+    fontSize: FONT_SIZES.md,
+    fontWeight: '700',
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
+  },
+  galleryScroll: {
+    paddingHorizontal: SPACING.md,
+    paddingTop: SPACING.sm,
+  },
+  galleryScrollItem: {
+    width: 160,
+    height: 120,
+    borderRadius: BORDER_RADIUS.lg,
+    overflow: 'hidden',
+    marginRight: SPACING.sm,
+  },
+  galleryScrollLabel: {
+    color: COLORS.white,
+    fontSize: FONT_SIZES.sm,
+    fontWeight: '600',
   },
   // Engagements Section Elegant
   engagementsSectionNew: {
