@@ -58,7 +58,7 @@ const PORTFOLIO_PHOTOS = [
     url: 'https://customer-assets.emergentagent.com/job_fe2730ba-35c4-4eb7-98c9-325cf295cc88/artifacts/c45b6sng_maddalena.jpg',
     label_fr: 'Archipel la Maddalena',
     label_en: 'Maddalena Archipelago',
-    cruiseName: 'Corse du Sud & Sardaigne'
+    cruiseName: 'Sardaigne & Corse du Sud'
   },
   { 
     url: 'https://static.wixstatic.com/media/ce6ce7_9e15d4c9779b4d48ad56a689ab2fe02b~mv2.avif/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/LAGOON%2043%20SOGNUDIMARE.avif',

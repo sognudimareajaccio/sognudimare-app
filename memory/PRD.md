@@ -1,18 +1,20 @@
 # Sognudimare - Product Requirements Document
 
 ## Original Problem Statement
-Application mobile de croisières en catamaran (Corse, Sardaigne, Grèce, Caraïbes). L'objectif initial était de corriger un bug critique de paiement sur l'app iOS live, puis de construire un panneau d'administration et redesigner la homepage.
+Application mobile de croisieres en catamaran (Corse, Sardaigne, Grece, Caraibes). L'objectif initial etait de corriger un bug critique de paiement sur l'app iOS live, puis de construire un panneau d'administration et redesigner l'ensemble du frontend.
 
 ## Architecture
 - **Frontend**: React Native / Expo / TypeScript / expo-router
 - **Backend**: Python / FastAPI / MongoDB
 - **Paiement**: Square (production)
-- **Hébergement backend**: Railway
+- **Hebergement backend**: Railway
 - **Build & Deploy mobile**: EAS (Expo Application Services)
 - **Distribution**: Apple App Store + Google Play Console
 
 ## Core Files
 - `frontend/app/index.tsx` - Homepage (redesign complet)
+- `frontend/app/engagements.tsx` - Page engagements (redesign complet)
+- `frontend/app/catamarans.tsx` - Page flotte (avec Lucy Sunreef 50)
 - `frontend/app/admin.tsx` - Panneau d'administration
 - `frontend/app.json` - Configuration Expo (v1.8.0)
 - `frontend/eas.json` - Configuration EAS build
@@ -21,49 +23,29 @@ Application mobile de croisières en catamaran (Corse, Sardaigne, Grèce, Caraï
 ## What's Been Implemented
 
 ### Completed (All sessions)
-- [x] Fix du bug de paiement (code corrigé dans `payment/[cruiseId].tsx`)
-- [x] Panneau d'administration complet (CRUD croisières, dates, prix)
-- [x] Redesign complet de la homepage:
-  - Carousel animé en hero section
-  - Section "Choisissez votre aventure" avec boarding cards
-  - Section "Nos destinations" en layout vertical
-  - Section "Ce qui fait vraiment notre différence" (redesign élégant)
-  - Section "Des vacances tout inclus" (redesign élégant avec cartes scrollables)
-  - Section "Une collaboration responsable et engagée" (partenaires locaux)
-  - Section "Club des Voyageurs" (3 cartes tarifs)
-  - Section "Nos engagements écoresponsables"
-  - Section "À propos de Sognudimare"
-- [x] Suppression du banner "2021"
-- [x] `app.json` corrigé: projectId invalide supprimé, version 1.8.0, buildNumber 9
+- [x] Fix du bug de paiement (code corrige dans `payment/[cruiseId].tsx`)
+- [x] Panneau d'administration complet (CRUD croisieres, dates, prix)
+- [x] Redesign complet de la homepage avec carousel anime, sections elegantes
+- [x] Page croisiere redesignee : hero moderne, carte "PROCHAIN DEPART", barre fixe reservation
+- [x] Page Destinations redesignee : cards premium avec prochain depart et prix
+- [x] Page La Flotte redesignee : catamarans Lagoon 38/43/46 + Lucy Sunreef 50 (flagship)
+- [x] Page L'Equipage redesignee : hero, section "Reve de mer", fiches equipage, valeurs
+- [x] Page Club modernisee : header marine, tabs dores, style coherent
+- [x] `app.json` corrige: projectId invalide supprime, version 1.8.0, buildNumber 9
 
-### Completed Today (March 2026)
-- [x] Vérification visuelle complète du redesign homepage
-- [x] Correction `app.json`: suppression du `projectId: "sognudimare-app"` (invalide)
-- [x] Mise à jour version: 1.7.1 → 1.8.0, buildNumber 8 → 9, versionCode 8 → 9
-- [x] Vérification API backend (4 croisières, admin login OK)
-- [x] Redesign section "Club des Voyageurs" : image des cartes Club ajoutée, "BEST" supprimé, design plus élégant avec pills de tarifs
-- [x] Ajout galerie photo "Instantanés de nos croisières" entre Club et Engagements : 5 photos plein écran + carrousel horizontal avec les photos restantes
-- [x] Portfolio réduit à 6 photos avec liens : Tour de Corse, Scandola, Îles Lavezzi, Archipel Maddalena, Les Catamarans, L'équipage
-- [x] Nouveaux logos dans le header (cercles Sdm + texte sognudimare)
-- [x] Logo complet dans la section À propos (remplace le texte "Sognudimare")
-- [x] Nouveau logo header Sognudimare (cercles + Sdm + texte) centré et agrandi
-- [x] Portfolio "Destinations authentiques" avec 6 photos + flèches de lien (Tour de Corse, Scandola, Îles Lavezzi, Archipel Maddalena, Les Catamarans, L'équipage)
-- [x] Section À propos : traits décoratifs supprimés
-- [x] Page croisière redesignée : hero moderne, carte "PROCHAIN DÉPART" en avant, tarifs élégants, sections repliables, barre fixe réservation
-- [x] Section About : nouveau texte (DAY CHARTER / CONVOYAGE) + encart Blu Sognu avec logo et badge App Store
-- [x] Page Destinations redesignée : cards premium avec prochain départ et prix
-- [x] Page La Flotte redesignée : catamarans Lagoon 38/43/46 avec specs et modal détail
-- [x] Page L'Équipage redesignée : hero, section "Rêve de mer", fiches équipage, valeurs
-- [x] Page Club modernisée : header marine, tabs dorés, style cohérent
+### Completed (11 Mars 2026)
+- [x] Correction lien Maddalena : la photo "Archipel la Maddalena" redirige maintenant vers la croisiere "Sardaigne & Corse du Sud"
+- [x] Page Engagements redesignee : design premium avec hero navy, carte donation 1%, liste d'engagements numerotee, section equipage engage, cartes d'associations avec bordure doree, citation et CTA elegant
+- [x] Lucy (Sunreef 50) deja ajoutee a la page flotte (flagship avec badge PRESTIGE)
 
 ## Pending / Next Steps
 
 ### P0 - EAS Build (User Action Required)
-L'utilisateur doit exécuter sur sa machine locale:
+L'utilisateur doit executer sur sa machine locale:
 ```bash
 cd frontend
 npx eas login          # Se connecter au compte Expo
-npx eas init           # Régénérer un projectId UUID valide
+npx eas init           # Regenerer un projectId UUID valide
 npx eas build --platform ios --profile preview   # Tester le build
 ```
 
@@ -75,8 +57,11 @@ npx eas submit --platform ios --latest
 
 ### P2 - Backlog
 - Guide utilisateur pour le panneau admin
-- Publication production Google Play (après test fermé)
-- Intégration API MisterBooking (synchro prix/disponibilités)
+- Publication production Google Play (apres test ferme)
+- Integration API MisterBooking (synchro prix/disponibilites)
+
+### Refactoring suggere
+- Deplacer le contenu hardcode (details flotte, equipage, textes) vers des fichiers JSON ou endpoints backend
 
 ## Credentials
 - Admin Panel: `admin` / `Capitaine2026!`
