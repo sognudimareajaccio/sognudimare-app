@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, Image, TouchableOpacity,
   Dimensions, Modal,
@@ -23,10 +23,12 @@ const CATAMARANS = [
       'https://www.lucy-yacht-charter.com/wp-content/uploads/2025/04/1741880477434-zoanls12-processed-445x600-c-default.jpg',
       'https://www.lucy-yacht-charter.com/wp-content/uploads/2025/04/1741880477435-zoanls29-processed-400x300-c-default.jpg',
     ],
-    capacity: 6, cabins: 3, bathrooms: 3,
+    capacity: 8, cabins: 4, bathrooms: 3,
+    cabins_detail_fr: '1 cabine proprietaire (2 PAX)\n2 cabines invites (4 PAX)\n1 cabine VIP (2 PAX)',
+    cabins_detail_en: '1 owner cabin (2 PAX)\n2 guest cabins (4 PAX)\n1 VIP cabin (2 PAX)',
     specs: { length: '15,26 m', width: '9,27 m', draft: '-', mainsail: 'Hydranet', jib: 'Hydranet', engine: '2 x 110 CV Yanmar', fuel: '1 500 L', water: '800 L', living: '167 m\u00B2' },
-    features_fr: ['Espaces de vie de 167 m\u00B2','Climatisation integrale','Bar, frigo et ice maker sur le fly','Tepanyaki sur le fly','2x Seabobs F5S','Paddleboard et ski nautique','TV 49" salon + TV 32" par cabine','Eclairage domotique et sous-marin','Dessalinisateur','Machine a laver et seche-linge','Passerelle et plateforme hydraulique','Equipement de peche complet'],
-    features_en: ['167 m\u00B2 living spaces','Full air conditioning','Bar, fridge and ice maker on flybridge','Teppanyaki on flybridge','2x Seabobs F5S','Paddleboard and water ski','49" TV in salon + 32" TV per cabin','Smart lighting and underwater lights','Watermaker','Washer and dryer','Electric gangway and hydraulic platform','Complete fishing equipment'],
+    features_fr: ['4 cabines : 1 proprietaire, 2 invites, 1 VIP (8 passagers)','Espaces de vie de 167 m\u00B2','Climatisation integrale','Bar, frigo et ice maker sur le fly','Tepanyaki sur le fly','2x Seabobs F5S','Paddleboard et ski nautique','TV 49" salon + TV 32" par cabine','Eclairage domotique et sous-marin','Dessalinisateur','Machine a laver et seche-linge','Passerelle et plateforme hydraulique','Equipement de peche complet'],
+    features_en: ['4 cabins: 1 owner, 2 guest, 1 VIP (8 passengers)','167 m\u00B2 living spaces','Full air conditioning','Bar, fridge and ice maker on flybridge','Teppanyaki on flybridge','2x Seabobs F5S','Paddleboard and water ski','49" TV in salon + 32" TV per cabin','Smart lighting and underwater lights','Watermaker','Washer and dryer','Electric gangway and hydraulic platform','Complete fishing equipment'],
   },
   {
     id: 'lagoon-46', name: 'LAGOON 46', model: 'Lagoon 46', year: 2020, flagship: false,
@@ -84,6 +86,7 @@ export default function CatamaransScreen() {
   const [selected, setSelected] = useState<typeof CATAMARANS[0] | null>(null);
   const [showModal, setShowModal] = useState(false);
 
+  const scrollRef = useRef<ScrollView>(null);
   const openDetail = (cat: typeof CATAMARANS[0]) => { setSelected(cat); setShowModal(true); };
 
   return (
@@ -96,7 +99,7 @@ export default function CatamaransScreen() {
         <View style={{ width: 40 }} />
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView ref={scrollRef} showsVerticalScrollIndicator={false}>
         {/* Intro */}
         <View style={s.intro}>
           <View style={s.introLine} />
@@ -165,7 +168,7 @@ export default function CatamaransScreen() {
         {/* CTA */}
         <View style={s.cta}>
           <Text style={s.ctaTitle}>{language === 'fr' ? 'Pret a embarquer ?' : 'Ready to board?'}</Text>
-          <TouchableOpacity style={s.ctaBtn} onPress={() => router.push('/cruises')}>
+          <TouchableOpacity style={s.ctaBtn} onPress={() => { scrollRef.current?.scrollTo({ y: 0, animated: true }); router.push('/cruises'); }}>
             <Text style={s.ctaBtnText}>{language === 'fr' ? 'Voir les croisieres' : 'View cruises'}</Text>
             <Ionicons name="arrow-forward" size={18} color={COLORS.primary} />
           </TouchableOpacity>
@@ -217,6 +220,19 @@ export default function CatamaransScreen() {
                 ))}
               </View>
 
+              {/* Cabin Detail for Lucy */}
+              {selected.cabins_detail_fr && (
+                <View style={s.cabinDetailBox}>
+                  <Text style={s.cabinDetailTitle}>{language === 'fr' ? 'Detail des cabines' : 'Cabin details'}</Text>
+                  {(language === 'fr' ? selected.cabins_detail_fr : selected.cabins_detail_en).split('\n').map((line: string, i: number) => (
+                    <View key={i} style={s.cabinDetailRow}>
+                      <Ionicons name="bed-outline" size={16} color={COLORS.secondary} />
+                      <Text style={s.cabinDetailText}>{line}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
+
               {/* Specs Table */}
               <View style={s.modalSection}>
                 <Text style={s.mSectionTitle}>{language === 'fr' ? 'Caracteristiques' : 'Specifications'}</Text>
@@ -244,7 +260,7 @@ export default function CatamaransScreen() {
                 ))}
               </View>
 
-              <TouchableOpacity style={s.modalBookBtn} onPress={() => { setShowModal(false); router.push('/cruises'); }}>
+              <TouchableOpacity style={s.modalBookBtn} onPress={() => { setShowModal(false); scrollRef.current?.scrollTo({ y: 0, animated: true }); router.push('/cruises'); }}>
                 <Text style={s.modalBookText}>{language === 'fr' ? 'Reserver une croisiere' : 'Book a cruise'}</Text>
                 <Ionicons name="arrow-forward" size={18} color={COLORS.white} />
               </TouchableOpacity>
@@ -321,4 +337,10 @@ const s = StyleSheet.create({
   featureText: { flex: 1, fontSize: 14, color: '#6B6560' },
   modalBookBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: COLORS.primary, marginHorizontal: SPACING.md, paddingVertical: 16, borderRadius: 12, gap: 8 },
   modalBookText: { color: COLORS.white, fontSize: 16, fontWeight: '700' },
+
+  // Cabin detail
+  cabinDetailBox: { marginHorizontal: SPACING.md, backgroundColor: 'rgba(235,208,169,0.1)', borderRadius: 14, padding: SPACING.md, marginTop: SPACING.md, borderWidth: 1, borderColor: 'rgba(235,208,169,0.3)' },
+  cabinDetailTitle: { fontSize: 13, fontWeight: '700', color: COLORS.primary, textTransform: 'uppercase', letterSpacing: 1, marginBottom: SPACING.sm },
+  cabinDetailRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8, gap: 10 },
+  cabinDetailText: { fontSize: 14, color: '#6B6560', fontWeight: '500' },
 });
