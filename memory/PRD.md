@@ -41,6 +41,9 @@ Application mobile de croisieres en catamaran (Corse, Sardaigne, Grece, Caraibes
 - [x] Icone voilier (sail-boat) pour "Des catamarans recents" dans la section "Ce qui fait vraiment notre difference" en homepage
 - [x] Page Admin redesignee : theme navy/or premium avec barre de stats, tabs dores, cartes croisieres avec image/badge/prix, modals elegants, login premium
 - [x] Boutons de la page Flotte renvoient en haut de page avant navigation
+- [x] Upload d'images dans l'admin : endpoint backend `/api/admin/upload-image` + bouton "Uploader une image" dans le modal d'edition avec apercu
+- [x] Icones du menu du bas plus elegantes : ancre (Accueil), rose des vents (Croisieres), voilier (Club), marqueur (Contact)
+- [x] Page Contact redesignee : hero avec photo Nicolas & Maud, mot de remerciement de l'equipage, cartes contact (tel/email/adresse), reseaux sociaux, lien admin, footer avec logo et infos legales
 
 ## Pending / Next Steps
 

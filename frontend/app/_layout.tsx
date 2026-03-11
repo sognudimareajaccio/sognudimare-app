@@ -33,7 +33,7 @@ export default function TabLayout() {
         options={{
           title: t('home'),
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home" size={size} color={color} />
+            <MaterialCommunityIcons name="anchor" size={size} color={color} />
           ),
         }}
       />
@@ -42,7 +42,7 @@ export default function TabLayout() {
         options={{
           title: t('cruises'),
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="sail-boat" size={size} color={color} />
+            <MaterialCommunityIcons name="compass-rose" size={size} color={color} />
           ),
         }}
       />
@@ -51,7 +51,7 @@ export default function TabLayout() {
         options={{
           title: t('club'),
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="people" size={size} color={color} />
+            <MaterialCommunityIcons name="sail-boat" size={size} color={color} />
           ),
         }}
       />
@@ -60,7 +60,7 @@ export default function TabLayout() {
         options={{
           title: t('contact'),
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="mail" size={size} color={color} />
+            <MaterialCommunityIcons name="map-marker-radius" size={size} color={color} />
           ),
         }}
       />

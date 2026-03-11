@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
   Alert,
   Modal,
   Image,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -17,6 +18,7 @@ import { useRouter } from 'expo-router';
 import { adminApi, Cruise, CommunityPost, Member, DirectMessage, CruiseAvailability } from '../src/services/api';
 import { useAppStore } from '../src/store/appStore';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../src/theme/theme';
+import * as ImagePicker from 'expo-image-picker';
 
 type AdminTab = 'cruises' | 'posts' | 'members' | 'messages';
 
@@ -56,6 +58,43 @@ export default function AdminScreen() {
   const [availabilityForm, setAvailabilityForm] = useState({
     date_range: '', price: '', status: 'available', remaining_places: '',
   });
+
+  const [uploading, setUploading] = useState(false);
+
+  const handlePickImage = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [16, 9],
+        quality: 0.8,
+      });
+      if (!result.canceled && result.assets[0]) {
+        setUploading(true);
+        const asset = result.assets[0];
+        const formData = new FormData();
+        if (Platform.OS === 'web') {
+          const resp = await fetch(asset.uri);
+          const blob = await resp.blob();
+          formData.append('file', blob, 'image.jpg');
+        } else {
+          formData.append('file', { uri: asset.uri, name: 'image.jpg', type: 'image/jpeg' } as any);
+        }
+        const baseUrl = (await import('../src/services/api')).default ? '' : '';
+        const uploadResp = await fetch(`/api/admin/upload-image`, { method: 'POST', body: formData });
+        const data = await uploadResp.json();
+        if (data.url) {
+          setEditForm(prev => ({ ...prev, image_url: data.url }));
+          Alert.alert('Succes', 'Image uploadee');
+        }
+        setUploading(false);
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      setUploading(false);
+      Alert.alert('Erreur', 'Impossible d\'uploader l\'image');
+    }
+  };
 
   const handleLogin = async () => {
     setLoginError('');
@@ -461,6 +500,21 @@ export default function AdminScreen() {
                 <View style={s.fieldHalf}><FormField label="Prix prive (EUR)" value={editForm.private_price} onChange={(v) => setEditForm({ ...editForm, private_price: v })} numeric /></View>
               </View>
               <FormField label="URL de l'image" value={editForm.image_url} onChange={(v) => setEditForm({ ...editForm, image_url: v })} />
+              
+              {/* Image upload button */}
+              <TouchableOpacity style={s.uploadBtn} onPress={handlePickImage} disabled={uploading}>
+                {uploading ? (
+                  <ActivityIndicator size="small" color={COLORS.primary} />
+                ) : (
+                  <>
+                    <Ionicons name="cloud-upload" size={18} color={COLORS.primary} />
+                    <Text style={s.uploadBtnText}>Uploader une image</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+              {editForm.image_url ? (
+                <Image source={{ uri: editForm.image_url }} style={s.uploadPreview} resizeMode="cover" />
+              ) : null}
               <FormField label="Description (FR)" value={editForm.description_fr} onChange={(v) => setEditForm({ ...editForm, description_fr: v })} multiline />
               <FormField label="Description (EN)" value={editForm.description_en} onChange={(v) => setEditForm({ ...editForm, description_en: v })} multiline />
             </ScrollView>
@@ -713,4 +767,9 @@ const s = StyleSheet.create({
   addDateBtnText: { fontSize: 14, fontWeight: '700', color: COLORS.primary },
   cancelEditLink: { alignItems: 'center', paddingVertical: 10, marginTop: 8 },
   cancelEditLinkText: { fontSize: 13, color: 'rgba(255,255,255,0.4)' },
+
+  // Upload
+  uploadBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: COLORS.secondary, paddingVertical: 12, borderRadius: 10, marginTop: 8, gap: 8 },
+  uploadBtnText: { fontSize: 13, fontWeight: '700', color: COLORS.primary },
+  uploadPreview: { width: '100%', height: 120, borderRadius: 10, marginTop: 10 },
 });

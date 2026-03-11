@@ -1,6 +1,7 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Query
+from fastapi import FastAPI, APIRouter, HTTPException, Query, UploadFile, File
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
+from starlette.staticfiles import StaticFiles
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
@@ -10,6 +11,7 @@ from typing import List, Optional
 import uuid
 from datetime import datetime
 from enum import Enum
+import shutil
 
 # Square Payment SDK
 from square import Square
@@ -1524,7 +1526,30 @@ async def refund_payment(payment_id: str, amount: Optional[int] = None):
         raise HTTPException(status_code=500, detail=f"Erreur de remboursement: {str(e)}")
 
 # Include the router in the main app
+# Image upload endpoint
+UPLOADS_DIR = ROOT_DIR / "uploads"
+UPLOADS_DIR.mkdir(exist_ok=True)
+
+@api_router.post("/admin/upload-image")
+async def upload_image(file: UploadFile = File(...)):
+    """Upload an image and return its URL"""
+    allowed = {".jpg", ".jpeg", ".png", ".webp", ".gif"}
+    ext = Path(file.filename).suffix.lower()
+    if ext not in allowed:
+        raise HTTPException(status_code=400, detail="Format non supporte")
+    
+    filename = f"{uuid.uuid4().hex}{ext}"
+    filepath = UPLOADS_DIR / filename
+    
+    with open(filepath, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    
+    return {"url": f"/api/uploads/{filename}"}
+
 app.include_router(api_router)
+
+# Serve uploaded images
+app.mount("/api/uploads", StaticFiles(directory=str(UPLOADS_DIR)), name="uploads")
 
 app.add_middleware(
     CORSMiddleware,
