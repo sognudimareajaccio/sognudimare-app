@@ -138,21 +138,14 @@ export default function ContactScreen() {
           <View style={styles.companyDetails}>
             <Text style={styles.companyDetailText}>SIRET: 45138736900031</Text>
             <Text style={styles.companyDetailText}>APE: 52.22Z</Text>
-            <Text style={styles.companyDetailText}>TVA: FR21451387369</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20, marginTop: 2 }}>
+              <Text style={styles.companyDetailText}>TVA: FR21451387369</Text>
+              <TouchableOpacity onPress={() => router.push('/admin')}>
+                <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 18 }}>⚙️</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-        
-        {/* Admin link - discrete settings icon - moved outside company box */}
-        <TouchableOpacity 
-          style={styles.adminLink}
-          onPress={() => router.push('/admin')}
-          data-testid="admin-link"
-        >
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-            <Ionicons name="settings-outline" size={24} color={COLORS.textSecondary} />
-            <Text style={{ color: COLORS.textSecondary, fontSize: 12 }}>Admin</Text>
-          </View>
-        </TouchableOpacity>
 
         <View style={{ height: SPACING.xxl }} />
       </ScrollView>
@@ -265,6 +258,7 @@ const styles = StyleSheet.create({
   companyInfo: {
     backgroundColor: COLORS.primary,
     padding: SPACING.xl,
+    paddingBottom: SPACING.xxl,
     borderRadius: BORDER_RADIUS.xl,
     alignItems: 'center',
   },
@@ -301,7 +295,6 @@ const styles = StyleSheet.create({
   },
   adminLink: {
     marginTop: SPACING.lg,
-    padding: SPACING.md,
-    alignSelf: 'center',
+    padding: SPACING.sm,
   },
 });
