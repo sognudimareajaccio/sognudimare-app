@@ -320,4 +320,30 @@ export const adminApi = {
   deleteCruise: async (cruiseId: string): Promise<void> => {
     await fetchApi<void>(`/admin/cruises/${cruiseId}`, { method: 'DELETE' });
   },
+  
+  // Toggle cruise active/inactive
+  toggleCruiseActive: async (cruiseId: string): Promise<{ is_active: boolean }> => {
+    return fetchApi<{ is_active: boolean }>(`/admin/cruises/${cruiseId}/toggle-active`, {
+      method: 'PUT',
+    });
+  },
+  
+  // Availability management
+  addAvailability: async (cruiseId: string, availability: CruiseAvailability): Promise<Cruise> => {
+    return fetchApi<Cruise>(`/admin/cruises/${cruiseId}/availabilities`, {
+      method: 'POST',
+      body: JSON.stringify(availability),
+    });
+  },
+  
+  updateAvailability: async (cruiseId: string, index: number, availability: CruiseAvailability): Promise<Cruise> => {
+    return fetchApi<Cruise>(`/admin/cruises/${cruiseId}/availabilities/${index}`, {
+      method: 'PUT',
+      body: JSON.stringify(availability),
+    });
+  },
+  
+  deleteAvailability: async (cruiseId: string, index: number): Promise<void> => {
+    await fetchApi<void>(`/admin/cruises/${cruiseId}/availabilities/${index}`, { method: 'DELETE' });
+  },
 };

@@ -463,7 +463,7 @@ class AdminCredentials(BaseModel):
 
 # Simple admin password (loaded from environment)
 ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "admin")
-ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "sognudimare2024")
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "Capitaine2026!")
 
 @api_router.post("/admin/login")
 async def admin_login(credentials: AdminCredentials):
@@ -534,7 +534,7 @@ async def admin_unban_member(member_id: str):
 @api_router.get("/admin/messages")
 async def admin_get_all_messages():
     """Get all messages for moderation"""
-    messages = await db.messages.find().sort("created_at", -1).to_list(200)
+    messages = await db.messages.find({}, {"_id": 0}).sort("created_at", -1).to_list(200)
     return messages
 
 @api_router.delete("/admin/messages/{message_id}")
@@ -550,12 +550,8 @@ async def admin_delete_message(message_id: str):
 @api_router.get("/admin/cruises")
 async def admin_get_all_cruises():
     """Get all cruises for admin"""
-    cruises = await db.cruises.find().sort("order", 1).to_list(100)
-    # Convert MongoDB documents to proper format
-    return [
-        {**cruise, "_id": str(cruise["_id"])} if "_id" in cruise else cruise 
-        for cruise in cruises
-    ]
+    cruises = await db.cruises.find({}, {"_id": 0}).sort("order", 1).to_list(100)
+    return cruises
 
 @api_router.put("/admin/cruises/{cruise_id}")
 async def admin_update_cruise(cruise_id: str, cruise_data: CruiseUpdate):
@@ -578,6 +574,137 @@ async def admin_delete_cruise(cruise_id: str):
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Cruise not found")
     return {"message": "Cruise deleted"}
+
+# ============= ADMIN AVAILABILITY MANAGEMENT =============
+
+class AvailabilityUpdate(BaseModel):
+    """Model for updating a single availability"""
+    date_range: str
+    price: float
+    status: str  # "available", "limited", "full"
+    remaining_places: Optional[int] = None
+    status_label: Optional[str] = None
+
+@api_router.post("/admin/cruises/{cruise_id}/availabilities")
+async def admin_add_availability(cruise_id: str, availability: AvailabilityUpdate):
+    """Add a new availability to a cruise"""
+    existing = await db.cruises.find_one({"id": cruise_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Cruise not found")
+    
+    new_availability = {
+        "date_range": availability.date_range,
+        "price": availability.price,
+        "status": availability.status,
+        "remaining_places": availability.remaining_places,
+        "status_label": availability.status_label or (
+            "COMPLET" if availability.status == "full" else
+            f"Reste {availability.remaining_places} places" if availability.status == "limited" else
+            "Disponible"
+        )
+    }
+    
+    await db.cruises.update_one(
+        {"id": cruise_id},
+        {
+            "$push": {"availabilities": new_availability},
+            "$set": {"updated_at": datetime.utcnow()}
+        }
+    )
+    
+    updated = await db.cruises.find_one({"id": cruise_id})
+    return Cruise(**updated)
+
+@api_router.put("/admin/cruises/{cruise_id}/availabilities/{availability_index}")
+async def admin_update_availability(cruise_id: str, availability_index: int, availability: AvailabilityUpdate):
+    """Update a specific availability by index"""
+    existing = await db.cruises.find_one({"id": cruise_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Cruise not found")
+    
+    availabilities = existing.get("availabilities", [])
+    if availability_index < 0 or availability_index >= len(availabilities):
+        raise HTTPException(status_code=404, detail="Availability index out of range")
+    
+    updated_availability = {
+        "date_range": availability.date_range,
+        "price": availability.price,
+        "status": availability.status,
+        "remaining_places": availability.remaining_places,
+        "status_label": availability.status_label or (
+            "COMPLET" if availability.status == "full" else
+            f"Reste {availability.remaining_places} places" if availability.status == "limited" else
+            "Disponible"
+        )
+    }
+    
+    availabilities[availability_index] = updated_availability
+    
+    await db.cruises.update_one(
+        {"id": cruise_id},
+        {
+            "$set": {
+                "availabilities": availabilities,
+                "updated_at": datetime.utcnow()
+            }
+        }
+    )
+    
+    updated = await db.cruises.find_one({"id": cruise_id})
+    return Cruise(**updated)
+
+@api_router.delete("/admin/cruises/{cruise_id}/availabilities/{availability_index}")
+async def admin_delete_availability(cruise_id: str, availability_index: int):
+    """Delete a specific availability by index"""
+    existing = await db.cruises.find_one({"id": cruise_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Cruise not found")
+    
+    availabilities = existing.get("availabilities", [])
+    if availability_index < 0 or availability_index >= len(availabilities):
+        raise HTTPException(status_code=404, detail="Availability index out of range")
+    
+    availabilities.pop(availability_index)
+    
+    await db.cruises.update_one(
+        {"id": cruise_id},
+        {
+            "$set": {
+                "availabilities": availabilities,
+                "updated_at": datetime.utcnow()
+            }
+        }
+    )
+    
+    return {"message": "Availability deleted successfully"}
+
+@api_router.put("/admin/cruises/{cruise_id}/toggle-active")
+async def admin_toggle_cruise_active(cruise_id: str):
+    """Toggle cruise active status"""
+    existing = await db.cruises.find_one({"id": cruise_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Cruise not found")
+    
+    new_status = not existing.get("is_active", True)
+    
+    await db.cruises.update_one(
+        {"id": cruise_id},
+        {
+            "$set": {
+                "is_active": new_status,
+                "updated_at": datetime.utcnow()
+            }
+        }
+    )
+    
+    return {"message": f"Cruise {'activated' if new_status else 'deactivated'}", "is_active": new_status}
+
+@api_router.post("/admin/cruises/create")
+async def admin_create_cruise(cruise_data: CruiseCreate):
+    """Admin create a new cruise"""
+    cruise = Cruise(**cruise_data.dict())
+    await db.cruises.insert_one(cruise.dict())
+    return cruise
 
 # ============= SEED DATA =============
 

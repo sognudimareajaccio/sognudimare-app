@@ -10,11 +10,12 @@ import {
   Alert,
   Modal,
   Image,
+  Switch,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { adminApi, Cruise, CommunityPost, Member, DirectMessage } from '../src/services/api';
+import { adminApi, Cruise, CommunityPost, Member, DirectMessage, CruiseAvailability } from '../src/services/api';
 import { useAppStore } from '../src/store/appStore';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../src/theme/theme';
 
@@ -36,7 +37,7 @@ export default function AdminScreen() {
   const [members, setMembers] = useState<Member[]>([]);
   const [messages, setMessages] = useState<DirectMessage[]>([]);
   
-  // Edit modal
+  // Edit cruise modal
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingCruise, setEditingCruise] = useState<Cruise | null>(null);
   const [editForm, setEditForm] = useState({
@@ -50,6 +51,17 @@ export default function AdminScreen() {
     private_price: '',
     image_url: '',
   });
+  
+  // Availability modal
+  const [showAvailabilityModal, setShowAvailabilityModal] = useState(false);
+  const [editingAvailabilityCruise, setEditingAvailabilityCruise] = useState<Cruise | null>(null);
+  const [editingAvailabilityIndex, setEditingAvailabilityIndex] = useState<number | null>(null);
+  const [availabilityForm, setAvailabilityForm] = useState({
+    date_range: '',
+    price: '',
+    status: 'available',
+    remaining_places: '',
+  });
 
   const t = (key: string) => {
     const translations: { [key: string]: { fr: string; en: string } } = {
@@ -59,29 +71,40 @@ export default function AdminScreen() {
       password: { fr: 'Mot de passe', en: 'Password' },
       loginButton: { fr: 'Se connecter', en: 'Log in' },
       invalidCredentials: { fr: 'Identifiants incorrects', en: 'Invalid credentials' },
-      cruises: { fr: 'Croisières', en: 'Cruises' },
+      cruises: { fr: 'Croisieres', en: 'Cruises' },
       posts: { fr: 'Publications', en: 'Posts' },
       members: { fr: 'Membres', en: 'Members' },
       messages: { fr: 'Messages', en: 'Messages' },
       edit: { fr: 'Modifier', en: 'Edit' },
       delete: { fr: 'Supprimer', en: 'Delete' },
       ban: { fr: 'Bannir', en: 'Ban' },
-      unban: { fr: 'Débannir', en: 'Unban' },
+      unban: { fr: 'Debannir', en: 'Unban' },
       save: { fr: 'Enregistrer', en: 'Save' },
       cancel: { fr: 'Annuler', en: 'Cancel' },
       confirmDelete: { fr: 'Confirmer la suppression ?', en: 'Confirm deletion?' },
-      noCruises: { fr: 'Aucune croisière', en: 'No cruises' },
+      noCruises: { fr: 'Aucune croisiere', en: 'No cruises' },
       noPosts: { fr: 'Aucune publication', en: 'No posts' },
       noMembers: { fr: 'Aucun membre', en: 'No members' },
       noMessages: { fr: 'Aucun message', en: 'No messages' },
       name: { fr: 'Nom', en: 'Name' },
       description: { fr: 'Description', en: 'Description' },
-      duration: { fr: 'Durée', en: 'Duration' },
-      departurePort: { fr: 'Port de départ', en: 'Departure Port' },
+      duration: { fr: 'Duree', en: 'Duration' },
+      departurePort: { fr: 'Port de depart', en: 'Departure Port' },
       cabinPrice: { fr: 'Prix cabine', en: 'Cabin Price' },
       privatePrice: { fr: 'Prix privatisation', en: 'Private Price' },
       imageUrl: { fr: 'URL de l\'image', en: 'Image URL' },
-      logout: { fr: 'Déconnexion', en: 'Logout' },
+      logout: { fr: 'Deconnexion', en: 'Logout' },
+      availabilities: { fr: 'Disponibilites', en: 'Availabilities' },
+      addAvailability: { fr: 'Ajouter une date', en: 'Add date' },
+      dateRange: { fr: 'Periode', en: 'Date range' },
+      price: { fr: 'Prix', en: 'Price' },
+      status: { fr: 'Statut', en: 'Status' },
+      remainingPlaces: { fr: 'Places restantes', en: 'Remaining places' },
+      available: { fr: 'Disponible', en: 'Available' },
+      limited: { fr: 'Limite', en: 'Limited' },
+      full: { fr: 'Complet', en: 'Full' },
+      active: { fr: 'Active', en: 'Active' },
+      inactive: { fr: 'Inactive', en: 'Inactive' },
     };
     return translations[key]?.[language] || key;
   };
@@ -158,9 +181,142 @@ export default function AdminScreen() {
       });
       setShowEditModal(false);
       fetchData();
+      Alert.alert('Succes', 'Croisiere mise a jour');
     } catch (error) {
       console.error('Error saving cruise:', error);
+      Alert.alert('Erreur', 'Impossible de sauvegarder');
     }
+  };
+
+  const handleDeleteCruise = async (cruiseId: string, cruiseName: string) => {
+    Alert.alert(
+      t('confirmDelete'),
+      `Supprimer "${cruiseName}" ?`,
+      [
+        { text: t('cancel'), style: 'cancel' },
+        {
+          text: t('delete'),
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await adminApi.deleteCruise(cruiseId);
+              fetchData();
+              Alert.alert('Succes', 'Croisiere supprimee');
+            } catch (error) {
+              console.error('Error deleting cruise:', error);
+              Alert.alert('Erreur', 'Impossible de supprimer');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleToggleCruiseActive = async (cruiseId: string) => {
+    try {
+      await adminApi.toggleCruiseActive(cruiseId);
+      fetchData();
+    } catch (error) {
+      console.error('Error toggling cruise:', error);
+    }
+  };
+
+  // Availability management
+  const handleOpenAvailabilities = (cruise: Cruise) => {
+    setEditingAvailabilityCruise(cruise);
+    setEditingAvailabilityIndex(null);
+    setAvailabilityForm({
+      date_range: '',
+      price: '',
+      status: 'available',
+      remaining_places: '8',
+    });
+    setShowAvailabilityModal(true);
+  };
+
+  const handleEditAvailability = (index: number) => {
+    if (!editingAvailabilityCruise) return;
+    const availability = editingAvailabilityCruise.availabilities?.[index];
+    if (availability) {
+      setEditingAvailabilityIndex(index);
+      setAvailabilityForm({
+        date_range: availability.date_range,
+        price: availability.price.toString(),
+        status: availability.status,
+        remaining_places: availability.remaining_places?.toString() || '8',
+      });
+    }
+  };
+
+  const handleSaveAvailability = async () => {
+    if (!editingAvailabilityCruise) return;
+    
+    const availability: CruiseAvailability = {
+      date_range: availabilityForm.date_range,
+      price: parseFloat(availabilityForm.price),
+      status: availabilityForm.status as 'available' | 'limited' | 'full',
+      remaining_places: parseInt(availabilityForm.remaining_places) || 8,
+    };
+    
+    try {
+      if (editingAvailabilityIndex !== null) {
+        await adminApi.updateAvailability(editingAvailabilityCruise.id, editingAvailabilityIndex, availability);
+      } else {
+        await adminApi.addAvailability(editingAvailabilityCruise.id, availability);
+      }
+      
+      // Refresh data
+      const updatedCruises = await adminApi.getCruises();
+      setCruises(updatedCruises);
+      const updatedCruise = updatedCruises.find(c => c.id === editingAvailabilityCruise.id);
+      if (updatedCruise) {
+        setEditingAvailabilityCruise(updatedCruise);
+      }
+      
+      setEditingAvailabilityIndex(null);
+      setAvailabilityForm({
+        date_range: '',
+        price: '',
+        status: 'available',
+        remaining_places: '8',
+      });
+      
+      Alert.alert('Succes', 'Disponibilite mise a jour');
+    } catch (error) {
+      console.error('Error saving availability:', error);
+      Alert.alert('Erreur', 'Impossible de sauvegarder');
+    }
+  };
+
+  const handleDeleteAvailability = async (index: number) => {
+    if (!editingAvailabilityCruise) return;
+    
+    Alert.alert(
+      'Supprimer cette date ?',
+      '',
+      [
+        { text: t('cancel'), style: 'cancel' },
+        {
+          text: t('delete'),
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await adminApi.deleteAvailability(editingAvailabilityCruise.id, index);
+              
+              // Refresh data
+              const updatedCruises = await adminApi.getCruises();
+              setCruises(updatedCruises);
+              const updatedCruise = updatedCruises.find(c => c.id === editingAvailabilityCruise.id);
+              if (updatedCruise) {
+                setEditingAvailabilityCruise(updatedCruise);
+              }
+            } catch (error) {
+              console.error('Error deleting availability:', error);
+            }
+          },
+        },
+      ]
+    );
   };
 
   const handleDeletePost = async (postId: string) => {
@@ -220,6 +376,15 @@ export default function AdminScreen() {
     );
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'available': return '#10B981';
+      case 'limited': return '#F59E0B';
+      case 'full': return '#EF4444';
+      default: return COLORS.textSecondary;
+    }
+  };
+
   // Login Screen
   if (!isLoggedIn) {
     return (
@@ -270,7 +435,7 @@ export default function AdminScreen() {
           >
             <Ionicons name="arrow-back" size={20} color={COLORS.textSecondary} />
             <Text style={styles.backLinkText}>
-              {language === 'fr' ? 'Retour à l\'application' : 'Back to app'}
+              {language === 'fr' ? 'Retour a l\'application' : 'Back to app'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -324,28 +489,71 @@ export default function AdminScreen() {
         {loading ? (
           <ActivityIndicator size="large" color={COLORS.primary} style={{ marginTop: 40 }} />
         ) : activeTab === 'cruises' ? (
-          // Cruises Tab
+          // Cruises Tab - Enhanced
           cruises.length === 0 ? (
             <Text style={styles.emptyText}>{t('noCruises')}</Text>
           ) : (
             cruises.map((cruise) => (
-              <View key={cruise.id} style={styles.itemCard}>
+              <View key={cruise.id} style={[styles.cruiseCard, !cruise.is_active && styles.inactiveCruise]}>
                 <Image source={{ uri: cruise.image_url }} style={styles.cruiseImage} />
-                <View style={styles.itemContent}>
-                  <Text style={styles.itemTitle}>{cruise.name_fr}</Text>
-                  <Text style={styles.itemSubtitle}>{cruise.duration} • {cruise.departure_port}</Text>
-                  <Text style={styles.itemPrice}>
-                    {cruise.pricing.cabin_price ? `${cruise.pricing.cabin_price}€/pers` : ''}
-                    {cruise.pricing.cabin_price && cruise.pricing.private_price ? ' • ' : ''}
-                    {cruise.pricing.private_price ? `${cruise.pricing.private_price}€ priv.` : ''}
+                <View style={styles.cruiseContent}>
+                  <View style={styles.cruiseHeader}>
+                    <Text style={styles.cruiseName}>{cruise.name_fr}</Text>
+                    <View style={[styles.statusBadge, cruise.is_active ? styles.activeBadge : styles.inactiveBadge]}>
+                      <Text style={styles.statusBadgeText}>
+                        {cruise.is_active ? 'ACTIVE' : 'INACTIVE'}
+                      </Text>
+                    </View>
+                  </View>
+                  <Text style={styles.cruiseSubtitle}>{cruise.duration} - {cruise.departure_port}</Text>
+                  <Text style={styles.cruisePrice}>
+                    {cruise.pricing.cabin_price ? `${cruise.pricing.cabin_price} EUR/pers` : ''}
+                    {cruise.pricing.private_price ? ` | ${cruise.pricing.private_price} EUR priv.` : ''}
                   </Text>
+                  <Text style={styles.availabilityCount}>
+                    {cruise.availabilities?.length || 0} dates disponibles
+                  </Text>
+                  
+                  {/* Action buttons */}
+                  <View style={styles.cruiseActions}>
+                    <TouchableOpacity
+                      style={styles.actionButton}
+                      onPress={() => handleEditCruise(cruise)}
+                    >
+                      <Ionicons name="pencil" size={16} color={COLORS.primary} />
+                      <Text style={styles.actionButtonText}>Modifier</Text>
+                    </TouchableOpacity>
+                    
+                    <TouchableOpacity
+                      style={styles.actionButton}
+                      onPress={() => handleOpenAvailabilities(cruise)}
+                    >
+                      <Ionicons name="calendar" size={16} color={COLORS.secondary} />
+                      <Text style={[styles.actionButtonText, { color: COLORS.secondary }]}>Dates</Text>
+                    </TouchableOpacity>
+                    
+                    <TouchableOpacity
+                      style={[styles.actionButton, cruise.is_active ? styles.deactivateButton : styles.activateButton]}
+                      onPress={() => handleToggleCruiseActive(cruise.id)}
+                    >
+                      <Ionicons 
+                        name={cruise.is_active ? 'eye-off' : 'eye'} 
+                        size={16} 
+                        color={cruise.is_active ? '#F59E0B' : '#10B981'} 
+                      />
+                      <Text style={[styles.actionButtonText, { color: cruise.is_active ? '#F59E0B' : '#10B981' }]}>
+                        {cruise.is_active ? 'Desactiver' : 'Activer'}
+                      </Text>
+                    </TouchableOpacity>
+                    
+                    <TouchableOpacity
+                      style={[styles.actionButton, styles.deleteButton]}
+                      onPress={() => handleDeleteCruise(cruise.id, cruise.name_fr)}
+                    >
+                      <Ionicons name="trash" size={16} color={COLORS.error} />
+                    </TouchableOpacity>
+                  </View>
                 </View>
-                <TouchableOpacity
-                  style={styles.editButton}
-                  onPress={() => handleEditCruise(cruise)}
-                >
-                  <Ionicons name="pencil" size={20} color={COLORS.primary} />
-                </TouchableOpacity>
               </View>
             ))
           )
@@ -359,12 +567,12 @@ export default function AdminScreen() {
                 <View style={styles.itemContent}>
                   <Text style={styles.itemTitle}>{post.title}</Text>
                   <Text style={styles.itemSubtitle}>
-                    {post.author_name} • {new Date(post.created_at).toLocaleDateString()}
+                    {post.author_name} - {new Date(post.created_at).toLocaleDateString()}
                   </Text>
                   <Text style={styles.itemText} numberOfLines={2}>{post.content}</Text>
                 </View>
                 <TouchableOpacity
-                  style={styles.deleteButton}
+                  style={styles.deleteIconButton}
                   onPress={() => handleDeletePost(post.id)}
                 >
                   <Ionicons name="trash" size={20} color={COLORS.error} />
@@ -411,7 +619,7 @@ export default function AdminScreen() {
               <View key={message.id} style={styles.itemCard}>
                 <View style={styles.itemContent}>
                   <Text style={styles.itemTitle}>
-                    {message.sender_name} → {message.receiver_name}
+                    {message.sender_name} - {message.receiver_name}
                   </Text>
                   <Text style={styles.itemSubtitle}>
                     {new Date(message.created_at).toLocaleString()}
@@ -419,7 +627,7 @@ export default function AdminScreen() {
                   <Text style={styles.itemText}>{message.content}</Text>
                 </View>
                 <TouchableOpacity
-                  style={styles.deleteButton}
+                  style={styles.deleteIconButton}
                   onPress={() => handleDeleteMessage(message.id)}
                 >
                   <Ionicons name="trash" size={20} color={COLORS.error} />
@@ -432,12 +640,12 @@ export default function AdminScreen() {
         <View style={{ height: 40 }} />
       </ScrollView>
 
-      {/* Edit Modal */}
+      {/* Edit Cruise Modal */}
       <Modal visible={showEditModal} animationType="slide" transparent>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>{t('edit')}: {editingCruise?.name_fr}</Text>
+              <Text style={styles.modalTitle}>Modifier: {editingCruise?.name_fr}</Text>
               <TouchableOpacity onPress={() => setShowEditModal(false)}>
                 <Ionicons name="close" size={24} color={COLORS.text} />
               </TouchableOpacity>
@@ -472,7 +680,7 @@ export default function AdminScreen() {
                 onChangeText={(text) => setEditForm({ ...editForm, departure_port: text })}
               />
               
-              <Text style={styles.inputLabel}>{t('cabinPrice')} (€)</Text>
+              <Text style={styles.inputLabel}>{t('cabinPrice')} (EUR)</Text>
               <TextInput
                 style={styles.modalInput}
                 value={editForm.cabin_price}
@@ -480,7 +688,7 @@ export default function AdminScreen() {
                 keyboardType="numeric"
               />
               
-              <Text style={styles.inputLabel}>{t('privatePrice')} (€)</Text>
+              <Text style={styles.inputLabel}>{t('privatePrice')} (EUR)</Text>
               <TextInput
                 style={styles.modalInput}
                 value={editForm.private_price}
@@ -524,6 +732,152 @@ export default function AdminScreen() {
                 onPress={handleSaveCruise}
               >
                 <Text style={styles.saveButtonText}>{t('save')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Availability Management Modal */}
+      <Modal visible={showAvailabilityModal} animationType="slide" transparent>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>
+                Dates: {editingAvailabilityCruise?.name_fr}
+              </Text>
+              <TouchableOpacity onPress={() => setShowAvailabilityModal(false)}>
+                <Ionicons name="close" size={24} color={COLORS.text} />
+              </TouchableOpacity>
+            </View>
+            
+            <ScrollView style={styles.modalScroll}>
+              {/* Current availabilities */}
+              <Text style={styles.sectionTitle}>Dates existantes</Text>
+              {editingAvailabilityCruise?.availabilities?.map((avail, index) => (
+                <View key={index} style={styles.availabilityItem}>
+                  <View style={styles.availabilityInfo}>
+                    <Text style={styles.availabilityDate}>{avail.date_range}</Text>
+                    <Text style={styles.availabilityPrice}>{avail.price} EUR/pers</Text>
+                    <View style={[styles.statusDot, { backgroundColor: getStatusColor(avail.status) }]} />
+                    <Text style={[styles.availabilityStatus, { color: getStatusColor(avail.status) }]}>
+                      {avail.status === 'full' ? 'COMPLET' : 
+                       avail.status === 'limited' ? `Reste ${avail.remaining_places}` : 
+                       'Disponible'}
+                    </Text>
+                  </View>
+                  <View style={styles.availabilityActions}>
+                    <TouchableOpacity
+                      style={styles.smallButton}
+                      onPress={() => handleEditAvailability(index)}
+                    >
+                      <Ionicons name="pencil" size={16} color={COLORS.primary} />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.smallButton, { backgroundColor: '#FEE2E2' }]}
+                      onPress={() => handleDeleteAvailability(index)}
+                    >
+                      <Ionicons name="trash" size={16} color={COLORS.error} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              ))}
+              
+              {/* Add/Edit form */}
+              <Text style={styles.sectionTitle}>
+                {editingAvailabilityIndex !== null ? 'Modifier la date' : 'Ajouter une date'}
+              </Text>
+              
+              <Text style={styles.inputLabel}>{t('dateRange')}</Text>
+              <TextInput
+                style={styles.modalInput}
+                value={availabilityForm.date_range}
+                onChangeText={(text) => setAvailabilityForm({ ...availabilityForm, date_range: text })}
+                placeholder="ex: du 23 mai au 6 juin 2026"
+                placeholderTextColor={COLORS.textSecondary}
+              />
+              
+              <Text style={styles.inputLabel}>{t('price')} (EUR/pers)</Text>
+              <TextInput
+                style={styles.modalInput}
+                value={availabilityForm.price}
+                onChangeText={(text) => setAvailabilityForm({ ...availabilityForm, price: text })}
+                keyboardType="numeric"
+                placeholder="ex: 2560"
+                placeholderTextColor={COLORS.textSecondary}
+              />
+              
+              <Text style={styles.inputLabel}>{t('status')}</Text>
+              <View style={styles.statusButtons}>
+                {['available', 'limited', 'full'].map((status) => (
+                  <TouchableOpacity
+                    key={status}
+                    style={[
+                      styles.statusButton,
+                      availabilityForm.status === status && styles.statusButtonActive,
+                      { borderColor: getStatusColor(status) }
+                    ]}
+                    onPress={() => setAvailabilityForm({ ...availabilityForm, status })}
+                  >
+                    <Text style={[
+                      styles.statusButtonText,
+                      availabilityForm.status === status && { color: getStatusColor(status) }
+                    ]}>
+                      {status === 'available' ? 'Disponible' : 
+                       status === 'limited' ? 'Limite' : 'Complet'}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+              
+              {availabilityForm.status !== 'full' && (
+                <>
+                  <Text style={styles.inputLabel}>{t('remainingPlaces')}</Text>
+                  <TextInput
+                    style={styles.modalInput}
+                    value={availabilityForm.remaining_places}
+                    onChangeText={(text) => setAvailabilityForm({ ...availabilityForm, remaining_places: text })}
+                    keyboardType="numeric"
+                    placeholder="ex: 8"
+                    placeholderTextColor={COLORS.textSecondary}
+                  />
+                </>
+              )}
+              
+              <TouchableOpacity
+                style={styles.addButton}
+                onPress={handleSaveAvailability}
+              >
+                <Ionicons name={editingAvailabilityIndex !== null ? 'checkmark' : 'add'} size={20} color={COLORS.white} />
+                <Text style={styles.addButtonText}>
+                  {editingAvailabilityIndex !== null ? 'Mettre a jour' : 'Ajouter cette date'}
+                </Text>
+              </TouchableOpacity>
+              
+              {editingAvailabilityIndex !== null && (
+                <TouchableOpacity
+                  style={styles.cancelEditButton}
+                  onPress={() => {
+                    setEditingAvailabilityIndex(null);
+                    setAvailabilityForm({
+                      date_range: '',
+                      price: '',
+                      status: 'available',
+                      remaining_places: '8',
+                    });
+                  }}
+                >
+                  <Text style={styles.cancelEditButtonText}>Annuler la modification</Text>
+                </TouchableOpacity>
+              )}
+            </ScrollView>
+            
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={styles.saveButton}
+                onPress={() => setShowAvailabilityModal(false)}
+              >
+                <Text style={styles.saveButtonText}>Fermer</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -653,6 +1007,94 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.md,
     marginTop: 40,
   },
+  // Cruise Card - Enhanced
+  cruiseCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: BORDER_RADIUS.lg,
+    marginBottom: SPACING.md,
+    overflow: 'hidden',
+  },
+  inactiveCruise: {
+    opacity: 0.6,
+  },
+  cruiseImage: {
+    width: '100%',
+    height: 120,
+  },
+  cruiseContent: {
+    padding: SPACING.md,
+  },
+  cruiseHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.xs,
+  },
+  cruiseName: {
+    fontSize: FONT_SIZES.lg,
+    fontWeight: '700',
+    color: COLORS.text,
+    flex: 1,
+  },
+  statusBadge: {
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 2,
+    borderRadius: BORDER_RADIUS.sm,
+  },
+  activeBadge: {
+    backgroundColor: '#D1FAE5',
+  },
+  inactiveBadge: {
+    backgroundColor: '#FEE2E2',
+  },
+  statusBadgeText: {
+    fontSize: FONT_SIZES.xs,
+    fontWeight: '700',
+  },
+  cruiseSubtitle: {
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.xs,
+  },
+  cruisePrice: {
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.secondary,
+    fontWeight: '600',
+    marginBottom: SPACING.xs,
+  },
+  availabilityCount: {
+    fontSize: FONT_SIZES.xs,
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.sm,
+  },
+  cruiseActions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: SPACING.xs,
+  },
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.xs,
+    borderRadius: BORDER_RADIUS.md,
+    backgroundColor: COLORS.surfaceLight,
+    gap: 4,
+  },
+  actionButtonText: {
+    fontSize: FONT_SIZES.xs,
+    color: COLORS.primary,
+    fontWeight: '500',
+  },
+  deactivateButton: {
+    backgroundColor: '#FEF3C7',
+  },
+  activateButton: {
+    backgroundColor: '#D1FAE5',
+  },
+  deleteButton: {
+    backgroundColor: '#FEE2E2',
+  },
   // Item Card
   itemCard: {
     flexDirection: 'row',
@@ -661,11 +1103,6 @@ const styles = StyleSheet.create({
     borderRadius: BORDER_RADIUS.lg,
     padding: SPACING.md,
     marginBottom: SPACING.sm,
-  },
-  cruiseImage: {
-    width: 60,
-    height: 60,
-    borderRadius: BORDER_RADIUS.md,
   },
   itemContent: {
     flex: 1,
@@ -681,23 +1118,12 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     marginTop: 2,
   },
-  itemPrice: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.secondary,
-    fontWeight: '600',
-    marginTop: 4,
-  },
   itemText: {
     fontSize: FONT_SIZES.sm,
     color: COLORS.textSecondary,
     marginTop: 4,
   },
-  editButton: {
-    padding: SPACING.sm,
-    backgroundColor: COLORS.surfaceLight,
-    borderRadius: BORDER_RADIUS.md,
-  },
-  deleteButton: {
+  deleteIconButton: {
     padding: SPACING.sm,
     backgroundColor: '#FEE2E2',
     borderRadius: BORDER_RADIUS.md,
@@ -817,5 +1243,102 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.md,
     fontWeight: '600',
     color: COLORS.white,
+  },
+  // Availability specific styles
+  sectionTitle: {
+    fontSize: FONT_SIZES.md,
+    fontWeight: '700',
+    color: COLORS.text,
+    marginTop: SPACING.lg,
+    marginBottom: SPACING.sm,
+  },
+  availabilityItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: COLORS.surfaceLight,
+    borderRadius: BORDER_RADIUS.md,
+    padding: SPACING.sm,
+    marginBottom: SPACING.xs,
+  },
+  availabilityInfo: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    gap: SPACING.xs,
+  },
+  availabilityDate: {
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.text,
+    fontWeight: '500',
+  },
+  availabilityPrice: {
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.secondary,
+    fontWeight: '600',
+  },
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  availabilityStatus: {
+    fontSize: FONT_SIZES.xs,
+    fontWeight: '600',
+  },
+  availabilityActions: {
+    flexDirection: 'row',
+    gap: SPACING.xs,
+  },
+  smallButton: {
+    padding: SPACING.xs,
+    backgroundColor: COLORS.surfaceLight,
+    borderRadius: BORDER_RADIUS.sm,
+  },
+  statusButtons: {
+    flexDirection: 'row',
+    gap: SPACING.sm,
+    marginTop: SPACING.xs,
+  },
+  statusButton: {
+    flex: 1,
+    paddingVertical: SPACING.sm,
+    borderRadius: BORDER_RADIUS.md,
+    borderWidth: 2,
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+  },
+  statusButtonActive: {
+    backgroundColor: COLORS.surfaceLight,
+  },
+  statusButtonText: {
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.textSecondary,
+    fontWeight: '500',
+  },
+  addButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.secondary,
+    paddingVertical: SPACING.md,
+    borderRadius: BORDER_RADIUS.lg,
+    marginTop: SPACING.lg,
+    gap: SPACING.xs,
+  },
+  addButtonText: {
+    fontSize: FONT_SIZES.md,
+    fontWeight: '600',
+    color: COLORS.white,
+  },
+  cancelEditButton: {
+    alignItems: 'center',
+    paddingVertical: SPACING.sm,
+    marginTop: SPACING.sm,
+  },
+  cancelEditButtonText: {
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.textSecondary,
   },
 });
