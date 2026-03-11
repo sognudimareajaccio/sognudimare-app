@@ -41,6 +41,7 @@ Application mobile de croisières en catamaran (Corse, Sardaigne, Grèce, Caraï
 - [x] Correction `app.json`: suppression du `projectId: "sognudimare-app"` (invalide)
 - [x] Mise à jour version: 1.7.1 → 1.8.0, buildNumber 8 → 9, versionCode 8 → 9
 - [x] Vérification API backend (4 croisières, admin login OK)
+- [x] Redesign section "Club des Voyageurs" : image des cartes Club ajoutée, "BEST" supprimé, design plus élégant avec pills de tarifs
 
 ## Pending / Next Steps
 

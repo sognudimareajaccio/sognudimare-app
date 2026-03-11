@@ -479,7 +479,7 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
 
-        {/* Club Section - Elegant with Card Visuals */}
+        {/* Club Section - Elegant with Card Image */}
         <View style={styles.clubSectionNew}>
           <View style={styles.clubTitleContainer}>
             <View style={styles.clubLine} />
@@ -489,46 +489,43 @@ export default function HomeScreen() {
             <Text style={styles.clubAccentTitle}>
               {language === 'fr' ? 'Voyageurs' : 'Club'}
             </Text>
-            <Text style={styles.clubTagline}>
-              {language === 'fr' 
-                ? 'Économisez jusqu\'à 20% sur vos croisières !' 
-                : 'Save up to 20% on your cruises!'}
-            </Text>
             <View style={styles.clubLine} />
           </View>
-          <View style={styles.clubCardsRow}>
-            <View style={styles.clubCardNew}>
-              <View style={styles.clubCardHeader}>
-                <Ionicons name="card" size={24} color={COLORS.secondary} />
-              </View>
-              <Text style={styles.clubCardDurationNew}>12 mois</Text>
-              <Text style={styles.clubCardPriceNew}>90€</Text>
-              <View style={styles.clubDiscountBadgeNew}>
-                <Text style={styles.clubDiscountTextNew}>-10%</Text>
-              </View>
+
+          {/* Club Cards Image */}
+          <View style={styles.clubImageContainer}>
+            <Image 
+              source={{ uri: 'https://customer-assets.emergentagent.com/job_sognudi-app/artifacts/nfk3yqi1_CARTE%20CLUB.avif' }}
+              style={styles.clubCardsImageHome}
+              resizeMode="contain"
+            />
+          </View>
+
+          <Text style={styles.clubDescriptionText}>
+            {language === 'fr' 
+              ? 'Rejoignez notre communauté de passionnés et profitez de réductions exclusives sur toutes vos croisières.'
+              : 'Join our community of enthusiasts and enjoy exclusive discounts on all your cruises.'}
+          </Text>
+
+          {/* Pricing Pills */}
+          <View style={styles.clubPricingRow}>
+            <View style={styles.clubPricingPill}>
+              <Text style={styles.clubPillDuration}>12 {language === 'fr' ? 'mois' : 'mo'}</Text>
+              <Text style={styles.clubPillPrice}>90€</Text>
+              <Text style={styles.clubPillDiscount}>-10%</Text>
             </View>
-            <View style={[styles.clubCardNew, styles.clubCardHighlightNew]}>
-              <View style={styles.clubCardHeaderHighlight}>
-                <Ionicons name="star" size={24} color={COLORS.primary} />
-                <Text style={styles.clubBestValue}>BEST</Text>
-              </View>
-              <Text style={styles.clubCardDurationHighlight}>24 mois</Text>
-              <Text style={styles.clubCardPriceHighlight}>150€</Text>
-              <View style={styles.clubDiscountBadgeHighlightNew}>
-                <Text style={styles.clubDiscountTextHighlight}>-15%</Text>
-              </View>
+            <View style={[styles.clubPricingPill, styles.clubPricingPillHighlight]}>
+              <Text style={styles.clubPillDurationHighlight}>24 {language === 'fr' ? 'mois' : 'mo'}</Text>
+              <Text style={styles.clubPillPriceHighlight}>150€</Text>
+              <Text style={styles.clubPillDiscountHighlight}>-15%</Text>
             </View>
-            <View style={styles.clubCardNew}>
-              <View style={styles.clubCardHeader}>
-                <Ionicons name="diamond" size={24} color={COLORS.secondary} />
-              </View>
-              <Text style={styles.clubCardDurationNew}>36 mois</Text>
-              <Text style={styles.clubCardPriceNew}>140€</Text>
-              <View style={styles.clubDiscountBadgeNew}>
-                <Text style={styles.clubDiscountTextNew}>-20%</Text>
-              </View>
+            <View style={styles.clubPricingPill}>
+              <Text style={styles.clubPillDuration}>36 {language === 'fr' ? 'mois' : 'mo'}</Text>
+              <Text style={styles.clubPillPrice}>140€</Text>
+              <Text style={styles.clubPillDiscount}>-20%</Text>
             </View>
           </View>
+
           <TouchableOpacity style={styles.clubButtonNew} onPress={() => router.push('/club')}>
             <Text style={styles.clubButtonTextNew}>{t('joinClub')}</Text>
             <Ionicons name="arrow-forward" size={18} color={COLORS.white} />
@@ -1498,90 +1495,82 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     letterSpacing: 0.5,
   },
-  clubTagline: {
-    fontSize: FONT_SIZES.sm,
-    color: 'rgba(255,255,255,0.8)',
-    textAlign: 'center',
-    marginTop: SPACING.sm,
+  clubImageContainer: {
+    alignItems: 'center',
+    marginBottom: SPACING.lg,
+    paddingHorizontal: SPACING.lg,
   },
-  clubCardsRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    paddingHorizontal: SPACING.md,
+  clubCardsImageHome: {
+    width: width - SPACING.lg * 2,
+    height: 180,
+    borderRadius: BORDER_RADIUS.xl,
+  },
+  clubDescriptionText: {
+    fontSize: FONT_SIZES.sm,
+    color: 'rgba(255,255,255,0.75)',
+    textAlign: 'center',
+    paddingHorizontal: SPACING.xl,
+    lineHeight: 20,
     marginBottom: SPACING.lg,
   },
-  clubCardNew: {
-    width: 100,
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    borderRadius: BORDER_RADIUS.lg,
-    padding: SPACING.md,
-    marginHorizontal: SPACING.xs,
+  clubPricingRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingHorizontal: SPACING.lg,
+    marginBottom: SPACING.xl,
+    gap: SPACING.sm,
+  },
+  clubPricingPill: {
+    flex: 1,
+    backgroundColor: 'rgba(255,255,255,0.08)',
+    borderRadius: BORDER_RADIUS.xl,
+    paddingVertical: SPACING.md,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
+    borderColor: 'rgba(255,255,255,0.15)',
   },
-  clubCardHighlightNew: {
+  clubPricingPillHighlight: {
     backgroundColor: COLORS.secondary,
     borderColor: COLORS.secondary,
-    transform: [{ scale: 1.05 }],
   },
-  clubCardHeader: {
-    marginBottom: SPACING.sm,
-  },
-  clubCardHeaderHighlight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: SPACING.sm,
-  },
-  clubBestValue: {
-    fontSize: 8,
-    fontWeight: '700',
-    color: COLORS.primary,
-    marginLeft: 4,
-  },
-  clubCardDurationNew: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.white,
+  clubPillDuration: {
+    fontSize: FONT_SIZES.xs,
+    color: 'rgba(255,255,255,0.7)',
     fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    marginBottom: 4,
   },
-  clubCardDurationHighlight: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.primary,
-    fontWeight: '600',
-  },
-  clubCardPriceNew: {
+  clubPillPrice: {
     fontSize: FONT_SIZES.xl,
     color: COLORS.white,
     fontWeight: '700',
-    marginVertical: 4,
+    marginBottom: 4,
   },
-  clubCardPriceHighlight: {
+  clubPillDiscount: {
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.secondary,
+    fontWeight: '700',
+  },
+  clubPillDurationHighlight: {
+    fontSize: FONT_SIZES.xs,
+    color: COLORS.primary,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+    marginBottom: 4,
+    opacity: 0.7,
+  },
+  clubPillPriceHighlight: {
     fontSize: FONT_SIZES.xl,
     color: COLORS.primary,
     fontWeight: '700',
-    marginVertical: 4,
+    marginBottom: 4,
   },
-  clubDiscountBadgeNew: {
-    backgroundColor: COLORS.secondary,
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: 2,
-    borderRadius: BORDER_RADIUS.full,
-  },
-  clubDiscountTextNew: {
-    fontSize: FONT_SIZES.xs,
-    fontWeight: '700',
+  clubPillDiscountHighlight: {
+    fontSize: FONT_SIZES.sm,
     color: COLORS.primary,
-  },
-  clubDiscountBadgeHighlightNew: {
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: 2,
-    borderRadius: BORDER_RADIUS.full,
-  },
-  clubDiscountTextHighlight: {
-    fontSize: FONT_SIZES.xs,
     fontWeight: '700',
-    color: COLORS.white,
   },
   clubButtonNew: {
     flexDirection: 'row',
