@@ -29,7 +29,9 @@ const HERO_CAROUSEL_IMAGES = [
 
 // Images from sognudimare website (keep for backup)
 const HERO_IMAGE = 'https://static.wixstatic.com/media/ce6ce7_d0178804b62b4c56802db975ade4e29ff000.jpg/v1/fill/w_1904,h_1008,al_c,q_85,usm_0.33_1.00_0.00,enc_avif,quality_auto/ce6ce7_d0178804b62b4c56802db975ade4e29ff000.jpg';
-const LOGO_URL = 'https://static.wixstatic.com/media/ce6ce7_a82e3e86741143d6ab7acd99c121af7b~mv2.png/v1/fill/w_317,h_161,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/croisieres%20catamaran%20corse%20sognudimare.png';
+const LOGO_URL = 'https://customer-assets.emergentagent.com/job_9595dfad-24f9-4c7d-8c80-c7800213d8b6/artifacts/n9vnxdmz_3.png';
+const LOGO_TEXT_URL = 'https://customer-assets.emergentagent.com/job_9595dfad-24f9-4c7d-8c80-c7800213d8b6/artifacts/dx9pk39n_4.png';
+const LOGO_FULL_URL = 'https://customer-assets.emergentagent.com/job_9595dfad-24f9-4c7d-8c80-c7800213d8b6/artifacts/fyysjnlz_2.png';
 const BOARDING_CARDS_IMAGE = 'https://customer-assets.emergentagent.com/job_sognudi-app/artifacts/b4ya6cm8_15.jpg';
 
 // Portfolio photos from sognudimare website
@@ -47,58 +49,28 @@ const PORTFOLIO_PHOTOS = [
     cruiseName: 'Ouest Corse'
   },
   { 
-    url: 'https://static.wixstatic.com/media/ce6ce7_9e15d4c9779b4d48ad56a689ab2fe02b~mv2.avif/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/LAGOON%2043%20SOGNUDIMARE.avif',
-    label_fr: 'Les Catamarans',
-    label_en: 'The Catamarans',
-    link: '/catamarans'
-  },
-  { 
     url: 'https://static.wixstatic.com/media/ce6ce7_1872feb30a584c1da72e05ee7d37fb22~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/ce6ce7_1872feb30a584c1da72e05ee7d37fb22~mv2.jpg',
     label_fr: 'Îles Lavezzi',
     label_en: 'Lavezzi Islands',
     cruiseName: 'Corse du Sud'
   },
   { 
-    url: 'https://static.wixstatic.com/media/ce6ce7_7f55aceeb39542168e40d1384ab96e09~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/ce6ce7_7f55aceeb39542168e40d1384ab96e09~mv2.jpg',
-    label_fr: 'Criques secrètes',
-    label_en: 'Secret coves'
-  },
-  { 
-    url: 'https://static.wixstatic.com/media/ce6ce7_e68872eb7cb44d2ba34396071f003322~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/ce6ce7_e68872eb7cb44d2ba34396071f003322~mv2.jpg',
-    label_fr: 'Eaux cristallines',
-    label_en: 'Crystal waters'
-  },
-  { 
     url: 'https://customer-assets.emergentagent.com/job_fe2730ba-35c4-4eb7-98c9-325cf295cc88/artifacts/c45b6sng_maddalena.jpg',
     label_fr: 'Archipel la Maddalena',
     label_en: 'Maddalena Archipelago',
-    cruiseName: 'Sardaigne'
+    cruiseName: 'Corse du Sud & Sardaigne'
+  },
+  { 
+    url: 'https://static.wixstatic.com/media/ce6ce7_9e15d4c9779b4d48ad56a689ab2fe02b~mv2.avif/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/LAGOON%2043%20SOGNUDIMARE.avif',
+    label_fr: 'Les Catamarans',
+    label_en: 'The Catamarans',
+    link: '/catamarans'
   },
   { 
     url: 'https://static.wixstatic.com/media/ce6ce7_322d9b6fa5b1489689b338b8367512ef~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/team.jpg',
-    label_fr: 'L\'équipage',
+    label_fr: "L'équipage",
     label_en: 'The crew',
     link: '/equipage'
-  },
-  { 
-    url: 'https://static.wixstatic.com/media/ce6ce7_33c3f5377f8546a68ad7377405f13f95~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/PHOTO-2025-08-02-23-15-20%204.jpg',
-    label_fr: 'À bord',
-    label_en: 'On board'
-  },
-  { 
-    url: 'https://static.wixstatic.com/media/ce6ce7_0a265a0d38054848b9385830b50ac84f~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/slider-lagoon-43-21.jpg',
-    label_fr: 'Lagoon 43',
-    label_en: 'Lagoon 43'
-  },
-  { 
-    url: 'https://static.wixstatic.com/media/ce6ce7_98fe44ee0ba0419794505afe2c70aa95~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/SOGNUDIMARE%20CROISIERE%20CATAMARAN%20DEPUIS%20AJACCIO.jpg',
-    label_fr: 'Coucher de soleil',
-    label_en: 'Sunset'
-  },
-  { 
-    url: 'https://static.wixstatic.com/media/ce6ce7_1f87dc5f279b4f8c910f5badc47d8385~mv2.jpg/v1/fill/w_600,h_400,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/tour%20santa%20maria%20cap%20corse%20avec%20sognudimare%20catamarans_JPG.jpg',
-    label_fr: 'Cap Corse',
-    label_en: 'Cap Corse'
   },
 ];
 
@@ -283,7 +255,7 @@ export default function HomeScreen() {
         <View style={styles.header}>
           <View style={styles.logoContainer}>
             <Image source={{ uri: LOGO_URL }} style={styles.logo} resizeMode="contain" />
-            <Text style={styles.logoText}>sognudimare</Text>
+            <Image source={{ uri: LOGO_TEXT_URL }} style={styles.logoTextImage} resizeMode="contain" />
           </View>
           <TouchableOpacity onPress={toggleLanguage} style={styles.langButton}>
             <Text style={styles.langText}>{language.toUpperCase()}</Text>
@@ -544,8 +516,8 @@ export default function HomeScreen() {
             </Text>
             <View style={styles.galleryLine} />
           </View>
-          {/* Featured photos - full width stacked */}
-          {[PORTFOLIO_PHOTOS[0], PORTFOLIO_PHOTOS[1], PORTFOLIO_PHOTOS[2], PORTFOLIO_PHOTOS[3], PORTFOLIO_PHOTOS[6]].map((photo, index) => (
+          {/* 6 Portfolio photos with links */}
+          {PORTFOLIO_PHOTOS.map((photo, index) => (
             <TouchableOpacity 
               key={index}
               style={styles.galleryItemFull}
@@ -564,23 +536,6 @@ export default function HomeScreen() {
               </View>
             </TouchableOpacity>
           ))}
-          {/* Scrollable remaining photos */}
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.galleryScroll}>
-            {[PORTFOLIO_PHOTOS[4], PORTFOLIO_PHOTOS[5], PORTFOLIO_PHOTOS[7], PORTFOLIO_PHOTOS[8], PORTFOLIO_PHOTOS[9], PORTFOLIO_PHOTOS[10], PORTFOLIO_PHOTOS[11]].map((photo, index) => (
-              <TouchableOpacity 
-                key={index} 
-                style={styles.galleryScrollItem}
-                onPress={() => {
-                  if (photo.link) router.push(photo.link as any);
-                }}
-              >
-                <Image source={{ uri: photo.url }} style={styles.galleryImage} />
-                <View style={styles.galleryOverlay}>
-                  <Text style={styles.galleryScrollLabel}>{language === 'fr' ? photo.label_fr : photo.label_en}</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
         </View>
 
         {/* Engagements Section - Elegant */}
@@ -632,9 +587,9 @@ export default function HomeScreen() {
             <Text style={styles.aboutMainTitle}>
               {language === 'fr' ? 'À propos de' : 'About'}
             </Text>
-            <Text style={styles.aboutAccentTitle}>Sognudimare</Text>
             <View style={styles.aboutLine} />
           </View>
+          <Image source={{ uri: LOGO_FULL_URL }} style={styles.aboutLogoImage} resizeMode="contain" />
           <Text style={styles.aboutTextNew}>{t('aboutText')}</Text>
           <View style={styles.aboutHighlightBox}>
             <Ionicons name="trophy" size={28} color={COLORS.secondary} />
@@ -670,15 +625,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logo: {
-    width: 50,
-    height: 40,
+    width: 40,
+    height: 35,
   },
-  logoText: {
-    fontSize: FONT_SIZES.md,
-    fontWeight: '600',
-    color: COLORS.secondary,
+  logoTextImage: {
+    width: 120,
+    height: 25,
     marginLeft: SPACING.sm,
-    letterSpacing: 0.5,
   },
   langButton: {
     flexDirection: 'row',
@@ -1830,6 +1783,12 @@ const styles = StyleSheet.create({
     color: COLORS.secondary,
     fontWeight: '700',
     letterSpacing: 0.5,
+  },
+  aboutLogoImage: {
+    width: 220,
+    height: 120,
+    alignSelf: 'center',
+    marginBottom: SPACING.lg,
   },
   aboutTextNew: {
     fontSize: FONT_SIZES.sm,

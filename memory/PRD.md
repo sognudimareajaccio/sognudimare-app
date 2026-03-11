@@ -43,6 +43,9 @@ Application mobile de croisières en catamaran (Corse, Sardaigne, Grèce, Caraï
 - [x] Vérification API backend (4 croisières, admin login OK)
 - [x] Redesign section "Club des Voyageurs" : image des cartes Club ajoutée, "BEST" supprimé, design plus élégant avec pills de tarifs
 - [x] Ajout galerie photo "Instantanés de nos croisières" entre Club et Engagements : 5 photos plein écran + carrousel horizontal avec les photos restantes
+- [x] Portfolio réduit à 6 photos avec liens : Tour de Corse, Scandola, Îles Lavezzi, Archipel Maddalena, Les Catamarans, L'équipage
+- [x] Nouveaux logos dans le header (cercles Sdm + texte sognudimare)
+- [x] Logo complet dans la section À propos (remplace le texte "Sognudimare")
 
 ## Pending / Next Steps
 
