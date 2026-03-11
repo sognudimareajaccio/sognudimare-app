@@ -10,16 +10,22 @@ import {
   Alert,
   Modal,
   Image,
-  Switch,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { adminApi, Cruise, CommunityPost, Member, DirectMessage, CruiseAvailability } from '../src/services/api';
 import { useAppStore } from '../src/store/appStore';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../src/theme/theme';
 
 type AdminTab = 'cruises' | 'posts' | 'members' | 'messages';
+
+const TAB_CONFIG = [
+  { key: 'cruises' as AdminTab, icon: 'sail-boat', label: 'Croisieres', ionicon: false },
+  { key: 'posts' as AdminTab, icon: 'chatbubbles', label: 'Publications', ionicon: true },
+  { key: 'members' as AdminTab, icon: 'people', label: 'Membres', ionicon: true },
+  { key: 'messages' as AdminTab, icon: 'mail', label: 'Messages', ionicon: true },
+];
 
 export default function AdminScreen() {
   const router = useRouter();
@@ -37,123 +43,47 @@ export default function AdminScreen() {
   const [members, setMembers] = useState<Member[]>([]);
   const [messages, setMessages] = useState<DirectMessage[]>([]);
   
-  // Edit cruise modal
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingCruise, setEditingCruise] = useState<Cruise | null>(null);
   const [editForm, setEditForm] = useState({
-    name_fr: '',
-    name_en: '',
-    description_fr: '',
-    description_en: '',
-    duration: '',
-    departure_port: '',
-    cabin_price: '',
-    private_price: '',
-    image_url: '',
+    name_fr: '', name_en: '', description_fr: '', description_en: '',
+    duration: '', departure_port: '', cabin_price: '', private_price: '', image_url: '',
   });
   
-  // Availability modal
   const [showAvailabilityModal, setShowAvailabilityModal] = useState(false);
   const [editingAvailabilityCruise, setEditingAvailabilityCruise] = useState<Cruise | null>(null);
   const [editingAvailabilityIndex, setEditingAvailabilityIndex] = useState<number | null>(null);
   const [availabilityForm, setAvailabilityForm] = useState({
-    date_range: '',
-    price: '',
-    status: 'available',
-    remaining_places: '',
+    date_range: '', price: '', status: 'available', remaining_places: '',
   });
-
-  const t = (key: string) => {
-    const translations: { [key: string]: { fr: string; en: string } } = {
-      backOffice: { fr: 'Back-Office', en: 'Admin Panel' },
-      login: { fr: 'Connexion', en: 'Login' },
-      username: { fr: 'Nom d\'utilisateur', en: 'Username' },
-      password: { fr: 'Mot de passe', en: 'Password' },
-      loginButton: { fr: 'Se connecter', en: 'Log in' },
-      invalidCredentials: { fr: 'Identifiants incorrects', en: 'Invalid credentials' },
-      cruises: { fr: 'Croisieres', en: 'Cruises' },
-      posts: { fr: 'Publications', en: 'Posts' },
-      members: { fr: 'Membres', en: 'Members' },
-      messages: { fr: 'Messages', en: 'Messages' },
-      edit: { fr: 'Modifier', en: 'Edit' },
-      delete: { fr: 'Supprimer', en: 'Delete' },
-      ban: { fr: 'Bannir', en: 'Ban' },
-      unban: { fr: 'Debannir', en: 'Unban' },
-      save: { fr: 'Enregistrer', en: 'Save' },
-      cancel: { fr: 'Annuler', en: 'Cancel' },
-      confirmDelete: { fr: 'Confirmer la suppression ?', en: 'Confirm deletion?' },
-      noCruises: { fr: 'Aucune croisiere', en: 'No cruises' },
-      noPosts: { fr: 'Aucune publication', en: 'No posts' },
-      noMembers: { fr: 'Aucun membre', en: 'No members' },
-      noMessages: { fr: 'Aucun message', en: 'No messages' },
-      name: { fr: 'Nom', en: 'Name' },
-      description: { fr: 'Description', en: 'Description' },
-      duration: { fr: 'Duree', en: 'Duration' },
-      departurePort: { fr: 'Port de depart', en: 'Departure Port' },
-      cabinPrice: { fr: 'Prix cabine', en: 'Cabin Price' },
-      privatePrice: { fr: 'Prix privatisation', en: 'Private Price' },
-      imageUrl: { fr: 'URL de l\'image', en: 'Image URL' },
-      logout: { fr: 'Deconnexion', en: 'Logout' },
-      availabilities: { fr: 'Disponibilites', en: 'Availabilities' },
-      addAvailability: { fr: 'Ajouter une date', en: 'Add date' },
-      dateRange: { fr: 'Periode', en: 'Date range' },
-      price: { fr: 'Prix', en: 'Price' },
-      status: { fr: 'Statut', en: 'Status' },
-      remainingPlaces: { fr: 'Places restantes', en: 'Remaining places' },
-      available: { fr: 'Disponible', en: 'Available' },
-      limited: { fr: 'Limite', en: 'Limited' },
-      full: { fr: 'Complet', en: 'Full' },
-      active: { fr: 'Active', en: 'Active' },
-      inactive: { fr: 'Inactive', en: 'Inactive' },
-    };
-    return translations[key]?.[language] || key;
-  };
 
   const handleLogin = async () => {
     setLoginError('');
     setLoading(true);
     try {
       const result = await adminApi.login(username, password);
-      if (result.success) {
-        setIsLoggedIn(true);
-        fetchData();
-      }
-    } catch (error) {
-      setLoginError(t('invalidCredentials'));
-    } finally {
-      setLoading(false);
-    }
+      if (result.success) { setIsLoggedIn(true); fetchData(); }
+    } catch (error) { setLoginError('Identifiants incorrects'); }
+    finally { setLoading(false); }
   };
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const [cruisesData, postsData, membersData, messagesData] = await Promise.all([
-        adminApi.getCruises(),
-        adminApi.getPosts(),
-        adminApi.getMembers(),
-        adminApi.getMessages(),
+        adminApi.getCruises(), adminApi.getPosts(), adminApi.getMembers(), adminApi.getMessages(),
       ]);
-      setCruises(cruisesData);
-      setPosts(postsData);
-      setMembers(membersData);
-      setMessages(messagesData);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    } finally {
-      setLoading(false);
-    }
+      setCruises(cruisesData); setPosts(postsData); setMembers(membersData); setMessages(messagesData);
+    } catch (error) { console.error('Error fetching data:', error); }
+    finally { setLoading(false); }
   }, []);
 
   const handleEditCruise = (cruise: Cruise) => {
     setEditingCruise(cruise);
     setEditForm({
-      name_fr: cruise.name_fr,
-      name_en: cruise.name_en,
-      description_fr: cruise.description_fr,
-      description_en: cruise.description_en,
-      duration: cruise.duration,
-      departure_port: cruise.departure_port,
+      name_fr: cruise.name_fr, name_en: cruise.name_en,
+      description_fr: cruise.description_fr, description_en: cruise.description_en,
+      duration: cruise.duration, departure_port: cruise.departure_port,
       cabin_price: cruise.pricing.cabin_price?.toString() || '',
       private_price: cruise.pricing.private_price?.toString() || '',
       image_url: cruise.image_url,
@@ -163,15 +93,11 @@ export default function AdminScreen() {
 
   const handleSaveCruise = async () => {
     if (!editingCruise) return;
-    
     try {
       await adminApi.updateCruise(editingCruise.id, {
-        name_fr: editForm.name_fr,
-        name_en: editForm.name_en,
-        description_fr: editForm.description_fr,
-        description_en: editForm.description_en,
-        duration: editForm.duration,
-        departure_port: editForm.departure_port,
+        name_fr: editForm.name_fr, name_en: editForm.name_en,
+        description_fr: editForm.description_fr, description_en: editForm.description_en,
+        duration: editForm.duration, departure_port: editForm.departure_port,
         image_url: editForm.image_url,
         pricing: {
           cabin_price: editForm.cabin_price ? parseFloat(editForm.cabin_price) : null,
@@ -179,58 +105,30 @@ export default function AdminScreen() {
           currency: 'EUR',
         },
       });
-      setShowEditModal(false);
-      fetchData();
+      setShowEditModal(false); fetchData();
       Alert.alert('Succes', 'Croisiere mise a jour');
-    } catch (error) {
-      console.error('Error saving cruise:', error);
-      Alert.alert('Erreur', 'Impossible de sauvegarder');
-    }
+    } catch (error) { Alert.alert('Erreur', 'Impossible de sauvegarder'); }
   };
 
   const handleDeleteCruise = async (cruiseId: string, cruiseName: string) => {
-    Alert.alert(
-      t('confirmDelete'),
-      `Supprimer "${cruiseName}" ?`,
-      [
-        { text: t('cancel'), style: 'cancel' },
-        {
-          text: t('delete'),
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await adminApi.deleteCruise(cruiseId);
-              fetchData();
-              Alert.alert('Succes', 'Croisiere supprimee');
-            } catch (error) {
-              console.error('Error deleting cruise:', error);
-              Alert.alert('Erreur', 'Impossible de supprimer');
-            }
-          },
-        },
-      ]
-    );
+    Alert.alert('Confirmer la suppression ?', `Supprimer "${cruiseName}" ?`, [
+      { text: 'Annuler', style: 'cancel' },
+      { text: 'Supprimer', style: 'destructive', onPress: async () => {
+        try { await adminApi.deleteCruise(cruiseId); fetchData(); }
+        catch (error) { Alert.alert('Erreur', 'Impossible de supprimer'); }
+      }},
+    ]);
   };
 
   const handleToggleCruiseActive = async (cruiseId: string) => {
-    try {
-      await adminApi.toggleCruiseActive(cruiseId);
-      fetchData();
-    } catch (error) {
-      console.error('Error toggling cruise:', error);
-    }
+    try { await adminApi.toggleCruiseActive(cruiseId); fetchData(); }
+    catch (error) { console.error('Error toggling cruise:', error); }
   };
 
-  // Availability management
   const handleOpenAvailabilities = (cruise: Cruise) => {
     setEditingAvailabilityCruise(cruise);
     setEditingAvailabilityIndex(null);
-    setAvailabilityForm({
-      date_range: '',
-      price: '',
-      status: 'available',
-      remaining_places: '8',
-    });
+    setAvailabilityForm({ date_range: '', price: '', status: 'available', remaining_places: '8' });
     setShowAvailabilityModal(true);
   };
 
@@ -240,317 +138,246 @@ export default function AdminScreen() {
     if (availability) {
       setEditingAvailabilityIndex(index);
       setAvailabilityForm({
-        date_range: availability.date_range,
-        price: availability.price.toString(),
-        status: availability.status,
-        remaining_places: availability.remaining_places?.toString() || '8',
+        date_range: availability.date_range, price: availability.price.toString(),
+        status: availability.status, remaining_places: availability.remaining_places?.toString() || '8',
       });
     }
   };
 
   const handleSaveAvailability = async () => {
     if (!editingAvailabilityCruise) return;
-    
     const availability: CruiseAvailability = {
-      date_range: availabilityForm.date_range,
-      price: parseFloat(availabilityForm.price),
+      date_range: availabilityForm.date_range, price: parseFloat(availabilityForm.price),
       status: availabilityForm.status as 'available' | 'limited' | 'full',
       remaining_places: parseInt(availabilityForm.remaining_places) || 8,
     };
-    
     try {
       if (editingAvailabilityIndex !== null) {
         await adminApi.updateAvailability(editingAvailabilityCruise.id, editingAvailabilityIndex, availability);
       } else {
         await adminApi.addAvailability(editingAvailabilityCruise.id, availability);
       }
-      
-      // Refresh data
       const updatedCruises = await adminApi.getCruises();
       setCruises(updatedCruises);
       const updatedCruise = updatedCruises.find(c => c.id === editingAvailabilityCruise.id);
-      if (updatedCruise) {
-        setEditingAvailabilityCruise(updatedCruise);
-      }
-      
+      if (updatedCruise) setEditingAvailabilityCruise(updatedCruise);
       setEditingAvailabilityIndex(null);
-      setAvailabilityForm({
-        date_range: '',
-        price: '',
-        status: 'available',
-        remaining_places: '8',
-      });
-      
+      setAvailabilityForm({ date_range: '', price: '', status: 'available', remaining_places: '8' });
       Alert.alert('Succes', 'Disponibilite mise a jour');
-    } catch (error) {
-      console.error('Error saving availability:', error);
-      Alert.alert('Erreur', 'Impossible de sauvegarder');
-    }
+    } catch (error) { Alert.alert('Erreur', 'Impossible de sauvegarder'); }
   };
 
   const handleDeleteAvailability = async (index: number) => {
     if (!editingAvailabilityCruise) return;
-    
-    Alert.alert(
-      'Supprimer cette date ?',
-      '',
-      [
-        { text: t('cancel'), style: 'cancel' },
-        {
-          text: t('delete'),
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await adminApi.deleteAvailability(editingAvailabilityCruise.id, index);
-              
-              // Refresh data
-              const updatedCruises = await adminApi.getCruises();
-              setCruises(updatedCruises);
-              const updatedCruise = updatedCruises.find(c => c.id === editingAvailabilityCruise.id);
-              if (updatedCruise) {
-                setEditingAvailabilityCruise(updatedCruise);
-              }
-            } catch (error) {
-              console.error('Error deleting availability:', error);
-            }
-          },
-        },
-      ]
-    );
+    Alert.alert('Supprimer cette date ?', '', [
+      { text: 'Annuler', style: 'cancel' },
+      { text: 'Supprimer', style: 'destructive', onPress: async () => {
+        try {
+          await adminApi.deleteAvailability(editingAvailabilityCruise.id, index);
+          const updatedCruises = await adminApi.getCruises();
+          setCruises(updatedCruises);
+          const updatedCruise = updatedCruises.find(c => c.id === editingAvailabilityCruise.id);
+          if (updatedCruise) setEditingAvailabilityCruise(updatedCruise);
+        } catch (error) { console.error('Error deleting availability:', error); }
+      }},
+    ]);
   };
 
   const handleDeletePost = async (postId: string) => {
-    Alert.alert(
-      t('confirmDelete'),
-      '',
-      [
-        { text: t('cancel'), style: 'cancel' },
-        {
-          text: t('delete'),
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await adminApi.deletePost(postId);
-              fetchData();
-            } catch (error) {
-              console.error('Error deleting post:', error);
-            }
-          },
-        },
-      ]
-    );
+    Alert.alert('Confirmer ?', '', [
+      { text: 'Annuler', style: 'cancel' },
+      { text: 'Supprimer', style: 'destructive', onPress: async () => {
+        try { await adminApi.deletePost(postId); fetchData(); } catch (error) {}
+      }},
+    ]);
   };
 
   const handleBanMember = async (memberId: string, isBanned: boolean) => {
     try {
-      if (isBanned) {
-        await adminApi.unbanMember(memberId);
-      } else {
-        await adminApi.banMember(memberId);
-      }
+      if (isBanned) await adminApi.unbanMember(memberId);
+      else await adminApi.banMember(memberId);
       fetchData();
-    } catch (error) {
-      console.error('Error banning/unbanning member:', error);
-    }
+    } catch (error) {}
   };
 
   const handleDeleteMessage = async (messageId: string) => {
-    Alert.alert(
-      t('confirmDelete'),
-      '',
-      [
-        { text: t('cancel'), style: 'cancel' },
-        {
-          text: t('delete'),
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await adminApi.deleteMessage(messageId);
-              fetchData();
-            } catch (error) {
-              console.error('Error deleting message:', error);
-            }
-          },
-        },
-      ]
-    );
+    Alert.alert('Confirmer ?', '', [
+      { text: 'Annuler', style: 'cancel' },
+      { text: 'Supprimer', style: 'destructive', onPress: async () => {
+        try { await adminApi.deleteMessage(messageId); fetchData(); } catch (error) {}
+      }},
+    ]);
   };
 
   const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'available': return '#10B981';
-      case 'limited': return '#F59E0B';
-      case 'full': return '#EF4444';
-      default: return COLORS.textSecondary;
-    }
+    switch (status) { case 'available': return '#10B981'; case 'limited': return '#F59E0B'; case 'full': return '#EF4444'; default: return '#999'; }
+  };
+  const getStatusLabel = (status: string) => {
+    switch (status) { case 'available': return 'Disponible'; case 'limited': return 'Limite'; case 'full': return 'Complet'; default: return status; }
   };
 
-  // Login Screen
+  // ─────────── LOGIN SCREEN ───────────
   if (!isLoggedIn) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.loginContainer}>
-          <View style={styles.loginIcon}>
-            <Ionicons name="shield-checkmark" size={60} color={COLORS.primary} />
+      <SafeAreaView style={s.loginSafe}>
+        <View style={s.loginPage}>
+          <View style={s.loginCard}>
+            <View style={s.loginLogoWrap}>
+              <View style={s.loginLogoBg}>
+                <Ionicons name="shield-checkmark" size={36} color={COLORS.secondary} />
+              </View>
+            </View>
+            <Text style={s.loginTitle}>Back-Office</Text>
+            <Text style={s.loginSub}>Sognudimare</Text>
+
+            <View style={s.inputGroup}>
+              <Text style={s.fieldLabel}>Identifiant</Text>
+              <View style={s.inputWrap}>
+                <Ionicons name="person-outline" size={18} color="#999" style={{ marginRight: 10 }} />
+                <TextInput style={s.fieldInput} placeholder="admin" value={username} onChangeText={setUsername} autoCapitalize="none" placeholderTextColor="#bbb" />
+              </View>
+            </View>
+
+            <View style={s.inputGroup}>
+              <Text style={s.fieldLabel}>Mot de passe</Text>
+              <View style={s.inputWrap}>
+                <Ionicons name="lock-closed-outline" size={18} color="#999" style={{ marginRight: 10 }} />
+                <TextInput style={s.fieldInput} placeholder="********" value={password} onChangeText={setPassword} secureTextEntry placeholderTextColor="#bbb" />
+              </View>
+            </View>
+
+            {loginError ? <Text style={s.loginErr}>{loginError}</Text> : null}
+
+            <TouchableOpacity style={s.loginBtn} onPress={handleLogin} disabled={loading}>
+              {loading ? <ActivityIndicator color={COLORS.primary} /> : (
+                <><Text style={s.loginBtnText}>Se connecter</Text><Ionicons name="arrow-forward" size={18} color={COLORS.primary} /></>
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity style={s.backLink} onPress={() => router.back()}>
+              <Ionicons name="arrow-back" size={16} color="rgba(255,255,255,0.5)" />
+              <Text style={s.backLinkText}>Retour a l'application</Text>
+            </TouchableOpacity>
           </View>
-          <Text style={styles.loginTitle}>{t('backOffice')}</Text>
-          
-          <TextInput
-            style={styles.input}
-            placeholder={t('username')}
-            value={username}
-            onChangeText={setUsername}
-            autoCapitalize="none"
-            placeholderTextColor={COLORS.textSecondary}
-          />
-          
-          <TextInput
-            style={styles.input}
-            placeholder={t('password')}
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            placeholderTextColor={COLORS.textSecondary}
-          />
-          
-          {loginError ? (
-            <Text style={styles.errorText}>{loginError}</Text>
-          ) : null}
-          
-          <TouchableOpacity
-            style={styles.loginButton}
-            onPress={handleLogin}
-            disabled={loading}
-          >
-            {loading ? (
-              <ActivityIndicator color={COLORS.white} />
-            ) : (
-              <Text style={styles.loginButtonText}>{t('loginButton')}</Text>
-            )}
-          </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={styles.backLink}
-            onPress={() => router.back()}
-          >
-            <Ionicons name="arrow-back" size={20} color={COLORS.textSecondary} />
-            <Text style={styles.backLinkText}>
-              {language === 'fr' ? 'Retour a l\'application' : 'Back to app'}
-            </Text>
-          </TouchableOpacity>
         </View>
       </SafeAreaView>
     );
   }
 
-  // Admin Panel
+  // ─────────── ADMIN PANEL ───────────
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={s.safe} edges={['top']}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
-          <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
+      <View style={s.header}>
+        <TouchableOpacity onPress={() => router.back()} style={s.headerBtn}>
+          <Ionicons name="arrow-back" size={20} color={COLORS.white} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{t('backOffice')}</Text>
-        <TouchableOpacity 
-          onPress={() => setIsLoggedIn(false)} 
-          style={styles.headerButton}
-        >
-          <Ionicons name="log-out-outline" size={24} color={COLORS.error} />
+        <View style={s.headerCenter}>
+          <Text style={s.headerLabel}>ADMINISTRATION</Text>
+          <Text style={s.headerBrand}>Sognudimare</Text>
+        </View>
+        <TouchableOpacity onPress={() => setIsLoggedIn(false)} style={s.headerBtn}>
+          <Ionicons name="log-out-outline" size={20} color="#FF8080" />
         </TouchableOpacity>
       </View>
 
-      {/* Tabs */}
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tabsScroll}>
-        {(['cruises', 'posts', 'members', 'messages'] as AdminTab[]).map((tab) => (
-          <TouchableOpacity
-            key={tab}
-            style={[styles.tab, activeTab === tab && styles.tabActive]}
-            onPress={() => setActiveTab(tab)}
-          >
-            <Ionicons
-              name={
-                tab === 'cruises' ? 'boat' :
-                tab === 'posts' ? 'chatbubbles' :
-                tab === 'members' ? 'people' : 'mail'
-              }
-              size={20}
-              color={activeTab === tab ? COLORS.white : COLORS.primary}
-            />
-            <Text style={[styles.tabText, activeTab === tab && styles.tabTextActive]}>
-              {t(tab)}
-            </Text>
-          </TouchableOpacity>
+      {/* Stats bar */}
+      <View style={s.statsBar}>
+        {[
+          { val: cruises.length, label: 'Croisieres', color: COLORS.secondary },
+          { val: cruises.reduce((sum, c) => sum + (c.availabilities?.length || 0), 0), label: 'Dates', color: COLORS.accent },
+          { val: members.length, label: 'Membres', color: '#10B981' },
+          { val: posts.length, label: 'Posts', color: '#F59E0B' },
+        ].map((stat, i) => (
+          <View key={i} style={s.statItem}>
+            <Text style={[s.statVal, { color: stat.color }]}>{stat.val}</Text>
+            <Text style={s.statLabel}>{stat.label}</Text>
+          </View>
         ))}
-      </ScrollView>
+      </View>
+
+      {/* Tabs */}
+      <View style={s.tabBar}>
+        {TAB_CONFIG.map((tab) => {
+          const isActive = activeTab === tab.key;
+          return (
+            <TouchableOpacity key={tab.key} style={[s.tab, isActive && s.tabActive]} onPress={() => setActiveTab(tab.key)}>
+              {tab.ionicon ? (
+                <Ionicons name={tab.icon as any} size={20} color={isActive ? COLORS.primary : 'rgba(255,255,255,0.5)'} />
+              ) : (
+                <MaterialCommunityIcons name={tab.icon as any} size={20} color={isActive ? COLORS.primary : 'rgba(255,255,255,0.5)'} />
+              )}
+              <Text style={[s.tabLabel, isActive && s.tabLabelActive]}>{tab.label}</Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
 
       {/* Content */}
-      <ScrollView style={styles.content}>
+      <ScrollView style={s.content} showsVerticalScrollIndicator={false}>
         {loading ? (
-          <ActivityIndicator size="large" color={COLORS.primary} style={{ marginTop: 40 }} />
+          <ActivityIndicator size="large" color={COLORS.secondary} style={{ marginTop: 60 }} />
         ) : activeTab === 'cruises' ? (
-          // Cruises Tab - Enhanced
-          cruises.length === 0 ? (
-            <Text style={styles.emptyText}>{t('noCruises')}</Text>
-          ) : (
+          cruises.length === 0 ? <EmptyState text="Aucune croisiere" icon="boat-outline" /> : (
             cruises.map((cruise) => (
-              <View key={cruise.id} style={[styles.cruiseCard, !cruise.is_active && styles.inactiveCruise]}>
-                <Image source={{ uri: cruise.image_url }} style={styles.cruiseImage} />
-                <View style={styles.cruiseContent}>
-                  <View style={styles.cruiseHeader}>
-                    <Text style={styles.cruiseName}>{cruise.name_fr}</Text>
-                    <View style={[styles.statusBadge, cruise.is_active ? styles.activeBadge : styles.inactiveBadge]}>
-                      <Text style={styles.statusBadgeText}>
-                        {cruise.is_active ? 'ACTIVE' : 'INACTIVE'}
-                      </Text>
+              <View key={cruise.id} style={[s.cruiseCard, !cruise.is_active && { opacity: 0.55 }]}>
+                <Image source={{ uri: cruise.image_url }} style={s.cruiseImg} />
+                <View style={s.cruiseBadgeRow}>
+                  <View style={[s.badge, cruise.is_active ? s.badgeGreen : s.badgeRed]}>
+                    <View style={[s.badgeDot, { backgroundColor: cruise.is_active ? '#10B981' : '#EF4444' }]} />
+                    <Text style={[s.badgeText, { color: cruise.is_active ? '#10B981' : '#EF4444' }]}>
+                      {cruise.is_active ? 'ACTIVE' : 'INACTIVE'}
+                    </Text>
+                  </View>
+                </View>
+                <View style={s.cruiseBody}>
+                  <Text style={s.cruiseName}>{cruise.name_fr}</Text>
+                  <View style={s.cruiseMetaRow}>
+                    <View style={s.cruiseMetaItem}>
+                      <Ionicons name="time-outline" size={14} color="#999" />
+                      <Text style={s.cruiseMetaText}>{cruise.duration}</Text>
+                    </View>
+                    <View style={s.cruiseMetaItem}>
+                      <Ionicons name="location-outline" size={14} color="#999" />
+                      <Text style={s.cruiseMetaText}>{cruise.departure_port}</Text>
                     </View>
                   </View>
-                  <Text style={styles.cruiseSubtitle}>{cruise.duration} - {cruise.departure_port}</Text>
-                  <Text style={styles.cruisePrice}>
-                    {cruise.pricing.cabin_price ? `${cruise.pricing.cabin_price} EUR/pers` : ''}
-                    {cruise.pricing.private_price ? ` | ${cruise.pricing.private_price} EUR priv.` : ''}
-                  </Text>
-                  <Text style={styles.availabilityCount}>
-                    {cruise.availabilities?.length || 0} dates disponibles
-                  </Text>
-                  
-                  {/* Action buttons */}
-                  <View style={styles.cruiseActions}>
-                    <TouchableOpacity
-                      style={styles.actionButton}
-                      onPress={() => handleEditCruise(cruise)}
-                    >
-                      <Ionicons name="pencil" size={16} color={COLORS.primary} />
-                      <Text style={styles.actionButtonText}>Modifier</Text>
+                  <View style={s.cruisePriceRow}>
+                    {cruise.pricing.cabin_price ? (
+                      <View style={s.priceChip}>
+                        <Text style={s.priceChipLabel}>Cabine</Text>
+                        <Text style={s.priceChipVal}>{cruise.pricing.cabin_price} EUR</Text>
+                      </View>
+                    ) : null}
+                    {cruise.pricing.private_price ? (
+                      <View style={s.priceChip}>
+                        <Text style={s.priceChipLabel}>Prive</Text>
+                        <Text style={s.priceChipVal}>{cruise.pricing.private_price} EUR</Text>
+                      </View>
+                    ) : null}
+                    <View style={s.priceChip}>
+                      <Text style={s.priceChipLabel}>Dates</Text>
+                      <Text style={[s.priceChipVal, { color: COLORS.accent }]}>{cruise.availabilities?.length || 0}</Text>
+                    </View>
+                  </View>
+                  {/* Actions */}
+                  <View style={s.actionRow}>
+                    <TouchableOpacity style={s.actionBtn} onPress={() => handleEditCruise(cruise)}>
+                      <Ionicons name="pencil" size={16} color={COLORS.secondary} />
+                      <Text style={[s.actionText, { color: COLORS.secondary }]}>Modifier</Text>
                     </TouchableOpacity>
-                    
-                    <TouchableOpacity
-                      style={styles.actionButton}
-                      onPress={() => handleOpenAvailabilities(cruise)}
-                    >
-                      <Ionicons name="calendar" size={16} color={COLORS.secondary} />
-                      <Text style={[styles.actionButtonText, { color: COLORS.secondary }]}>Dates</Text>
+                    <TouchableOpacity style={s.actionBtn} onPress={() => handleOpenAvailabilities(cruise)}>
+                      <Ionicons name="calendar" size={16} color={COLORS.accent} />
+                      <Text style={[s.actionText, { color: COLORS.accent }]}>Dates</Text>
                     </TouchableOpacity>
-                    
-                    <TouchableOpacity
-                      style={[styles.actionButton, cruise.is_active ? styles.deactivateButton : styles.activateButton]}
-                      onPress={() => handleToggleCruiseActive(cruise.id)}
-                    >
-                      <Ionicons 
-                        name={cruise.is_active ? 'eye-off' : 'eye'} 
-                        size={16} 
-                        color={cruise.is_active ? '#F59E0B' : '#10B981'} 
-                      />
-                      <Text style={[styles.actionButtonText, { color: cruise.is_active ? '#F59E0B' : '#10B981' }]}>
-                        {cruise.is_active ? 'Desactiver' : 'Activer'}
+                    <TouchableOpacity style={s.actionBtn} onPress={() => handleToggleCruiseActive(cruise.id)}>
+                      <Ionicons name={cruise.is_active ? 'eye-off' : 'eye'} size={16} color={cruise.is_active ? '#F59E0B' : '#10B981'} />
+                      <Text style={[s.actionText, { color: cruise.is_active ? '#F59E0B' : '#10B981' }]}>
+                        {cruise.is_active ? 'Masquer' : 'Activer'}
                       </Text>
                     </TouchableOpacity>
-                    
-                    <TouchableOpacity
-                      style={[styles.actionButton, styles.deleteButton]}
-                      onPress={() => handleDeleteCruise(cruise.id, cruise.name_fr)}
-                    >
-                      <Ionicons name="trash" size={16} color={COLORS.error} />
+                    <TouchableOpacity style={[s.actionBtn, s.actionDanger]} onPress={() => handleDeleteCruise(cruise.id, cruise.name_fr)}>
+                      <Ionicons name="trash" size={16} color="#EF4444" />
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -558,326 +385,172 @@ export default function AdminScreen() {
             ))
           )
         ) : activeTab === 'posts' ? (
-          // Posts Tab
-          posts.length === 0 ? (
-            <Text style={styles.emptyText}>{t('noPosts')}</Text>
-          ) : (
+          posts.length === 0 ? <EmptyState text="Aucune publication" icon="chatbubbles-outline" /> : (
             posts.map((post) => (
-              <View key={post.id} style={styles.itemCard}>
-                <View style={styles.itemContent}>
-                  <Text style={styles.itemTitle}>{post.title}</Text>
-                  <Text style={styles.itemSubtitle}>
-                    {post.author_name} - {new Date(post.created_at).toLocaleDateString()}
-                  </Text>
-                  <Text style={styles.itemText} numberOfLines={2}>{post.content}</Text>
+              <View key={post.id} style={s.listCard}>
+                <View style={s.listCardIcon}><Ionicons name="document-text" size={20} color={COLORS.secondary} /></View>
+                <View style={s.listCardBody}>
+                  <Text style={s.listCardTitle}>{post.title}</Text>
+                  <Text style={s.listCardSub}>{post.author_name} - {new Date(post.created_at).toLocaleDateString()}</Text>
+                  <Text style={s.listCardDesc} numberOfLines={2}>{post.content}</Text>
                 </View>
-                <TouchableOpacity
-                  style={styles.deleteIconButton}
-                  onPress={() => handleDeletePost(post.id)}
-                >
-                  <Ionicons name="trash" size={20} color={COLORS.error} />
+                <TouchableOpacity style={s.listCardDel} onPress={() => handleDeletePost(post.id)}>
+                  <Ionicons name="trash-outline" size={18} color="#EF4444" />
                 </TouchableOpacity>
               </View>
             ))
           )
         ) : activeTab === 'members' ? (
-          // Members Tab
-          members.length === 0 ? (
-            <Text style={styles.emptyText}>{t('noMembers')}</Text>
-          ) : (
+          members.length === 0 ? <EmptyState text="Aucun membre" icon="people-outline" /> : (
             members.map((member: any) => (
-              <View key={member.id} style={styles.itemCard}>
-                <View style={styles.memberAvatar}>
-                  <Text style={styles.memberAvatarText}>
-                    {member.username.charAt(0).toUpperCase()}
-                  </Text>
+              <View key={member.id} style={s.listCard}>
+                <View style={s.memberAvatar}><Text style={s.memberAvatarText}>{member.username.charAt(0).toUpperCase()}</Text></View>
+                <View style={s.listCardBody}>
+                  <Text style={s.listCardTitle}>{member.username}</Text>
+                  <Text style={s.listCardSub}>{member.email}</Text>
+                  {member.is_banned && <View style={s.bannedPill}><Text style={s.bannedPillText}>BANNI</Text></View>}
                 </View>
-                <View style={styles.itemContent}>
-                  <Text style={styles.itemTitle}>{member.username}</Text>
-                  <Text style={styles.itemSubtitle}>{member.email}</Text>
-                  {member.is_banned && (
-                    <Text style={styles.bannedBadge}>BANNI</Text>
-                  )}
-                </View>
-                <TouchableOpacity
-                  style={[styles.banButton, member.is_banned && styles.unbanButton]}
-                  onPress={() => handleBanMember(member.id, member.is_banned)}
-                >
-                  <Text style={[styles.banButtonText, member.is_banned && styles.unbanButtonText]}>
-                    {member.is_banned ? t('unban') : t('ban')}
-                  </Text>
+                <TouchableOpacity style={[s.memberAction, member.is_banned && s.memberActionUnban]} onPress={() => handleBanMember(member.id, member.is_banned)}>
+                  <Text style={[s.memberActionText, member.is_banned && { color: '#10B981' }]}>{member.is_banned ? 'Debannir' : 'Bannir'}</Text>
                 </TouchableOpacity>
               </View>
             ))
           )
         ) : (
-          // Messages Tab
-          messages.length === 0 ? (
-            <Text style={styles.emptyText}>{t('noMessages')}</Text>
-          ) : (
-            messages.map((message) => (
-              <View key={message.id} style={styles.itemCard}>
-                <View style={styles.itemContent}>
-                  <Text style={styles.itemTitle}>
-                    {message.sender_name} - {message.receiver_name}
-                  </Text>
-                  <Text style={styles.itemSubtitle}>
-                    {new Date(message.created_at).toLocaleString()}
-                  </Text>
-                  <Text style={styles.itemText}>{message.content}</Text>
+          messages.length === 0 ? <EmptyState text="Aucun message" icon="mail-outline" /> : (
+            messages.map((msg) => (
+              <View key={msg.id} style={s.listCard}>
+                <View style={s.listCardIcon}><Ionicons name="chatbubble-ellipses" size={20} color={COLORS.accent} /></View>
+                <View style={s.listCardBody}>
+                  <Text style={s.listCardTitle}>{msg.sender_name} → {msg.receiver_name}</Text>
+                  <Text style={s.listCardSub}>{new Date(msg.created_at).toLocaleString()}</Text>
+                  <Text style={s.listCardDesc}>{msg.content}</Text>
                 </View>
-                <TouchableOpacity
-                  style={styles.deleteIconButton}
-                  onPress={() => handleDeleteMessage(message.id)}
-                >
-                  <Ionicons name="trash" size={20} color={COLORS.error} />
+                <TouchableOpacity style={s.listCardDel} onPress={() => handleDeleteMessage(msg.id)}>
+                  <Ionicons name="trash-outline" size={18} color="#EF4444" />
                 </TouchableOpacity>
               </View>
             ))
           )
         )}
-        
         <View style={{ height: 40 }} />
       </ScrollView>
 
-      {/* Edit Cruise Modal */}
+      {/* ─── Edit Cruise Modal ─── */}
       <Modal visible={showEditModal} animationType="slide" transparent>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Modifier: {editingCruise?.name_fr}</Text>
-              <TouchableOpacity onPress={() => setShowEditModal(false)}>
-                <Ionicons name="close" size={24} color={COLORS.text} />
+        <View style={s.modalOverlay}>
+          <View style={s.modalWrap}>
+            <View style={s.modalHead}>
+              <View>
+                <Text style={s.modalHeadLabel}>MODIFIER</Text>
+                <Text style={s.modalHeadTitle}>{editingCruise?.name_fr}</Text>
+              </View>
+              <TouchableOpacity onPress={() => setShowEditModal(false)} style={s.modalClose}>
+                <Ionicons name="close" size={22} color={COLORS.white} />
               </TouchableOpacity>
             </View>
-            
-            <ScrollView style={styles.modalScroll}>
-              <Text style={styles.inputLabel}>{t('name')} (FR)</Text>
-              <TextInput
-                style={styles.modalInput}
-                value={editForm.name_fr}
-                onChangeText={(text) => setEditForm({ ...editForm, name_fr: text })}
-              />
-              
-              <Text style={styles.inputLabel}>{t('name')} (EN)</Text>
-              <TextInput
-                style={styles.modalInput}
-                value={editForm.name_en}
-                onChangeText={(text) => setEditForm({ ...editForm, name_en: text })}
-              />
-              
-              <Text style={styles.inputLabel}>{t('duration')}</Text>
-              <TextInput
-                style={styles.modalInput}
-                value={editForm.duration}
-                onChangeText={(text) => setEditForm({ ...editForm, duration: text })}
-              />
-              
-              <Text style={styles.inputLabel}>{t('departurePort')}</Text>
-              <TextInput
-                style={styles.modalInput}
-                value={editForm.departure_port}
-                onChangeText={(text) => setEditForm({ ...editForm, departure_port: text })}
-              />
-              
-              <Text style={styles.inputLabel}>{t('cabinPrice')} (EUR)</Text>
-              <TextInput
-                style={styles.modalInput}
-                value={editForm.cabin_price}
-                onChangeText={(text) => setEditForm({ ...editForm, cabin_price: text })}
-                keyboardType="numeric"
-              />
-              
-              <Text style={styles.inputLabel}>{t('privatePrice')} (EUR)</Text>
-              <TextInput
-                style={styles.modalInput}
-                value={editForm.private_price}
-                onChangeText={(text) => setEditForm({ ...editForm, private_price: text })}
-                keyboardType="numeric"
-              />
-              
-              <Text style={styles.inputLabel}>{t('imageUrl')}</Text>
-              <TextInput
-                style={styles.modalInput}
-                value={editForm.image_url}
-                onChangeText={(text) => setEditForm({ ...editForm, image_url: text })}
-              />
-              
-              <Text style={styles.inputLabel}>{t('description')} (FR)</Text>
-              <TextInput
-                style={[styles.modalInput, styles.textArea]}
-                value={editForm.description_fr}
-                onChangeText={(text) => setEditForm({ ...editForm, description_fr: text })}
-                multiline
-              />
-              
-              <Text style={styles.inputLabel}>{t('description')} (EN)</Text>
-              <TextInput
-                style={[styles.modalInput, styles.textArea]}
-                value={editForm.description_en}
-                onChangeText={(text) => setEditForm({ ...editForm, description_en: text })}
-                multiline
-              />
+            <ScrollView style={s.modalBody}>
+              <FormField label="Nom (FR)" value={editForm.name_fr} onChange={(v) => setEditForm({ ...editForm, name_fr: v })} />
+              <FormField label="Nom (EN)" value={editForm.name_en} onChange={(v) => setEditForm({ ...editForm, name_en: v })} />
+              <View style={s.fieldRow}>
+                <View style={s.fieldHalf}><FormField label="Duree" value={editForm.duration} onChange={(v) => setEditForm({ ...editForm, duration: v })} /></View>
+                <View style={s.fieldHalf}><FormField label="Port de depart" value={editForm.departure_port} onChange={(v) => setEditForm({ ...editForm, departure_port: v })} /></View>
+              </View>
+              <View style={s.fieldRow}>
+                <View style={s.fieldHalf}><FormField label="Prix cabine (EUR)" value={editForm.cabin_price} onChange={(v) => setEditForm({ ...editForm, cabin_price: v })} numeric /></View>
+                <View style={s.fieldHalf}><FormField label="Prix prive (EUR)" value={editForm.private_price} onChange={(v) => setEditForm({ ...editForm, private_price: v })} numeric /></View>
+              </View>
+              <FormField label="URL de l'image" value={editForm.image_url} onChange={(v) => setEditForm({ ...editForm, image_url: v })} />
+              <FormField label="Description (FR)" value={editForm.description_fr} onChange={(v) => setEditForm({ ...editForm, description_fr: v })} multiline />
+              <FormField label="Description (EN)" value={editForm.description_en} onChange={(v) => setEditForm({ ...editForm, description_en: v })} multiline />
             </ScrollView>
-            
-            <View style={styles.modalActions}>
-              <TouchableOpacity
-                style={styles.cancelButton}
-                onPress={() => setShowEditModal(false)}
-              >
-                <Text style={styles.cancelButtonText}>{t('cancel')}</Text>
+            <View style={s.modalFoot}>
+              <TouchableOpacity style={s.footCancel} onPress={() => setShowEditModal(false)}>
+                <Text style={s.footCancelText}>Annuler</Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.saveButton}
-                onPress={handleSaveCruise}
-              >
-                <Text style={styles.saveButtonText}>{t('save')}</Text>
+              <TouchableOpacity style={s.footSave} onPress={handleSaveCruise}>
+                <Ionicons name="checkmark" size={18} color={COLORS.primary} />
+                <Text style={s.footSaveText}>Enregistrer</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
       </Modal>
 
-      {/* Availability Management Modal */}
+      {/* ─── Availability Modal ─── */}
       <Modal visible={showAvailabilityModal} animationType="slide" transparent>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>
-                Dates: {editingAvailabilityCruise?.name_fr}
-              </Text>
-              <TouchableOpacity onPress={() => setShowAvailabilityModal(false)}>
-                <Ionicons name="close" size={24} color={COLORS.text} />
+        <View style={s.modalOverlay}>
+          <View style={s.modalWrap}>
+            <View style={s.modalHead}>
+              <View>
+                <Text style={s.modalHeadLabel}>DISPONIBILITES</Text>
+                <Text style={s.modalHeadTitle}>{editingAvailabilityCruise?.name_fr}</Text>
+              </View>
+              <TouchableOpacity onPress={() => setShowAvailabilityModal(false)} style={s.modalClose}>
+                <Ionicons name="close" size={22} color={COLORS.white} />
               </TouchableOpacity>
             </View>
-            
-            <ScrollView style={styles.modalScroll}>
-              {/* Current availabilities */}
-              <Text style={styles.sectionTitle}>Dates existantes</Text>
+            <ScrollView style={s.modalBody}>
+              {/* Existing availabilities */}
+              <Text style={s.sectionHead}>Dates existantes</Text>
               {editingAvailabilityCruise?.availabilities?.map((avail, index) => (
-                <View key={index} style={styles.availabilityItem}>
-                  <View style={styles.availabilityInfo}>
-                    <Text style={styles.availabilityDate}>{avail.date_range}</Text>
-                    <Text style={styles.availabilityPrice}>{avail.price} EUR/pers</Text>
-                    <View style={[styles.statusDot, { backgroundColor: getStatusColor(avail.status) }]} />
-                    <Text style={[styles.availabilityStatus, { color: getStatusColor(avail.status) }]}>
-                      {avail.status === 'full' ? 'COMPLET' : 
-                       avail.status === 'limited' ? `Reste ${avail.remaining_places}` : 
-                       'Disponible'}
-                    </Text>
+                <View key={index} style={s.availCard}>
+                  <View style={s.availTop}>
+                    <Ionicons name="calendar-outline" size={16} color={COLORS.secondary} />
+                    <Text style={s.availDate}>{avail.date_range}</Text>
+                    <View style={[s.availStatusPill, { backgroundColor: getStatusColor(avail.status) + '20' }]}>
+                      <View style={[s.availDot, { backgroundColor: getStatusColor(avail.status) }]} />
+                      <Text style={[s.availStatusText, { color: getStatusColor(avail.status) }]}>{getStatusLabel(avail.status)}</Text>
+                    </View>
                   </View>
-                  <View style={styles.availabilityActions}>
-                    <TouchableOpacity
-                      style={styles.smallButton}
-                      onPress={() => handleEditAvailability(index)}
-                    >
-                      <Ionicons name="pencil" size={16} color={COLORS.primary} />
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[styles.smallButton, { backgroundColor: '#FEE2E2' }]}
-                      onPress={() => handleDeleteAvailability(index)}
-                    >
-                      <Ionicons name="trash" size={16} color={COLORS.error} />
-                    </TouchableOpacity>
+                  <View style={s.availBottom}>
+                    <Text style={s.availPrice}>{avail.price} EUR/pers</Text>
+                    {avail.status !== 'full' && <Text style={s.availPlaces}>{avail.remaining_places} places</Text>}
+                    <View style={s.availActions}>
+                      <TouchableOpacity style={s.availEditBtn} onPress={() => handleEditAvailability(index)}>
+                        <Ionicons name="pencil" size={14} color={COLORS.secondary} />
+                      </TouchableOpacity>
+                      <TouchableOpacity style={s.availDelBtn} onPress={() => handleDeleteAvailability(index)}>
+                        <Ionicons name="trash" size={14} color="#EF4444" />
+                      </TouchableOpacity>
+                    </View>
                   </View>
                 </View>
               ))}
-              
+
               {/* Add/Edit form */}
-              <Text style={styles.sectionTitle}>
-                {editingAvailabilityIndex !== null ? 'Modifier la date' : 'Ajouter une date'}
-              </Text>
-              
-              <Text style={styles.inputLabel}>{t('dateRange')}</Text>
-              <TextInput
-                style={styles.modalInput}
-                value={availabilityForm.date_range}
-                onChangeText={(text) => setAvailabilityForm({ ...availabilityForm, date_range: text })}
-                placeholder="ex: du 23 mai au 6 juin 2026"
-                placeholderTextColor={COLORS.textSecondary}
-              />
-              
-              <Text style={styles.inputLabel}>{t('price')} (EUR/pers)</Text>
-              <TextInput
-                style={styles.modalInput}
-                value={availabilityForm.price}
-                onChangeText={(text) => setAvailabilityForm({ ...availabilityForm, price: text })}
-                keyboardType="numeric"
-                placeholder="ex: 2560"
-                placeholderTextColor={COLORS.textSecondary}
-              />
-              
-              <Text style={styles.inputLabel}>{t('status')}</Text>
-              <View style={styles.statusButtons}>
-                {['available', 'limited', 'full'].map((status) => (
-                  <TouchableOpacity
-                    key={status}
-                    style={[
-                      styles.statusButton,
-                      availabilityForm.status === status && styles.statusButtonActive,
-                      { borderColor: getStatusColor(status) }
-                    ]}
-                    onPress={() => setAvailabilityForm({ ...availabilityForm, status })}
-                  >
-                    <Text style={[
-                      styles.statusButtonText,
-                      availabilityForm.status === status && { color: getStatusColor(status) }
-                    ]}>
-                      {status === 'available' ? 'Disponible' : 
-                       status === 'limited' ? 'Limite' : 'Complet'}
-                    </Text>
+              <Text style={s.sectionHead}>{editingAvailabilityIndex !== null ? 'Modifier la date' : 'Ajouter une date'}</Text>
+              <FormField label="Periode" value={availabilityForm.date_range} onChange={(v) => setAvailabilityForm({ ...availabilityForm, date_range: v })} placeholder="ex: du 23 mai au 6 juin 2026" />
+              <FormField label="Prix (EUR/pers)" value={availabilityForm.price} onChange={(v) => setAvailabilityForm({ ...availabilityForm, price: v })} numeric placeholder="ex: 2560" />
+
+              <Text style={s.fLabel}>Statut</Text>
+              <View style={s.statusRow}>
+                {['available', 'limited', 'full'].map((st) => (
+                  <TouchableOpacity key={st} style={[s.statusChip, availabilityForm.status === st && { backgroundColor: getStatusColor(st) + '20', borderColor: getStatusColor(st) }]} onPress={() => setAvailabilityForm({ ...availabilityForm, status: st })}>
+                    <View style={[s.statusChipDot, { backgroundColor: availabilityForm.status === st ? getStatusColor(st) : '#ccc' }]} />
+                    <Text style={[s.statusChipText, availabilityForm.status === st && { color: getStatusColor(st) }]}>{getStatusLabel(st)}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
-              
+
               {availabilityForm.status !== 'full' && (
-                <>
-                  <Text style={styles.inputLabel}>{t('remainingPlaces')}</Text>
-                  <TextInput
-                    style={styles.modalInput}
-                    value={availabilityForm.remaining_places}
-                    onChangeText={(text) => setAvailabilityForm({ ...availabilityForm, remaining_places: text })}
-                    keyboardType="numeric"
-                    placeholder="ex: 8"
-                    placeholderTextColor={COLORS.textSecondary}
-                  />
-                </>
+                <FormField label="Places restantes" value={availabilityForm.remaining_places} onChange={(v) => setAvailabilityForm({ ...availabilityForm, remaining_places: v })} numeric placeholder="ex: 8" />
               )}
-              
-              <TouchableOpacity
-                style={styles.addButton}
-                onPress={handleSaveAvailability}
-              >
-                <Ionicons name={editingAvailabilityIndex !== null ? 'checkmark' : 'add'} size={20} color={COLORS.white} />
-                <Text style={styles.addButtonText}>
-                  {editingAvailabilityIndex !== null ? 'Mettre a jour' : 'Ajouter cette date'}
-                </Text>
+
+              <TouchableOpacity style={s.addDateBtn} onPress={handleSaveAvailability}>
+                <Ionicons name={editingAvailabilityIndex !== null ? 'checkmark-circle' : 'add-circle'} size={20} color={COLORS.primary} />
+                <Text style={s.addDateBtnText}>{editingAvailabilityIndex !== null ? 'Mettre a jour' : 'Ajouter cette date'}</Text>
               </TouchableOpacity>
-              
+
               {editingAvailabilityIndex !== null && (
-                <TouchableOpacity
-                  style={styles.cancelEditButton}
-                  onPress={() => {
-                    setEditingAvailabilityIndex(null);
-                    setAvailabilityForm({
-                      date_range: '',
-                      price: '',
-                      status: 'available',
-                      remaining_places: '8',
-                    });
-                  }}
-                >
-                  <Text style={styles.cancelEditButtonText}>Annuler la modification</Text>
+                <TouchableOpacity style={s.cancelEditLink} onPress={() => { setEditingAvailabilityIndex(null); setAvailabilityForm({ date_range: '', price: '', status: 'available', remaining_places: '8' }); }}>
+                  <Text style={s.cancelEditLinkText}>Annuler la modification</Text>
                 </TouchableOpacity>
               )}
             </ScrollView>
-            
-            <View style={styles.modalActions}>
-              <TouchableOpacity
-                style={styles.saveButton}
-                onPress={() => setShowAvailabilityModal(false)}
-              >
-                <Text style={styles.saveButtonText}>Fermer</Text>
+            <View style={s.modalFoot}>
+              <TouchableOpacity style={s.footSave} onPress={() => setShowAvailabilityModal(false)}>
+                <Text style={s.footSaveText}>Fermer</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -887,458 +560,157 @@ export default function AdminScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
+// ─── Helper Components ───
+function EmptyState({ text, icon }: { text: string; icon: string }) {
+  return (
+    <View style={{ alignItems: 'center', marginTop: 60 }}>
+      <Ionicons name={icon as any} size={48} color="rgba(255,255,255,0.2)" />
+      <Text style={{ color: 'rgba(255,255,255,0.4)', fontSize: 15, marginTop: 12 }}>{text}</Text>
+    </View>
+  );
+}
+
+function FormField({ label, value, onChange, multiline, numeric, placeholder }: { label: string; value: string; onChange: (v: string) => void; multiline?: boolean; numeric?: boolean; placeholder?: string }) {
+  return (
+    <View style={s.fGroup}>
+      <Text style={s.fLabel}>{label}</Text>
+      <TextInput style={[s.fInput, multiline && { height: 80, textAlignVertical: 'top' }]} value={value} onChangeText={onChange} multiline={multiline} keyboardType={numeric ? 'numeric' : 'default'} placeholder={placeholder} placeholderTextColor="#666" />
+    </View>
+  );
+}
+
+// ─── Styles ───
+const s = StyleSheet.create({
   // Login
-  loginContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: SPACING.xl,
-  },
-  loginIcon: {
-    marginBottom: SPACING.lg,
-  },
-  loginTitle: {
-    fontSize: FONT_SIZES.xxl,
-    fontWeight: '700',
-    color: COLORS.primary,
-    marginBottom: SPACING.xl,
-  },
-  input: {
-    width: '100%',
-    backgroundColor: COLORS.white,
-    borderRadius: BORDER_RADIUS.lg,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.md,
-    fontSize: FONT_SIZES.md,
-    color: COLORS.text,
-    marginBottom: SPACING.md,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  errorText: {
-    color: COLORS.error,
-    fontSize: FONT_SIZES.sm,
-    marginBottom: SPACING.md,
-  },
-  loginButton: {
-    width: '100%',
-    backgroundColor: COLORS.primary,
-    paddingVertical: SPACING.md,
-    borderRadius: BORDER_RADIUS.lg,
-    alignItems: 'center',
-    marginTop: SPACING.md,
-  },
-  loginButtonText: {
-    color: COLORS.white,
-    fontSize: FONT_SIZES.md,
-    fontWeight: '600',
-  },
-  backLink: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: SPACING.xl,
-    gap: SPACING.xs,
-  },
-  backLinkText: {
-    color: COLORS.textSecondary,
-    fontSize: FONT_SIZES.sm,
-  },
-  // Header
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
-    backgroundColor: COLORS.white,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-  },
-  headerButton: {
-    padding: SPACING.xs,
-  },
-  headerTitle: {
-    fontSize: FONT_SIZES.lg,
-    fontWeight: '700',
-    color: COLORS.primary,
-  },
+  loginSafe: { flex: 1, backgroundColor: COLORS.primary },
+  loginPage: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
+  loginCard: { width: '100%', maxWidth: 380, alignItems: 'center' },
+  loginLogoWrap: { marginBottom: 24 },
+  loginLogoBg: { width: 72, height: 72, borderRadius: 36, backgroundColor: 'rgba(235,208,169,0.1)', justifyContent: 'center', alignItems: 'center', borderWidth: 2, borderColor: 'rgba(235,208,169,0.3)' },
+  loginTitle: { fontSize: 28, fontWeight: '800', color: COLORS.white, letterSpacing: 1 },
+  loginSub: { fontSize: 14, color: COLORS.secondary, fontWeight: '600', letterSpacing: 2, marginBottom: 32 },
+  inputGroup: { width: '100%', marginBottom: 16 },
+  fieldLabel: { fontSize: 12, color: 'rgba(255,255,255,0.5)', fontWeight: '600', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 },
+  inputWrap: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.08)', borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14, borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)' },
+  fieldInput: { flex: 1, fontSize: 15, color: COLORS.white },
+  loginErr: { color: '#FF8080', fontSize: 13, marginBottom: 12, fontWeight: '500' },
+  loginBtn: { width: '100%', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', backgroundColor: COLORS.secondary, paddingVertical: 16, borderRadius: 12, gap: 8, marginTop: 8 },
+  loginBtnText: { fontSize: 16, fontWeight: '700', color: COLORS.primary },
+  backLink: { flexDirection: 'row', alignItems: 'center', marginTop: 24, gap: 8 },
+  backLinkText: { fontSize: 13, color: 'rgba(255,255,255,0.5)' },
+
+  // Main layout
+  safe: { flex: 1, backgroundColor: '#0B1530' },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 14, backgroundColor: COLORS.primary, borderBottomWidth: 1, borderBottomColor: 'rgba(235,208,169,0.15)' },
+  headerBtn: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center', borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.08)' },
+  headerCenter: { alignItems: 'center' },
+  headerLabel: { fontSize: 10, color: 'rgba(255,255,255,0.4)', fontWeight: '700', letterSpacing: 2 },
+  headerBrand: { fontSize: 18, color: COLORS.secondary, fontWeight: '700' },
+
+  // Stats
+  statsBar: { flexDirection: 'row', backgroundColor: COLORS.primary, paddingVertical: 12, paddingHorizontal: 8, borderBottomWidth: 1, borderBottomColor: 'rgba(235,208,169,0.1)' },
+  statItem: { flex: 1, alignItems: 'center' },
+  statVal: { fontSize: 22, fontWeight: '800' },
+  statLabel: { fontSize: 10, color: 'rgba(255,255,255,0.4)', fontWeight: '600', letterSpacing: 1, textTransform: 'uppercase', marginTop: 2 },
+
   // Tabs
-  tabsScroll: {
-    backgroundColor: COLORS.white,
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: SPACING.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-  },
-  tab: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
-    borderRadius: BORDER_RADIUS.full,
-    backgroundColor: COLORS.surfaceLight,
-    marginRight: SPACING.sm,
-    gap: SPACING.xs,
-  },
-  tabActive: {
-    backgroundColor: COLORS.primary,
-  },
-  tabText: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.primary,
-  },
-  tabTextActive: {
-    color: COLORS.white,
-    fontWeight: '600',
-  },
+  tabBar: { flexDirection: 'row', backgroundColor: COLORS.primary, paddingHorizontal: 8, paddingBottom: 12 },
+  tab: { flex: 1, alignItems: 'center', paddingVertical: 10, borderRadius: 10, gap: 4 },
+  tabActive: { backgroundColor: COLORS.secondary },
+  tabLabel: { fontSize: 10, color: 'rgba(255,255,255,0.5)', fontWeight: '600' },
+  tabLabelActive: { color: COLORS.primary, fontWeight: '700' },
+
   // Content
-  content: {
-    flex: 1,
-    padding: SPACING.md,
-  },
-  emptyText: {
-    textAlign: 'center',
-    color: COLORS.textSecondary,
-    fontSize: FONT_SIZES.md,
-    marginTop: 40,
-  },
-  // Cruise Card - Enhanced
-  cruiseCard: {
-    backgroundColor: COLORS.white,
-    borderRadius: BORDER_RADIUS.lg,
-    marginBottom: SPACING.md,
-    overflow: 'hidden',
-  },
-  inactiveCruise: {
-    opacity: 0.6,
-  },
-  cruiseImage: {
-    width: '100%',
-    height: 120,
-  },
-  cruiseContent: {
-    padding: SPACING.md,
-  },
-  cruiseHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: SPACING.xs,
-  },
-  cruiseName: {
-    fontSize: FONT_SIZES.lg,
-    fontWeight: '700',
-    color: COLORS.text,
-    flex: 1,
-  },
-  statusBadge: {
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: 2,
-    borderRadius: BORDER_RADIUS.sm,
-  },
-  activeBadge: {
-    backgroundColor: '#D1FAE5',
-  },
-  inactiveBadge: {
-    backgroundColor: '#FEE2E2',
-  },
-  statusBadgeText: {
-    fontSize: FONT_SIZES.xs,
-    fontWeight: '700',
-  },
-  cruiseSubtitle: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.textSecondary,
-    marginBottom: SPACING.xs,
-  },
-  cruisePrice: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.secondary,
-    fontWeight: '600',
-    marginBottom: SPACING.xs,
-  },
-  availabilityCount: {
-    fontSize: FONT_SIZES.xs,
-    color: COLORS.textSecondary,
-    marginBottom: SPACING.sm,
-  },
-  cruiseActions: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: SPACING.xs,
-  },
-  actionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: SPACING.xs,
-    borderRadius: BORDER_RADIUS.md,
-    backgroundColor: COLORS.surfaceLight,
-    gap: 4,
-  },
-  actionButtonText: {
-    fontSize: FONT_SIZES.xs,
-    color: COLORS.primary,
-    fontWeight: '500',
-  },
-  deactivateButton: {
-    backgroundColor: '#FEF3C7',
-  },
-  activateButton: {
-    backgroundColor: '#D1FAE5',
-  },
-  deleteButton: {
-    backgroundColor: '#FEE2E2',
-  },
-  // Item Card
-  itemCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderRadius: BORDER_RADIUS.lg,
-    padding: SPACING.md,
-    marginBottom: SPACING.sm,
-  },
-  itemContent: {
-    flex: 1,
-    marginLeft: SPACING.md,
-  },
-  itemTitle: {
-    fontSize: FONT_SIZES.md,
-    fontWeight: '600',
-    color: COLORS.text,
-  },
-  itemSubtitle: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.textSecondary,
-    marginTop: 2,
-  },
-  itemText: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.textSecondary,
-    marginTop: 4,
-  },
-  deleteIconButton: {
-    padding: SPACING.sm,
-    backgroundColor: '#FEE2E2',
-    borderRadius: BORDER_RADIUS.md,
-  },
+  content: { flex: 1, backgroundColor: '#0F1D3D', padding: 12 },
+
+  // Cruise card
+  cruiseCard: { backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 16, marginBottom: 14, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(235,208,169,0.1)' },
+  cruiseImg: { width: '100%', height: 140 },
+  cruiseBadgeRow: { position: 'absolute', top: 12, right: 12 },
+  badge: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 10, paddingVertical: 5, borderRadius: 20, gap: 6 },
+  badgeGreen: { backgroundColor: 'rgba(16,185,129,0.15)' },
+  badgeRed: { backgroundColor: 'rgba(239,68,68,0.15)' },
+  badgeDot: { width: 7, height: 7, borderRadius: 4 },
+  badgeText: { fontSize: 10, fontWeight: '800', letterSpacing: 1 },
+  cruiseBody: { padding: 16 },
+  cruiseName: { fontSize: 18, fontWeight: '700', color: COLORS.white, marginBottom: 6 },
+  cruiseMetaRow: { flexDirection: 'row', gap: 16, marginBottom: 10 },
+  cruiseMetaItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  cruiseMetaText: { fontSize: 12, color: 'rgba(255,255,255,0.5)' },
+  cruisePriceRow: { flexDirection: 'row', gap: 8, marginBottom: 14 },
+  priceChip: { backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 6, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  priceChipLabel: { fontSize: 9, color: 'rgba(255,255,255,0.4)', fontWeight: '600', textTransform: 'uppercase', letterSpacing: 1 },
+  priceChipVal: { fontSize: 14, color: COLORS.secondary, fontWeight: '700', marginTop: 2 },
+  actionRow: { flexDirection: 'row', gap: 6 },
+  actionBtn: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 8, backgroundColor: 'rgba(255,255,255,0.06)', gap: 6 },
+  actionDanger: { backgroundColor: 'rgba(239,68,68,0.1)' },
+  actionText: { fontSize: 12, fontWeight: '600' },
+
+  // Generic list card
+  listCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 12, padding: 14, marginBottom: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
+  listCardIcon: { width: 40, height: 40, borderRadius: 20, backgroundColor: 'rgba(235,208,169,0.1)', justifyContent: 'center', alignItems: 'center' },
+  listCardBody: { flex: 1, marginLeft: 12 },
+  listCardTitle: { fontSize: 14, fontWeight: '600', color: COLORS.white },
+  listCardSub: { fontSize: 11, color: 'rgba(255,255,255,0.4)', marginTop: 2 },
+  listCardDesc: { fontSize: 12, color: 'rgba(255,255,255,0.5)', marginTop: 4 },
+  listCardDel: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(239,68,68,0.1)', justifyContent: 'center', alignItems: 'center' },
+
   // Members
-  memberAvatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: COLORS.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  memberAvatarText: {
-    fontSize: FONT_SIZES.lg,
-    fontWeight: '700',
-    color: COLORS.white,
-  },
-  bannedBadge: {
-    fontSize: FONT_SIZES.xs,
-    color: COLORS.error,
-    fontWeight: '700',
-    marginTop: 4,
-  },
-  banButton: {
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
-    backgroundColor: '#FEE2E2',
-    borderRadius: BORDER_RADIUS.md,
-  },
-  unbanButton: {
-    backgroundColor: '#D1FAE5',
-  },
-  banButtonText: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.error,
-    fontWeight: '600',
-  },
-  unbanButtonText: {
-    color: COLORS.success,
-  },
+  memberAvatar: { width: 40, height: 40, borderRadius: 20, backgroundColor: COLORS.secondary, justifyContent: 'center', alignItems: 'center' },
+  memberAvatarText: { fontSize: 16, fontWeight: '800', color: COLORS.primary },
+  bannedPill: { backgroundColor: 'rgba(239,68,68,0.15)', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10, alignSelf: 'flex-start', marginTop: 4 },
+  bannedPillText: { fontSize: 9, fontWeight: '800', color: '#EF4444', letterSpacing: 1 },
+  memberAction: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 8, backgroundColor: 'rgba(239,68,68,0.1)' },
+  memberActionUnban: { backgroundColor: 'rgba(16,185,129,0.1)' },
+  memberActionText: { fontSize: 12, fontWeight: '600', color: '#EF4444' },
+
   // Modal
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
-  },
-  modalContent: {
-    backgroundColor: COLORS.white,
-    borderTopLeftRadius: BORDER_RADIUS.xl,
-    borderTopRightRadius: BORDER_RADIUS.xl,
-    maxHeight: '90%',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: SPACING.lg,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-  },
-  modalTitle: {
-    fontSize: FONT_SIZES.lg,
-    fontWeight: '700',
-    color: COLORS.primary,
-    flex: 1,
-  },
-  modalScroll: {
-    padding: SPACING.lg,
-    maxHeight: 500,
-  },
-  inputLabel: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.textSecondary,
-    marginBottom: SPACING.xs,
-    marginTop: SPACING.sm,
-  },
-  modalInput: {
-    backgroundColor: COLORS.surfaceLight,
-    borderRadius: BORDER_RADIUS.lg,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
-    fontSize: FONT_SIZES.md,
-    color: COLORS.text,
-  },
-  textArea: {
-    height: 80,
-    textAlignVertical: 'top',
-  },
-  modalActions: {
-    flexDirection: 'row',
-    padding: SPACING.lg,
-    gap: SPACING.md,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-  },
-  cancelButton: {
-    flex: 1,
-    paddingVertical: SPACING.md,
-    borderRadius: BORDER_RADIUS.lg,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    alignItems: 'center',
-  },
-  cancelButtonText: {
-    fontSize: FONT_SIZES.md,
-    color: COLORS.textSecondary,
-  },
-  saveButton: {
-    flex: 1,
-    paddingVertical: SPACING.md,
-    borderRadius: BORDER_RADIUS.lg,
-    backgroundColor: COLORS.primary,
-    alignItems: 'center',
-  },
-  saveButtonText: {
-    fontSize: FONT_SIZES.md,
-    fontWeight: '600',
-    color: COLORS.white,
-  },
-  // Availability specific styles
-  sectionTitle: {
-    fontSize: FONT_SIZES.md,
-    fontWeight: '700',
-    color: COLORS.text,
-    marginTop: SPACING.lg,
-    marginBottom: SPACING.sm,
-  },
-  availabilityItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: COLORS.surfaceLight,
-    borderRadius: BORDER_RADIUS.md,
-    padding: SPACING.sm,
-    marginBottom: SPACING.xs,
-  },
-  availabilityInfo: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: SPACING.xs,
-  },
-  availabilityDate: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.text,
-    fontWeight: '500',
-  },
-  availabilityPrice: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.secondary,
-    fontWeight: '600',
-  },
-  statusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  availabilityStatus: {
-    fontSize: FONT_SIZES.xs,
-    fontWeight: '600',
-  },
-  availabilityActions: {
-    flexDirection: 'row',
-    gap: SPACING.xs,
-  },
-  smallButton: {
-    padding: SPACING.xs,
-    backgroundColor: COLORS.surfaceLight,
-    borderRadius: BORDER_RADIUS.sm,
-  },
-  statusButtons: {
-    flexDirection: 'row',
-    gap: SPACING.sm,
-    marginTop: SPACING.xs,
-  },
-  statusButton: {
-    flex: 1,
-    paddingVertical: SPACING.sm,
-    borderRadius: BORDER_RADIUS.md,
-    borderWidth: 2,
-    alignItems: 'center',
-    backgroundColor: COLORS.white,
-  },
-  statusButtonActive: {
-    backgroundColor: COLORS.surfaceLight,
-  },
-  statusButtonText: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.textSecondary,
-    fontWeight: '500',
-  },
-  addButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: COLORS.secondary,
-    paddingVertical: SPACING.md,
-    borderRadius: BORDER_RADIUS.lg,
-    marginTop: SPACING.lg,
-    gap: SPACING.xs,
-  },
-  addButtonText: {
-    fontSize: FONT_SIZES.md,
-    fontWeight: '600',
-    color: COLORS.white,
-  },
-  cancelEditButton: {
-    alignItems: 'center',
-    paddingVertical: SPACING.sm,
-    marginTop: SPACING.sm,
-  },
-  cancelEditButtonText: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.textSecondary,
-  },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.7)', justifyContent: 'flex-end' },
+  modalWrap: { backgroundColor: '#0F1D3D', borderTopLeftRadius: 24, borderTopRightRadius: 24, maxHeight: '92%' },
+  modalHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 20, borderBottomWidth: 1, borderBottomColor: 'rgba(235,208,169,0.1)' },
+  modalHeadLabel: { fontSize: 10, color: COLORS.secondary, fontWeight: '700', letterSpacing: 2 },
+  modalHeadTitle: { fontSize: 18, color: COLORS.white, fontWeight: '700', marginTop: 2 },
+  modalClose: { width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.1)', justifyContent: 'center', alignItems: 'center' },
+  modalBody: { padding: 20, maxHeight: 480 },
+  modalFoot: { flexDirection: 'row', padding: 16, gap: 12, borderTopWidth: 1, borderTopColor: 'rgba(235,208,169,0.1)' },
+  footCancel: { flex: 1, paddingVertical: 14, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)', alignItems: 'center' },
+  footCancelText: { fontSize: 14, color: 'rgba(255,255,255,0.5)', fontWeight: '500' },
+  footSave: { flex: 1, flexDirection: 'row', paddingVertical: 14, borderRadius: 12, backgroundColor: COLORS.secondary, alignItems: 'center', justifyContent: 'center', gap: 6 },
+  footSaveText: { fontSize: 14, fontWeight: '700', color: COLORS.primary },
+
+  // Form
+  fGroup: { marginBottom: 14 },
+  fLabel: { fontSize: 11, color: 'rgba(255,255,255,0.4)', fontWeight: '600', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 },
+  fInput: { backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12, fontSize: 14, color: COLORS.white, borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)' },
+  fieldRow: { flexDirection: 'row', gap: 10 },
+  fieldHalf: { flex: 1 },
+
+  // Section heads
+  sectionHead: { fontSize: 14, fontWeight: '700', color: COLORS.secondary, letterSpacing: 1, marginTop: 20, marginBottom: 10 },
+
+  // Availability card
+  availCard: { backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 12, padding: 12, marginBottom: 8, borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' },
+  availTop: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
+  availDate: { flex: 1, fontSize: 13, color: COLORS.white, fontWeight: '500' },
+  availStatusPill: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 12, gap: 4 },
+  availDot: { width: 6, height: 6, borderRadius: 3 },
+  availStatusText: { fontSize: 10, fontWeight: '700' },
+  availBottom: { flexDirection: 'row', alignItems: 'center' },
+  availPrice: { fontSize: 14, color: COLORS.secondary, fontWeight: '700', flex: 1 },
+  availPlaces: { fontSize: 12, color: 'rgba(255,255,255,0.4)', marginRight: 12 },
+  availActions: { flexDirection: 'row', gap: 6 },
+  availEditBtn: { width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(235,208,169,0.1)', justifyContent: 'center', alignItems: 'center' },
+  availDelBtn: { width: 32, height: 32, borderRadius: 16, backgroundColor: 'rgba(239,68,68,0.1)', justifyContent: 'center', alignItems: 'center' },
+
+  // Status chips
+  statusRow: { flexDirection: 'row', gap: 8, marginBottom: 14 },
+  statusChip: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 10, borderRadius: 10, borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.1)', gap: 6 },
+  statusChipDot: { width: 8, height: 8, borderRadius: 4 },
+  statusChipText: { fontSize: 12, color: 'rgba(255,255,255,0.5)', fontWeight: '600' },
+
+  // Add date button
+  addDateBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: COLORS.secondary, paddingVertical: 14, borderRadius: 12, marginTop: 12, gap: 8 },
+  addDateBtnText: { fontSize: 14, fontWeight: '700', color: COLORS.primary },
+  cancelEditLink: { alignItems: 'center', paddingVertical: 10, marginTop: 8 },
+  cancelEditLinkText: { fontSize: 13, color: 'rgba(255,255,255,0.4)' },
 });

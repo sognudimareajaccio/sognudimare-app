@@ -240,12 +240,12 @@ export default function HomeScreen() {
   };
 
   const differenceItems = [
-    { icon: 'heart', label_fr: "L'authenticité de nos croisières", label_en: 'Authentic cruises', desc_fr: 'Des expériences uniques loin du tourisme de masse', desc_en: 'Unique experiences away from mass tourism' },
-    { icon: 'leaf', label_fr: 'Le concept Slow Tourisme', label_en: 'Slow Tourism concept', desc_fr: 'Voyagez plus lentement, plus sainement', desc_en: 'Travel slower, healthier' },
-    { icon: 'boat', label_fr: 'Des catamarans récents', label_en: 'Recent catamarans', desc_fr: 'Navires spacieux et confortables', desc_en: 'Spacious and comfortable vessels' },
-    { icon: 'people', label_fr: "L'équipage aux petits soins", label_en: 'Dedicated crew', desc_fr: 'Maud & Nicolas à votre service', desc_en: 'Maud & Nicolas at your service' },
-    { icon: 'restaurant', label_fr: 'Produits frais et locaux', label_en: 'Fresh local products', desc_fr: '11 partenaires locaux', desc_en: '11 local partners' },
-    { icon: 'earth', label_fr: 'Engagement environnemental', label_en: 'Environmental commitment', desc_fr: '1% reversé aux associations', desc_en: '1% donated to associations' },
+    { icon: 'heart', iconType: 'ionicons', label_fr: "L'authenticité de nos croisières", label_en: 'Authentic cruises', desc_fr: 'Des expériences uniques loin du tourisme de masse', desc_en: 'Unique experiences away from mass tourism' },
+    { icon: 'leaf', iconType: 'ionicons', label_fr: 'Le concept Slow Tourisme', label_en: 'Slow Tourism concept', desc_fr: 'Voyagez plus lentement, plus sainement', desc_en: 'Travel slower, healthier' },
+    { icon: 'sail-boat', iconType: 'material', label_fr: 'Des catamarans récents', label_en: 'Recent catamarans', desc_fr: 'Navires spacieux et confortables', desc_en: 'Spacious and comfortable vessels' },
+    { icon: 'people', iconType: 'ionicons', label_fr: "L'équipage aux petits soins", label_en: 'Dedicated crew', desc_fr: 'Maud & Nicolas à votre service', desc_en: 'Maud & Nicolas at your service' },
+    { icon: 'restaurant', iconType: 'ionicons', label_fr: 'Produits frais et locaux', label_en: 'Fresh local products', desc_fr: '11 partenaires locaux', desc_en: '11 local partners' },
+    { icon: 'earth', iconType: 'ionicons', label_fr: 'Engagement environnemental', label_en: 'Environmental commitment', desc_fr: '1% reversé aux associations', desc_en: '1% donated to associations' },
   ];
 
   return (
@@ -353,7 +353,11 @@ export default function HomeScreen() {
             {differenceItems.map((item, index) => (
               <View key={index} style={styles.differenceCardNew}>
                 <View style={styles.differenceIconNew}>
-                  <Ionicons name={item.icon as any} size={24} color={COLORS.white} />
+                  {item.iconType === 'material' ? (
+                    <MaterialCommunityIcons name={item.icon as any} size={24} color={COLORS.white} />
+                  ) : (
+                    <Ionicons name={item.icon as any} size={24} color={COLORS.white} />
+                  )}
                 </View>
                 <Text style={styles.differenceLabelNew}>
                   {language === 'fr' ? item.label_fr : item.label_en}

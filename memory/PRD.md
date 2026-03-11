@@ -37,6 +37,10 @@ Application mobile de croisieres en catamaran (Corse, Sardaigne, Grece, Caraibes
 - [x] Correction lien Maddalena : la photo "Archipel la Maddalena" redirige maintenant vers la croisiere "Sardaigne & Corse du Sud"
 - [x] Page Engagements redesignee : design premium avec hero navy, carte donation 1%, liste d'engagements numerotee, section equipage engage, cartes d'associations avec bordure doree, citation et CTA elegant
 - [x] Lucy (Sunreef 50) deja ajoutee a la page flotte (flagship avec badge PRESTIGE)
+- [x] Lucy mise a jour : 4 cabines (1 proprietaire 2PAX, 2 invites 4PAX, 1 VIP 2PAX = 8 passagers), detail affiche dans le modal
+- [x] Icone voilier (sail-boat) pour "Des catamarans recents" dans la section "Ce qui fait vraiment notre difference" en homepage
+- [x] Page Admin redesignee : theme navy/or premium avec barre de stats, tabs dores, cartes croisieres avec image/badge/prix, modals elegants, login premium
+- [x] Boutons de la page Flotte renvoient en haut de page avant navigation
 
 ## Pending / Next Steps
 
