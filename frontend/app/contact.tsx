@@ -140,15 +140,19 @@ export default function ContactScreen() {
             <Text style={styles.companyDetailText}>APE: 52.22Z</Text>
             <Text style={styles.companyDetailText}>TVA: FR21451387369</Text>
           </View>
-          
-          {/* Admin link - discrete settings icon */}
-          <TouchableOpacity 
-            style={styles.adminLink}
-            onPress={() => router.push('/admin')}
-          >
-            <Ionicons name="settings-outline" size={18} color="rgba(255,255,255,0.4)" />
-          </TouchableOpacity>
         </View>
+        
+        {/* Admin link - discrete settings icon - moved outside company box */}
+        <TouchableOpacity 
+          style={styles.adminLink}
+          onPress={() => router.push('/admin')}
+          data-testid="admin-link"
+        >
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <Ionicons name="settings-outline" size={24} color={COLORS.textSecondary} />
+            <Text style={{ color: COLORS.textSecondary, fontSize: 12 }}>Admin</Text>
+          </View>
+        </TouchableOpacity>
 
         <View style={{ height: SPACING.xxl }} />
       </ScrollView>
@@ -297,7 +301,7 @@ const styles = StyleSheet.create({
   },
   adminLink: {
     marginTop: SPACING.lg,
-    padding: SPACING.sm,
-    opacity: 0.6,
+    padding: SPACING.md,
+    alignSelf: 'center',
   },
 });
