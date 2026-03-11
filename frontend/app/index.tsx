@@ -253,7 +253,8 @@ export default function HomeScreen() {
         {/* Header with Logo */}
         <View style={styles.header}>
           <Image source={{ uri: LOGO_URL }} style={styles.headerLogo} resizeMode="contain" />
-          <TouchableOpacity onPress={toggleLanguage} style={styles.langButton}>            <Text style={styles.langText}>{language.toUpperCase()}</Text>
+          <TouchableOpacity onPress={toggleLanguage} style={styles.langButton}>
+            <Text style={styles.langText}>{language.toUpperCase()}</Text>
             <Ionicons name="globe-outline" size={18} color={COLORS.secondary} />
           </TouchableOpacity>
         </View>
@@ -614,7 +615,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: SPACING.md,
+    paddingLeft: SPACING.xs,
+    paddingRight: SPACING.md,
     paddingVertical: SPACING.sm,
     backgroundColor: COLORS.primary,
   },
