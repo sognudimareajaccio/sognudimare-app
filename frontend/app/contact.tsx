@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS, SHADOWS } from '../src/constants/theme';
 import { useTranslation } from '../src/hooks/useTranslation';
 
@@ -28,6 +29,7 @@ const SOCIAL_LINKS = [
 
 export default function ContactScreen() {
   const { t } = useTranslation();
+  const router = useRouter();
 
   const handleCall = () => {
     Linking.openURL(`tel:${PHONE_NUMBER}`);
@@ -138,6 +140,14 @@ export default function ContactScreen() {
             <Text style={styles.companyDetailText}>APE: 52.22Z</Text>
             <Text style={styles.companyDetailText}>TVA: FR21451387369</Text>
           </View>
+          
+          {/* Admin link - discrete settings icon */}
+          <TouchableOpacity 
+            style={styles.adminLink}
+            onPress={() => router.push('/admin')}
+          >
+            <Ionicons name="settings-outline" size={18} color="rgba(255,255,255,0.4)" />
+          </TouchableOpacity>
         </View>
 
         <View style={{ height: SPACING.xxl }} />
@@ -284,5 +294,10 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     opacity: 0.7,
     marginTop: 2,
+  },
+  adminLink: {
+    marginTop: SPACING.lg,
+    padding: SPACING.sm,
+    opacity: 0.6,
   },
 });
