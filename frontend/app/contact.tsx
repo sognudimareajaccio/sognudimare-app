@@ -124,6 +124,15 @@ export default function ContactScreen() {
           </View>
         </View>
 
+        {/* Admin Button - Before the blue box */}
+        <TouchableOpacity 
+          style={styles.adminButton}
+          onPress={() => router.push('/admin')}
+        >
+          <Ionicons name="settings-outline" size={18} color={COLORS.primary} />
+          <Text style={styles.adminButtonText}>Administration</Text>
+        </TouchableOpacity>
+
         {/* Company Info with Logo */}
         <View style={styles.companyInfo}>
           <Image 
@@ -141,15 +150,6 @@ export default function ContactScreen() {
             <Text style={styles.companyDetailText}>TVA: FR21451387369</Text>
           </View>
         </View>
-        
-        {/* Admin Button - Outside the blue box */}
-        <TouchableOpacity 
-          style={styles.adminButton}
-          onPress={() => router.push('/admin')}
-        >
-          <Ionicons name="settings-outline" size={18} color={COLORS.primary} />
-          <Text style={styles.adminButtonText}>Administration</Text>
-        </TouchableOpacity>
 
         <View style={{ height: SPACING.xxl }} />
       </ScrollView>
