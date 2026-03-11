@@ -102,9 +102,14 @@ export default function CruisesScreen() {
                 {/* Next departure highlight */}
                 {nextAvail && (
                   <View style={s.nextDep}>
-                    <Ionicons name="calendar-outline" size={14} color={COLORS.primary} />
-                    <Text style={s.nextDepText}>{nextAvail.date_range}</Text>
-                    <Text style={s.nextDepPrice}>{nextAvail.price}€</Text>
+                    <View style={s.nextDepHeader}>
+                      <Ionicons name="calendar" size={14} color={COLORS.secondary} />
+                      <Text style={s.nextDepLabel}>{language === 'fr' ? 'PROCHAIN DÉPART' : 'NEXT DEPARTURE'}</Text>
+                    </View>
+                    <View style={s.nextDepRow}>
+                      <Text style={s.nextDepText}>{nextAvail.date_range}</Text>
+                      <Text style={s.nextDepPrice}>{nextAvail.price}€</Text>
+                    </View>
                   </View>
                 )}
 
@@ -166,11 +171,19 @@ const s = StyleSheet.create({
   metaText: { fontSize: 13, color: '#6B6560', marginLeft: 6 },
 
   nextDep: {
-    flexDirection: 'row', alignItems: 'center', backgroundColor: '#F0EDE8',
-    padding: 10, borderRadius: 10, marginBottom: SPACING.md, gap: 8,
+    backgroundColor: COLORS.primary, borderRadius: 12, padding: 12, marginBottom: SPACING.md,
   },
-  nextDepText: { flex: 1, fontSize: 12, color: COLORS.primary, fontWeight: '600' },
-  nextDepPrice: { fontSize: 14, fontWeight: '800', color: COLORS.primary },
+  nextDepHeader: {
+    flexDirection: 'row', alignItems: 'center', marginBottom: 6, gap: 6,
+  },
+  nextDepLabel: {
+    fontSize: 10, fontWeight: '800', color: COLORS.secondary, letterSpacing: 1.5,
+  },
+  nextDepRow: {
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+  },
+  nextDepText: { fontSize: 13, color: COLORS.white, fontWeight: '600' },
+  nextDepPrice: { fontSize: 16, fontWeight: '800', color: COLORS.secondary },
 
   cardFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: SPACING.sm, borderTopWidth: 1, borderTopColor: '#F0EDE8' },
   priceFrom: { fontSize: 10, color: '#8A8478' },

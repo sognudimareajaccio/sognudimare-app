@@ -1835,6 +1835,9 @@ const styles = StyleSheet.create({
     width: 200,
     height: 120,
     marginBottom: SPACING.md,
+    borderRadius: BORDER_RADIUS.xl,
+    borderWidth: 2,
+    borderColor: 'rgba(255,255,255,0.5)',
   },
   appStoreBadge: {
     width: 160,
