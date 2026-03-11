@@ -397,40 +397,50 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* All Inclusive Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            {language === 'fr' 
-              ? 'DES VACANCES TOUT INCLUS' 
-              : 'ALL-INCLUSIVE VACATION'}
+        {/* All Inclusive Section - Elegant */}
+        <View style={styles.allInclusiveSection}>
+          <View style={styles.allInclusiveTitleContainer}>
+            <View style={styles.allInclusiveLine} />
+            <Text style={styles.allInclusiveMainTitle}>
+              {language === 'fr' ? 'Des vacances' : 'All-inclusive'}
+            </Text>
+            <Text style={styles.allInclusiveAccentTitle}>
+              {language === 'fr' ? 'tout inclus' : 'vacation'}
+            </Text>
+            <Text style={styles.allInclusiveTagline}>
+              {language === 'fr' 
+                ? 'Formule tout compris & respectueuse de l\'environnement' 
+                : 'All-inclusive & eco-friendly formula'}
+            </Text>
+            <View style={styles.allInclusiveLine} />
+          </View>
+          
+          <Text style={styles.petitPlusSectionTitle}>
+            {language === 'fr' ? 'LES PETITS +++ DE SOGNUDIMARE' : 'SOGNUDIMARE EXTRAS'}
           </Text>
-          <Text style={styles.allInclusiveSubtitle}>
-            {language === 'fr' 
-              ? 'Formule tout compris & respectueuse de l\'environnement\nLES PETITS +++ DE SOGNUDIMARE' 
-              : 'All-inclusive & eco-friendly formula\nSOGNUDIMARE EXTRAS'}
-          </Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.inclusiveScroll}>
+          
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.inclusiveScrollNew}>
             {ALL_INCLUSIVE_FEATURES.map((feature, index) => (
-              <View key={index} style={styles.inclusiveCard}>
-                <View style={styles.inclusiveHeader}>
+              <View key={index} style={styles.inclusiveCardNew}>
+                <View style={styles.inclusiveIconNew}>
                   {feature.iconType === 'material' ? (
-                    <MaterialCommunityIcons name={feature.icon as any} size={32} color={COLORS.accent} />
+                    <MaterialCommunityIcons name={feature.icon as any} size={28} color={COLORS.white} />
                   ) : (
-                    <Ionicons name={feature.icon as any} size={32} color={COLORS.accent} />
+                    <Ionicons name={feature.icon as any} size={28} color={COLORS.white} />
                   )}
-                  <Text style={styles.inclusiveTitle}>
-                    {language === 'fr' ? feature.title_fr : feature.title_en}
-                  </Text>
-                  <View style={styles.inclusiveBadge}>
-                    <Text style={styles.inclusiveBadgeText}>INCLUS</Text>
-                  </View>
                 </View>
-                <Text style={styles.inclusiveDesc}>
+                <Text style={styles.inclusiveTitleNew}>
+                  {language === 'fr' ? feature.title_fr : feature.title_en}
+                </Text>
+                <View style={styles.inclusiveBadgeNew}>
+                  <Text style={styles.inclusiveBadgeTextNew}>INCLUS</Text>
+                </View>
+                <Text style={styles.inclusiveDescNew}>
                   {language === 'fr' ? feature.desc_fr : feature.desc_en}
                 </Text>
-                <View style={styles.petitPlusBox}>
-                  <Text style={styles.petitPlusLabel}>PETIT + SOGNUDIMARE</Text>
-                  <Text style={styles.petitPlusText}>
+                <View style={styles.petitPlusBoxNew}>
+                  <Ionicons name="sparkles" size={14} color={COLORS.secondary} />
+                  <Text style={styles.petitPlusTextNew}>
                     {language === 'fr' ? feature.petit_plus_fr : feature.petit_plus_en}
                   </Text>
                 </View>
@@ -1230,5 +1240,116 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.7)',
     textAlign: 'center',
     lineHeight: 16,
+  },
+  // Elegant All Inclusive Section
+  allInclusiveSection: {
+    backgroundColor: COLORS.surfaceLight,
+    paddingVertical: SPACING.xxl,
+  },
+  allInclusiveTitleContainer: {
+    alignItems: 'center',
+    paddingHorizontal: SPACING.lg,
+    marginBottom: SPACING.lg,
+  },
+  allInclusiveLine: {
+    width: 60,
+    height: 2,
+    backgroundColor: COLORS.secondary,
+    marginVertical: SPACING.sm,
+  },
+  allInclusiveMainTitle: {
+    fontSize: FONT_SIZES.lg,
+    color: COLORS.primary,
+    fontWeight: '300',
+    letterSpacing: 1,
+  },
+  allInclusiveAccentTitle: {
+    fontSize: FONT_SIZES.xxl,
+    color: COLORS.secondary,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  allInclusiveTagline: {
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    marginTop: SPACING.sm,
+    fontStyle: 'italic',
+  },
+  petitPlusSectionTitle: {
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.primary,
+    fontWeight: '700',
+    textAlign: 'center',
+    letterSpacing: 2,
+    marginBottom: SPACING.lg,
+  },
+  inclusiveScrollNew: {
+    paddingHorizontal: SPACING.lg,
+  },
+  inclusiveCardNew: {
+    width: 260,
+    backgroundColor: COLORS.white,
+    borderRadius: BORDER_RADIUS.xl,
+    padding: SPACING.lg,
+    marginRight: SPACING.md,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
+  },
+  inclusiveIconNew: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: COLORS.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: SPACING.md,
+    alignSelf: 'center',
+  },
+  inclusiveTitleNew: {
+    fontSize: FONT_SIZES.md,
+    fontWeight: '700',
+    color: COLORS.primary,
+    textAlign: 'center',
+    marginBottom: SPACING.sm,
+  },
+  inclusiveBadgeNew: {
+    backgroundColor: COLORS.secondary,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: 4,
+    borderRadius: BORDER_RADIUS.full,
+    alignSelf: 'center',
+    marginBottom: SPACING.md,
+  },
+  inclusiveBadgeTextNew: {
+    fontSize: FONT_SIZES.xs,
+    fontWeight: '700',
+    color: COLORS.white,
+    letterSpacing: 1,
+  },
+  inclusiveDescNew: {
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: SPACING.md,
+  },
+  petitPlusBoxNew: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(198, 165, 114, 0.1)',
+    borderRadius: BORDER_RADIUS.md,
+    padding: SPACING.sm,
+    gap: SPACING.xs,
+  },
+  petitPlusTextNew: {
+    fontSize: FONT_SIZES.xs,
+    color: COLORS.secondary,
+    fontWeight: '600',
+    flex: 1,
   },
 });
