@@ -337,32 +337,35 @@ export default function HomeScreen() {
         {/* Nos Destinations Section - Vertical Layout */}
         <View style={styles.destinationsSection}>
           <Text style={styles.sectionTitle}>
-            {language === 'fr' ? 'Nos destinations' : 'Our destinations'}
+            {t('ourDestinations')}
           </Text>
-          {PORTFOLIO_PHOTOS.slice(0, 4).map((photo, index) => (
-            <TouchableOpacity 
-              key={index} 
-              style={styles.destinationCard}
-              onPress={() => {
-                if ((photo as any).link) {
-                  router.push((photo as any).link);
-                } else if ((photo as any).cruiseName && cruises.length > 0) {
-                  const cruise = cruises.find(c => c.name_fr.includes((photo as any).cruiseName));
-                  if (cruise) {
-                    router.push(`/cruise/${cruise.id}`);
-                  }
-                }
-              }}
-            >
-              <Image source={{ uri: photo.url }} style={styles.destinationImage} />
-              <View style={styles.destinationOverlay}>
-                <Text style={styles.destinationLabel}>
-                  {language === 'fr' ? photo.label_fr : photo.label_en}
-                </Text>
-                <Ionicons name="arrow-forward-circle" size={28} color={COLORS.white} />
-              </View>
-            </TouchableOpacity>
-          ))}
+          {loading ? (
+            <ActivityIndicator size="large" color={COLORS.accent} />
+          ) : (
+            cruises.slice(0, 4).map((cruise) => (
+              <TouchableOpacity
+                key={cruise.id}
+                style={styles.destinationCard}
+                onPress={() => router.push(`/cruise/${cruise.id}`)}
+              >
+                <Image source={{ uri: cruise.image_url }} style={styles.destinationImage} />
+                <View style={styles.destinationOverlay}>
+                  <View>
+                    <Text style={styles.destinationSubtitle}>
+                      {language === 'fr' ? cruise.subtitle_fr : cruise.subtitle_en}
+                    </Text>
+                    <Text style={styles.destinationLabel}>
+                      {language === 'fr' ? cruise.name_fr : cruise.name_en}
+                    </Text>
+                    <Text style={styles.destinationPrice}>
+                      {t('from')} {cruise.pricing.cabin_price || cruise.pricing.private_price}€
+                    </Text>
+                  </View>
+                  <Ionicons name="arrow-forward-circle" size={32} color={COLORS.white} />
+                </View>
+              </TouchableOpacity>
+            ))
+          )}
         </View>
 
         {/* Stats Section */}
@@ -472,37 +475,6 @@ export default function HomeScreen() {
               </View>
             ))}
           </ScrollView>
-        </View>
-
-        {/* Featured Cruises */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('ourDestinations')}</Text>
-          {loading ? (
-            <ActivityIndicator size="large" color={COLORS.accent} />
-          ) : (
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.cruisesScroll}>
-              {cruises.slice(0, 4).map((cruise) => (
-                <TouchableOpacity
-                  key={cruise.id}
-                  style={styles.cruiseCard}
-                  onPress={() => router.push(`/cruise/${cruise.id}`)}
-                >
-                  <Image source={{ uri: cruise.image_url }} style={styles.cruiseImage} />
-                  <View style={styles.cruiseCardContent}>
-                    <Text style={styles.cruiseSubtitle}>
-                      {language === 'fr' ? cruise.subtitle_fr : cruise.subtitle_en}
-                    </Text>
-                    <Text style={styles.cruiseName}>
-                      {language === 'fr' ? cruise.name_fr : cruise.name_en}
-                    </Text>
-                    <Text style={styles.cruisePrice}>
-                      {t('from')} {cruise.pricing.cabin_price || cruise.pricing.private_price}€
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          )}
         </View>
 
         {/* Club Section */}
@@ -1196,5 +1168,17 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(0,0,0,0.5)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 3,
+  },
+  destinationSubtitle: {
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.secondary,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  destinationPrice: {
+    fontSize: FONT_SIZES.md,
+    color: COLORS.white,
+    fontWeight: '600',
+    marginTop: 4,
   },
 });
