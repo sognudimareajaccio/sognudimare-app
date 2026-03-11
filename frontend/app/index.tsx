@@ -319,74 +319,6 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* Photo Portfolio Section */}
-        <View style={styles.portfolioSection}>
-          <Text style={styles.portfolioTitle}>
-            {language === 'fr' ? 'Découvrez nos croisières en images' : 'Discover our cruises in pictures'}
-          </Text>
-          <View style={styles.portfolioGrid}>
-            {PORTFOLIO_PHOTOS.slice(0, 4).map((photo, index) => (
-              <TouchableOpacity 
-                key={index} 
-                style={styles.portfolioItem}
-                onPress={() => {
-                  if ((photo as any).link) {
-                    router.push((photo as any).link);
-                  } else if ((photo as any).cruiseName && cruises.length > 0) {
-                    const cruise = cruises.find(c => c.name_fr.includes((photo as any).cruiseName));
-                    if (cruise) {
-                      router.push(`/cruise/${cruise.id}`);
-                    }
-                  }
-                }}
-              >
-                <Image source={{ uri: photo.url }} style={styles.portfolioImage} />
-                <View style={styles.portfolioOverlay}>
-                  <Text style={styles.portfolioLabel}>
-                    {language === 'fr' ? photo.label_fr : photo.label_en}
-                  </Text>
-                  {((photo as any).link || (photo as any).cruiseName) && (
-                    <Ionicons name="arrow-forward-circle" size={24} color={COLORS.white} style={{ marginTop: 4 }} />
-                  )}
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
-          <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false} 
-            contentContainerStyle={styles.portfolioScrollContent}
-            style={styles.portfolioScroll}
-          >
-            {PORTFOLIO_PHOTOS.slice(6).map((photo, index) => (
-              <TouchableOpacity 
-                key={index} 
-                style={styles.portfolioScrollItem}
-                onPress={() => {
-                  if ((photo as any).link) {
-                    router.push((photo as any).link);
-                  } else if ((photo as any).cruiseName && cruises.length > 0) {
-                    const cruise = cruises.find(c => c.name_fr.includes((photo as any).cruiseName));
-                    if (cruise) {
-                      router.push(`/cruise/${cruise.id}`);
-                    }
-                  }
-                }}
-              >
-                <Image source={{ uri: photo.url }} style={styles.portfolioScrollImage} />
-                <View style={styles.portfolioScrollOverlay}>
-                  <Text style={styles.portfolioScrollLabel}>
-                    {language === 'fr' ? photo.label_fr : photo.label_en}
-                  </Text>
-                  {((photo as any).link || (photo as any).cruiseName) && (
-                    <Ionicons name="arrow-forward-circle" size={18} color={COLORS.white} style={{ marginTop: 2 }} />
-                  )}
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
-
         {/* Boarding Cards Section */}
         <View style={styles.boardingSection}>
           <Text style={styles.sectionTitle}>
@@ -400,6 +332,37 @@ export default function HomeScreen() {
               ? '8 jours / 7 nuits ou 2 semaines (selon la destination)\nen pension complète avec équipage aux petits soins.'
               : '8 days / 7 nights or 2 weeks (depending on destination)\nfull board with dedicated crew.'}
           </Text>
+        </View>
+
+        {/* Nos Destinations Section - Vertical Layout */}
+        <View style={styles.destinationsSection}>
+          <Text style={styles.sectionTitle}>
+            {language === 'fr' ? 'Nos destinations' : 'Our destinations'}
+          </Text>
+          {PORTFOLIO_PHOTOS.slice(0, 4).map((photo, index) => (
+            <TouchableOpacity 
+              key={index} 
+              style={styles.destinationCard}
+              onPress={() => {
+                if ((photo as any).link) {
+                  router.push((photo as any).link);
+                } else if ((photo as any).cruiseName && cruises.length > 0) {
+                  const cruise = cruises.find(c => c.name_fr.includes((photo as any).cruiseName));
+                  if (cruise) {
+                    router.push(`/cruise/${cruise.id}`);
+                  }
+                }
+              }}
+            >
+              <Image source={{ uri: photo.url }} style={styles.destinationImage} />
+              <View style={styles.destinationOverlay}>
+                <Text style={styles.destinationLabel}>
+                  {language === 'fr' ? photo.label_fr : photo.label_en}
+                </Text>
+                <Ionicons name="arrow-forward-circle" size={28} color={COLORS.white} />
+              </View>
+            </TouchableOpacity>
+          ))}
         </View>
 
         {/* Stats Section */}
@@ -1199,5 +1162,39 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: COLORS.primary,
     marginRight: SPACING.sm,
+  },
+  // Destinations Section - Vertical Layout
+  destinationsSection: {
+    padding: SPACING.lg,
+    backgroundColor: COLORS.surfaceLight,
+  },
+  destinationCard: {
+    width: '100%',
+    height: 200,
+    borderRadius: BORDER_RADIUS.xl,
+    overflow: 'hidden',
+    marginBottom: SPACING.md,
+  },
+  destinationImage: {
+    width: '100%',
+    height: '100%',
+  },
+  destinationOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    justifyContent: 'flex-end',
+    alignItems: 'flex-start',
+    padding: SPACING.lg,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+  },
+  destinationLabel: {
+    fontSize: FONT_SIZES.xl,
+    fontWeight: '700',
+    color: COLORS.white,
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
   },
 });
