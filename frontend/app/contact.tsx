@@ -138,14 +138,18 @@ export default function ContactScreen() {
           <View style={styles.companyDetails}>
             <Text style={styles.companyDetailText}>SIRET: 45138736900031</Text>
             <Text style={styles.companyDetailText}>APE: 52.22Z</Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20, marginTop: 2 }}>
-              <Text style={styles.companyDetailText}>TVA: FR21451387369</Text>
-              <TouchableOpacity onPress={() => router.push('/admin')}>
-                <Text style={{ color: 'rgba(255,255,255,0.5)', fontSize: 18 }}>⚙️</Text>
-              </TouchableOpacity>
-            </View>
+            <Text style={styles.companyDetailText}>TVA: FR21451387369</Text>
           </View>
         </View>
+        
+        {/* Admin Button - Outside the blue box */}
+        <TouchableOpacity 
+          style={styles.adminButton}
+          onPress={() => router.push('/admin')}
+        >
+          <Ionicons name="settings-outline" size={18} color={COLORS.primary} />
+          <Text style={styles.adminButtonText}>Administration</Text>
+        </TouchableOpacity>
 
         <View style={{ height: SPACING.xxl }} />
       </ScrollView>
@@ -296,5 +300,23 @@ const styles = StyleSheet.create({
   adminLink: {
     marginTop: SPACING.lg,
     padding: SPACING.sm,
+  },
+  adminButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.surfaceLight,
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.xl,
+    borderRadius: BORDER_RADIUS.lg,
+    marginTop: SPACING.lg,
+    gap: SPACING.sm,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  adminButtonText: {
+    color: COLORS.primary,
+    fontSize: FONT_SIZES.sm,
+    fontWeight: '600',
   },
 });
