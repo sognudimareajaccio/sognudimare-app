@@ -46,6 +46,9 @@ Application mobile de croisières en catamaran (Corse, Sardaigne, Grèce, Caraï
 - [x] Portfolio réduit à 6 photos avec liens : Tour de Corse, Scandola, Îles Lavezzi, Archipel Maddalena, Les Catamarans, L'équipage
 - [x] Nouveaux logos dans le header (cercles Sdm + texte sognudimare)
 - [x] Logo complet dans la section À propos (remplace le texte "Sognudimare")
+- [x] Nouveau logo header Sognudimare (cercles + Sdm + texte) centré et agrandi
+- [x] Portfolio "Destinations authentiques" avec 6 photos + flèches de lien (Tour de Corse, Scandola, Îles Lavezzi, Archipel Maddalena, Les Catamarans, L'équipage)
+- [x] Section À propos : logo agrandi, espacement réduit
 
 ## Pending / Next Steps
 

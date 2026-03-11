@@ -29,8 +29,7 @@ const HERO_CAROUSEL_IMAGES = [
 
 // Images from sognudimare website (keep for backup)
 const HERO_IMAGE = 'https://static.wixstatic.com/media/ce6ce7_d0178804b62b4c56802db975ade4e29ff000.jpg/v1/fill/w_1904,h_1008,al_c,q_85,usm_0.33_1.00_0.00,enc_avif,quality_auto/ce6ce7_d0178804b62b4c56802db975ade4e29ff000.jpg';
-const LOGO_URL = 'https://customer-assets.emergentagent.com/job_9595dfad-24f9-4c7d-8c80-c7800213d8b6/artifacts/n9vnxdmz_3.png';
-const LOGO_TEXT_URL = 'https://customer-assets.emergentagent.com/job_9595dfad-24f9-4c7d-8c80-c7800213d8b6/artifacts/dx9pk39n_4.png';
+const LOGO_URL = 'https://customer-assets.emergentagent.com/job_9595dfad-24f9-4c7d-8c80-c7800213d8b6/artifacts/xqltz436_Copie%20de%20logo%20sognudimare%202026.png';
 const LOGO_FULL_URL = 'https://customer-assets.emergentagent.com/job_9595dfad-24f9-4c7d-8c80-c7800213d8b6/artifacts/fyysjnlz_2.png';
 const BOARDING_CARDS_IMAGE = 'https://customer-assets.emergentagent.com/job_sognudi-app/artifacts/b4ya6cm8_15.jpg';
 
@@ -253,10 +252,7 @@ export default function HomeScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Header with Logo */}
         <View style={styles.header}>
-          <View style={styles.logoContainer}>
-            <Image source={{ uri: LOGO_URL }} style={styles.logo} resizeMode="contain" />
-            <Image source={{ uri: LOGO_TEXT_URL }} style={styles.logoTextImage} resizeMode="contain" />
-          </View>
+          <Image source={{ uri: LOGO_URL }} style={styles.headerLogo} resizeMode="contain" />
           <TouchableOpacity onPress={toggleLanguage} style={styles.langButton}>
             <Text style={styles.langText}>{language.toUpperCase()}</Text>
             <Ionicons name="globe-outline" size={18} color={COLORS.secondary} />
@@ -509,10 +505,10 @@ export default function HomeScreen() {
           <View style={styles.galleryTitleContainer}>
             <View style={styles.galleryLine} />
             <Text style={styles.galleryMainTitle}>
-              {language === 'fr' ? 'Instantanés' : 'Snapshots'}
+              {language === 'fr' ? 'Destinations' : 'Authentic'}
             </Text>
             <Text style={styles.galleryAccentTitle}>
-              {language === 'fr' ? 'de nos croisières' : 'from our cruises'}
+              {language === 'fr' ? 'authentiques' : 'Destinations'}
             </Text>
             <View style={styles.galleryLine} />
           </View>
@@ -532,7 +528,10 @@ export default function HomeScreen() {
             >
               <Image source={{ uri: photo.url }} style={styles.galleryImage} />
               <View style={styles.galleryOverlay}>
-                <Text style={styles.galleryLabel}>{language === 'fr' ? photo.label_fr : photo.label_en}</Text>
+                <View style={styles.galleryLabelRow}>
+                  <Text style={styles.galleryLabel}>{language === 'fr' ? photo.label_fr : photo.label_en}</Text>
+                  <Ionicons name="arrow-forward-circle" size={24} color={COLORS.white} />
+                </View>
               </View>
             </TouchableOpacity>
           ))}
@@ -613,27 +612,19 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   header: {
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
+    paddingVertical: SPACING.lg,
     backgroundColor: COLORS.primary,
   },
-  logoContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  logo: {
-    width: 40,
-    height: 35,
-  },
-  logoTextImage: {
-    width: 120,
-    height: 25,
-    marginLeft: SPACING.sm,
+  headerLogo: {
+    width: width * 0.75,
+    height: 60,
   },
   langButton: {
+    position: 'absolute',
+    right: SPACING.md,
+    top: SPACING.lg,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: SPACING.sm,
@@ -1637,6 +1628,11 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     padding: SPACING.md,
   },
+  galleryLabelRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   galleryLabel: {
     color: COLORS.white,
     fontSize: FONT_SIZES.md,
@@ -1785,10 +1781,11 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   aboutLogoImage: {
-    width: 220,
-    height: 120,
+    width: 280,
+    height: 150,
     alignSelf: 'center',
-    marginBottom: SPACING.lg,
+    marginTop: -SPACING.sm,
+    marginBottom: SPACING.md,
   },
   aboutTextNew: {
     fontSize: FONT_SIZES.sm,
