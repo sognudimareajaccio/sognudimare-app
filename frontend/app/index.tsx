@@ -22,7 +22,6 @@ const { width } = Dimensions.get('window');
 
 // Hero carousel images
 const HERO_CAROUSEL_IMAGES = [
-  'https://customer-assets.emergentagent.com/job_5ba811cf-02a8-4655-b752-0019730eddad/artifacts/qyrn5qct_1741880477430-dji0149-0196-processed-1-e1744794238742.jpg',
   'https://customer-assets.emergentagent.com/job_5ba811cf-02a8-4655-b752-0019730eddad/artifacts/oxvhoibd_1741880477434-zoanls12-processed-1282x855-c-default.webp',
   'https://customer-assets.emergentagent.com/job_5ba811cf-02a8-4655-b752-0019730eddad/artifacts/edw900fs_1741880477436-zoanls34-processed-1282x855-c-default.webp',
   'https://customer-assets.emergentagent.com/job_5ba811cf-02a8-4655-b752-0019730eddad/artifacts/xd5y7qna_1741880477435-zoanls22-processed-1282x855-c-default.webp',
