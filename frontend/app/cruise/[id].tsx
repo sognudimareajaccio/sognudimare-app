@@ -41,7 +41,7 @@ const getIncludedEN = (duration: string) => [
 ];
 
 const NOT_INCLUDED_FR = [
-  'Les taxes éventuelles de séjour et de sortie du territoire',
+  'Les taxes éventuelles de séjour',
   'Le petit déjeuner du jour 1 ainsi que le diner du jour du débarquement',
   'Les repas et les boissons non inclus dans la formule (ex : champagne)',
   'La caisse de bord : 240 €/ passager / semaine',
@@ -264,29 +264,41 @@ export default function CruiseDetailScreen() {
             ))}
           </View>
 
-          {/* Program */}
+          {/* Program - Timeline */}
           <View style={s.section}>
             <Text style={s.sectionTitle}>{t('program')}</Text>
-            {hasDetailedProgram ? (
-              detailedProgram.map((day, i) => (
-                <View key={i} style={s.programDay}>
-                  <View style={s.programBadge}>
-                    <Text style={s.programBadgeText}>{language === 'fr' ? 'J' : 'D'}{day.day}</Text>
+            <View style={s.timeline}>
+              {hasDetailedProgram ? (
+                detailedProgram.map((day, i) => (
+                  <View key={i} style={s.timelineItem}>
+                    <View style={s.timelineLeft}>
+                      <View style={s.timelineDot}>
+                        <Text style={s.timelineDotText}>{day.day}</Text>
+                      </View>
+                      {i < detailedProgram.length - 1 && <View style={s.timelineLine} />}
+                    </View>
+                    <View style={s.timelineContent}>
+                      <Text style={s.timelineTitle}>{day.title}</Text>
+                      <Text style={s.timelineDesc}>{day.description}</Text>
+                    </View>
                   </View>
-                  <View style={s.programInfo}>
-                    <Text style={s.programTitle}>{day.title}</Text>
-                    <Text style={s.programDesc}>{day.description}</Text>
+                ))
+              ) : (
+                program.map((p, i) => (
+                  <View key={i} style={s.timelineItem}>
+                    <View style={s.timelineLeft}>
+                      <View style={s.timelineDot}>
+                        <Text style={s.timelineDotText}>{i + 1}</Text>
+                      </View>
+                      {i < program.length - 1 && <View style={s.timelineLine} />}
+                    </View>
+                    <View style={s.timelineContent}>
+                      <Text style={s.timelineDesc}>{p}</Text>
+                    </View>
                   </View>
-                </View>
-              ))
-            ) : (
-              program.map((p, i) => (
-                <View key={i} style={s.programSimple}>
-                  <View style={s.programDot} />
-                  <Text style={s.programSimpleText}>{p}</Text>
-                </View>
-              ))
-            )}
+                ))
+              )}
+            </View>
           </View>
 
           {/* All Dates */}
@@ -408,12 +420,12 @@ const s = StyleSheet.create({
   headerTitle: { flex: 1, fontSize: 17, fontWeight: '600', color: COLORS.secondary, textAlign: 'center' },
 
   // Hero
-  hero: { height: 300, position: 'relative' },
+  hero: { height: 340, position: 'relative' },
   heroImg: { width: '100%', height: '100%' },
   heroGradient: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(14,28,64,0.45)',
-    justifyContent: 'flex-end', padding: SPACING.lg,
+    justifyContent: 'center', padding: SPACING.lg, paddingBottom: 60,
   },
   heroBadge: {
     flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start',
@@ -479,22 +491,23 @@ const s = StyleSheet.create({
   highlightItem: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
   highlightText: { marginLeft: 10, fontSize: 14, color: COLORS.primary, fontWeight: '500', flex: 1 },
 
-  // Program
-  programDay: {
-    flexDirection: 'row', marginBottom: 14, backgroundColor: COLORS.white,
-    borderRadius: 12, padding: 14, borderLeftWidth: 3, borderLeftColor: COLORS.secondary,
+  // Program - Timeline
+  timeline: {},
+  timelineItem: { flexDirection: 'row', minHeight: 70 },
+  timelineLeft: { alignItems: 'center', width: 44 },
+  timelineDot: {
+    width: 36, height: 36, borderRadius: 18,
+    backgroundColor: COLORS.primary, justifyContent: 'center', alignItems: 'center',
+    borderWidth: 3, borderColor: COLORS.secondary,
   },
-  programBadge: {
-    width: 34, height: 34, borderRadius: 17, backgroundColor: COLORS.primary,
-    justifyContent: 'center', alignItems: 'center', marginRight: 12,
+  timelineDotText: { color: COLORS.secondary, fontSize: 14, fontWeight: '800' },
+  timelineLine: { width: 2, flex: 1, backgroundColor: 'rgba(197,171,110,0.3)', marginVertical: 4 },
+  timelineContent: {
+    flex: 1, marginLeft: 14, paddingBottom: 20,
+    backgroundColor: COLORS.white, borderRadius: 12, padding: 14, marginBottom: 8,
   },
-  programBadgeText: { color: COLORS.secondary, fontSize: 13, fontWeight: '700' },
-  programInfo: { flex: 1 },
-  programTitle: { fontSize: 15, fontWeight: '700', color: COLORS.primary, marginBottom: 4 },
-  programDesc: { fontSize: 13, color: COLORS.textSecondary, lineHeight: 19 },
-  programSimple: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12 },
-  programDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: COLORS.secondary, marginTop: 6, marginRight: 12 },
-  programSimpleText: { flex: 1, fontSize: 14, color: COLORS.text, lineHeight: 21 },
+  timelineTitle: { fontSize: 15, fontWeight: '700', color: COLORS.primary, marginBottom: 4 },
+  timelineDesc: { fontSize: 13, color: COLORS.textSecondary, lineHeight: 19 },
 
   // Dates
   statusDot: { width: 10, height: 10, borderRadius: 5, marginRight: 12 },
