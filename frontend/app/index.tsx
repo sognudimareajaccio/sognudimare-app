@@ -449,103 +449,153 @@ export default function HomeScreen() {
           </ScrollView>
         </View>
 
-        {/* Local Partners Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            {language === 'fr' 
-              ? 'Une collaboration responsable et engagée' 
-              : 'Responsible and committed collaboration'}
-          </Text>
-          <Text style={styles.partnersSubtitle}>
-            {language === 'fr' 
-              ? 'Nous travaillons uniquement avec des acteurs locaux' 
-              : 'We work exclusively with local partners'}
-          </Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.partnersScroll}>
+        {/* Local Partners Section - Elegant */}
+        <View style={styles.partnersSection}>
+          <View style={styles.partnersTitleContainer}>
+            <View style={styles.partnersLine} />
+            <Text style={styles.partnersMainTitle}>
+              {language === 'fr' ? 'Une collaboration' : 'Responsible and'}
+            </Text>
+            <Text style={styles.partnersAccentTitle}>
+              {language === 'fr' ? 'responsable et engagée' : 'committed collaboration'}
+            </Text>
+            <Text style={styles.partnersTagline}>
+              {language === 'fr' 
+                ? 'Nous travaillons uniquement avec des acteurs locaux' 
+                : 'We work exclusively with local partners'}
+            </Text>
+            <View style={styles.partnersLine} />
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.partnersScrollNew}>
             {LOCAL_PARTNERS.map((partner, index) => (
-              <View key={index} style={styles.partnerCard}>
-                <View style={styles.partnerIcon}>
-                  <Ionicons name="storefront" size={24} color={COLORS.accent} />
+              <View key={index} style={styles.partnerCardNew}>
+                <View style={styles.partnerIconNew}>
+                  <Ionicons name="storefront" size={24} color={COLORS.white} />
                 </View>
-                <Text style={styles.partnerName}>{partner.name}</Text>
-                <Text style={styles.partnerType}>{partner.type}</Text>
+                <Text style={styles.partnerNameNew}>{partner.name}</Text>
+                <Text style={styles.partnerTypeNew}>{partner.type}</Text>
               </View>
             ))}
           </ScrollView>
         </View>
 
-        {/* Club Section */}
-        <View style={styles.clubSection}>
-          <Text style={styles.clubTitle}>{t('clubTitle')}</Text>
-          <Text style={styles.clubSubtitle}>
-            {language === 'fr' 
-              ? 'Économisez jusqu\'à 20% sur vos croisières !' 
-              : 'Save up to 20% on your cruises!'}
-          </Text>
-          <View style={styles.clubCardsPreview}>
-            <View style={styles.clubCardPreview}>
-              <Text style={styles.clubCardDuration}>12 mois</Text>
-              <Text style={styles.clubCardPrice}>90€</Text>
-              <View style={styles.clubDiscountBadge}><Text style={styles.clubDiscountText}>-10%</Text></View>
+        {/* Club Section - Elegant with Card Visuals */}
+        <View style={styles.clubSectionNew}>
+          <View style={styles.clubTitleContainer}>
+            <View style={styles.clubLine} />
+            <Text style={styles.clubMainTitle}>
+              {language === 'fr' ? 'Club des' : 'Travelers'}
+            </Text>
+            <Text style={styles.clubAccentTitle}>
+              {language === 'fr' ? 'Voyageurs' : 'Club'}
+            </Text>
+            <Text style={styles.clubTagline}>
+              {language === 'fr' 
+                ? 'Économisez jusqu\'à 20% sur vos croisières !' 
+                : 'Save up to 20% on your cruises!'}
+            </Text>
+            <View style={styles.clubLine} />
+          </View>
+          <View style={styles.clubCardsRow}>
+            <View style={styles.clubCardNew}>
+              <View style={styles.clubCardHeader}>
+                <Ionicons name="card" size={24} color={COLORS.secondary} />
+              </View>
+              <Text style={styles.clubCardDurationNew}>12 mois</Text>
+              <Text style={styles.clubCardPriceNew}>90€</Text>
+              <View style={styles.clubDiscountBadgeNew}>
+                <Text style={styles.clubDiscountTextNew}>-10%</Text>
+              </View>
             </View>
-            <View style={[styles.clubCardPreview, styles.clubCardHighlight]}>
-              <Text style={[styles.clubCardDuration, styles.clubCardTextLight]}>24 mois</Text>
-              <Text style={[styles.clubCardPrice, styles.clubCardTextLight]}>150€</Text>
-              <View style={styles.clubDiscountBadgeHighlight}><Text style={styles.clubDiscountTextDark}>-15%</Text></View>
+            <View style={[styles.clubCardNew, styles.clubCardHighlightNew]}>
+              <View style={styles.clubCardHeaderHighlight}>
+                <Ionicons name="star" size={24} color={COLORS.primary} />
+                <Text style={styles.clubBestValue}>BEST</Text>
+              </View>
+              <Text style={styles.clubCardDurationHighlight}>24 mois</Text>
+              <Text style={styles.clubCardPriceHighlight}>150€</Text>
+              <View style={styles.clubDiscountBadgeHighlightNew}>
+                <Text style={styles.clubDiscountTextHighlight}>-15%</Text>
+              </View>
             </View>
-            <View style={styles.clubCardPreview}>
-              <Text style={styles.clubCardDuration}>36 mois</Text>
-              <Text style={styles.clubCardPrice}>140€</Text>
-              <View style={styles.clubDiscountBadge}><Text style={styles.clubDiscountText}>-20%</Text></View>
+            <View style={styles.clubCardNew}>
+              <View style={styles.clubCardHeader}>
+                <Ionicons name="diamond" size={24} color={COLORS.secondary} />
+              </View>
+              <Text style={styles.clubCardDurationNew}>36 mois</Text>
+              <Text style={styles.clubCardPriceNew}>140€</Text>
+              <View style={styles.clubDiscountBadgeNew}>
+                <Text style={styles.clubDiscountTextNew}>-20%</Text>
+              </View>
             </View>
           </View>
-          <TouchableOpacity style={styles.clubButton} onPress={() => router.push('/club')}>
-            <Text style={styles.clubButtonText}>{t('joinClub')}</Text>
+          <TouchableOpacity style={styles.clubButtonNew} onPress={() => router.push('/club')}>
+            <Text style={styles.clubButtonTextNew}>{t('joinClub')}</Text>
+            <Ionicons name="arrow-forward" size={18} color={COLORS.white} />
           </TouchableOpacity>
         </View>
 
-        {/* Engagements Section */}
-        <View style={styles.engagementsSection}>
-          <View style={styles.engagementsIconRow}>
-            <Ionicons name="leaf" size={28} color={COLORS.accent} />
-            <Text style={styles.engagementsBadge}>1%</Text>
-            <Ionicons name="heart" size={28} color={COLORS.accent} />
+        {/* Engagements Section - Elegant */}
+        <View style={styles.engagementsSectionNew}>
+          <View style={styles.engagementsTitleContainer}>
+            <View style={styles.engagementsLine} />
+            <View style={styles.engagementsIconRowNew}>
+              <Ionicons name="leaf" size={32} color={COLORS.white} />
+              <View style={styles.engagementsBadgeNew}>
+                <Text style={styles.engagementsBadgeText}>1%</Text>
+              </View>
+              <Ionicons name="heart" size={32} color={COLORS.white} />
+            </View>
+            <Text style={styles.engagementsMainTitle}>
+              {language === 'fr' ? 'Nos engagements' : 'Our eco-responsible'}
+            </Text>
+            <Text style={styles.engagementsAccentTitle}>
+              {language === 'fr' ? 'écoresponsables' : 'commitments'}
+            </Text>
+            <View style={styles.engagementsLine} />
           </View>
-          <Text style={styles.engagementsTitle}>
-            {language === 'fr' ? 'Nos engagements écoresponsables' : 'Our eco-responsible commitments'}
-          </Text>
-          <Text style={styles.engagementsText}>
+          <Text style={styles.engagementsTextNew}>
             {language === 'fr' 
-              ? 'Tourisme durable, circuits courts, protection de la biodiversité marine... 1% de notre CA est reversé à des associations locales qui œuvrent pour la préservation de la Méditerranée.'
-              : 'Sustainable tourism, short supply chains, marine biodiversity protection... 1% of our revenue is donated to local associations working to preserve the Mediterranean.'}
+              ? 'Tourisme durable, circuits courts, protection de la biodiversité marine... 1% de notre CA est reversé à des associations locales.' 
+              : 'Sustainable tourism, short supply chains, marine biodiversity protection... 1% of our revenue is donated to local associations.'}
           </Text>
-          <View style={styles.engagementsAssociations}>
-            <View style={styles.engagementAssocItem}>
-              <Ionicons name="checkmark-circle" size={18} color={COLORS.secondary} />
-              <Text style={styles.engagementAssocName}>Mare Vivu</Text>
+          <View style={styles.engagementsAssociationsNew}>
+            <View style={styles.engagementAssocItemNew}>
+              <Ionicons name="checkmark-circle" size={20} color={COLORS.secondary} />
+              <Text style={styles.engagementAssocNameNew}>Mare Vivu</Text>
             </View>
-            <View style={styles.engagementAssocItem}>
-              <Ionicons name="checkmark-circle" size={18} color={COLORS.secondary} />
-              <Text style={styles.engagementAssocName}>La Girelle</Text>
+            <View style={styles.engagementAssocItemNew}>
+              <Ionicons name="checkmark-circle" size={20} color={COLORS.secondary} />
+              <Text style={styles.engagementAssocNameNew}>La Girelle</Text>
             </View>
           </View>
-          <TouchableOpacity style={styles.engagementsButton} onPress={() => router.push('/engagements')}>
-            <Text style={styles.engagementsButtonText}>
+          <TouchableOpacity style={styles.engagementsButtonNew} onPress={() => router.push('/engagements')}>
+            <Text style={styles.engagementsButtonTextNew}>
               {language === 'fr' ? 'Découvrir nos engagements' : 'Discover our commitments'}
             </Text>
-            <Ionicons name="arrow-forward" size={18} color={COLORS.primary} />
+            <Ionicons name="arrow-forward" size={18} color={COLORS.secondary} />
           </TouchableOpacity>
         </View>
 
-        {/* About Section */}
-        <View style={styles.aboutSection}>
-          <Text style={styles.aboutTitle}>{t('aboutTitle')}</Text>
-          <Text style={styles.aboutText}>{t('aboutText')}</Text>
-          <Text style={styles.aboutHighlight}>
-            {language === 'fr' 
-              ? 'En septembre 2025, la Corse a été labellisée GREEN DESTINATION, confirmant son rôle de référence méditerranéenne en matière de tourisme durable.' 
-              : 'In September 2025, Corsica was labeled GREEN DESTINATION, confirming its role as a Mediterranean reference in sustainable tourism.'}
-          </Text>
+        {/* About Section - Elegant */}
+        <View style={styles.aboutSectionNew}>
+          <View style={styles.aboutTitleContainer}>
+            <View style={styles.aboutLine} />
+            <Text style={styles.aboutMainTitle}>
+              {language === 'fr' ? 'À propos de' : 'About'}
+            </Text>
+            <Text style={styles.aboutAccentTitle}>Sognudimare</Text>
+            <View style={styles.aboutLine} />
+          </View>
+          <Text style={styles.aboutTextNew}>{t('aboutText')}</Text>
+          <View style={styles.aboutHighlightBox}>
+            <Ionicons name="trophy" size={28} color={COLORS.secondary} />
+            <Text style={styles.aboutHighlightNew}>
+              {language === 'fr' 
+                ? 'En septembre 2025, la Corse a été labellisée GREEN DESTINATION, confirmant son rôle de référence méditerranéenne en matière de tourisme durable.' 
+                : 'In September 2025, Corsica was labeled GREEN DESTINATION, confirming its role as a Mediterranean reference in sustainable tourism.'}
+            </Text>
+          </View>
         </View>
 
         <View style={{ height: SPACING.xxl }} />
@@ -1351,5 +1401,349 @@ const styles = StyleSheet.create({
     color: COLORS.secondary,
     fontWeight: '600',
     flex: 1,
+  },
+  // Partners Section Elegant
+  partnersSection: {
+    backgroundColor: COLORS.white,
+    paddingVertical: SPACING.xxl,
+  },
+  partnersTitleContainer: {
+    alignItems: 'center',
+    paddingHorizontal: SPACING.lg,
+    marginBottom: SPACING.lg,
+  },
+  partnersLine: {
+    width: 60,
+    height: 2,
+    backgroundColor: COLORS.secondary,
+    marginVertical: SPACING.sm,
+  },
+  partnersMainTitle: {
+    fontSize: FONT_SIZES.lg,
+    color: COLORS.primary,
+    fontWeight: '300',
+    letterSpacing: 1,
+  },
+  partnersAccentTitle: {
+    fontSize: FONT_SIZES.xl,
+    color: COLORS.secondary,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+    textAlign: 'center',
+  },
+  partnersTagline: {
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    marginTop: SPACING.sm,
+    fontStyle: 'italic',
+  },
+  partnersScrollNew: {
+    paddingHorizontal: SPACING.lg,
+  },
+  partnerCardNew: {
+    width: 140,
+    backgroundColor: COLORS.surfaceLight,
+    borderRadius: BORDER_RADIUS.xl,
+    padding: SPACING.md,
+    marginRight: SPACING.md,
+    alignItems: 'center',
+  },
+  partnerIconNew: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: COLORS.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: SPACING.sm,
+  },
+  partnerNameNew: {
+    fontSize: FONT_SIZES.sm,
+    fontWeight: '700',
+    color: COLORS.primary,
+    textAlign: 'center',
+  },
+  partnerTypeNew: {
+    fontSize: FONT_SIZES.xs,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    marginTop: 2,
+  },
+  // Club Section Elegant
+  clubSectionNew: {
+    backgroundColor: COLORS.primary,
+    paddingVertical: SPACING.xxl,
+  },
+  clubTitleContainer: {
+    alignItems: 'center',
+    paddingHorizontal: SPACING.lg,
+    marginBottom: SPACING.lg,
+  },
+  clubLine: {
+    width: 60,
+    height: 2,
+    backgroundColor: COLORS.secondary,
+    marginVertical: SPACING.sm,
+  },
+  clubMainTitle: {
+    fontSize: FONT_SIZES.lg,
+    color: COLORS.white,
+    fontWeight: '300',
+    letterSpacing: 1,
+  },
+  clubAccentTitle: {
+    fontSize: FONT_SIZES.xxl,
+    color: COLORS.secondary,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  clubTagline: {
+    fontSize: FONT_SIZES.sm,
+    color: 'rgba(255,255,255,0.8)',
+    textAlign: 'center',
+    marginTop: SPACING.sm,
+  },
+  clubCardsRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingHorizontal: SPACING.md,
+    marginBottom: SPACING.lg,
+  },
+  clubCardNew: {
+    width: 100,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: BORDER_RADIUS.lg,
+    padding: SPACING.md,
+    marginHorizontal: SPACING.xs,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.2)',
+  },
+  clubCardHighlightNew: {
+    backgroundColor: COLORS.secondary,
+    borderColor: COLORS.secondary,
+    transform: [{ scale: 1.05 }],
+  },
+  clubCardHeader: {
+    marginBottom: SPACING.sm,
+  },
+  clubCardHeaderHighlight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.sm,
+  },
+  clubBestValue: {
+    fontSize: 8,
+    fontWeight: '700',
+    color: COLORS.primary,
+    marginLeft: 4,
+  },
+  clubCardDurationNew: {
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.white,
+    fontWeight: '600',
+  },
+  clubCardDurationHighlight: {
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.primary,
+    fontWeight: '600',
+  },
+  clubCardPriceNew: {
+    fontSize: FONT_SIZES.xl,
+    color: COLORS.white,
+    fontWeight: '700',
+    marginVertical: 4,
+  },
+  clubCardPriceHighlight: {
+    fontSize: FONT_SIZES.xl,
+    color: COLORS.primary,
+    fontWeight: '700',
+    marginVertical: 4,
+  },
+  clubDiscountBadgeNew: {
+    backgroundColor: COLORS.secondary,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 2,
+    borderRadius: BORDER_RADIUS.full,
+  },
+  clubDiscountTextNew: {
+    fontSize: FONT_SIZES.xs,
+    fontWeight: '700',
+    color: COLORS.primary,
+  },
+  clubDiscountBadgeHighlightNew: {
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 2,
+    borderRadius: BORDER_RADIUS.full,
+  },
+  clubDiscountTextHighlight: {
+    fontSize: FONT_SIZES.xs,
+    fontWeight: '700',
+    color: COLORS.white,
+  },
+  clubButtonNew: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.secondary,
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.xl,
+    borderRadius: BORDER_RADIUS.full,
+    alignSelf: 'center',
+    gap: SPACING.sm,
+  },
+  clubButtonTextNew: {
+    fontSize: FONT_SIZES.md,
+    fontWeight: '700',
+    color: COLORS.white,
+  },
+  // Engagements Section Elegant
+  engagementsSectionNew: {
+    backgroundColor: COLORS.surfaceLight,
+    paddingVertical: SPACING.xxl,
+    paddingHorizontal: SPACING.lg,
+  },
+  engagementsTitleContainer: {
+    alignItems: 'center',
+    marginBottom: SPACING.lg,
+  },
+  engagementsLine: {
+    width: 60,
+    height: 2,
+    backgroundColor: COLORS.secondary,
+    marginVertical: SPACING.sm,
+  },
+  engagementsIconRowNew: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.primary,
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.xl,
+    borderRadius: BORDER_RADIUS.full,
+    gap: SPACING.md,
+    marginBottom: SPACING.md,
+  },
+  engagementsBadgeNew: {
+    backgroundColor: COLORS.secondary,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.xs,
+    borderRadius: BORDER_RADIUS.md,
+  },
+  engagementsBadgeText: {
+    fontSize: FONT_SIZES.lg,
+    fontWeight: '700',
+    color: COLORS.primary,
+  },
+  engagementsMainTitle: {
+    fontSize: FONT_SIZES.lg,
+    color: COLORS.primary,
+    fontWeight: '300',
+    letterSpacing: 1,
+  },
+  engagementsAccentTitle: {
+    fontSize: FONT_SIZES.xl,
+    color: COLORS.secondary,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  engagementsTextNew: {
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: SPACING.lg,
+  },
+  engagementsAssociationsNew: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: SPACING.lg,
+    marginBottom: SPACING.lg,
+  },
+  engagementAssocItemNew: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    paddingVertical: SPACING.sm,
+    paddingHorizontal: SPACING.md,
+    borderRadius: BORDER_RADIUS.full,
+    gap: SPACING.xs,
+  },
+  engagementAssocNameNew: {
+    fontSize: FONT_SIZES.sm,
+    fontWeight: '600',
+    color: COLORS.primary,
+  },
+  engagementsButtonNew: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.white,
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.xl,
+    borderRadius: BORDER_RADIUS.full,
+    alignSelf: 'center',
+    gap: SPACING.sm,
+    borderWidth: 2,
+    borderColor: COLORS.secondary,
+  },
+  engagementsButtonTextNew: {
+    fontSize: FONT_SIZES.sm,
+    fontWeight: '700',
+    color: COLORS.secondary,
+  },
+  // About Section Elegant
+  aboutSectionNew: {
+    backgroundColor: COLORS.primary,
+    paddingVertical: SPACING.xxl,
+    paddingHorizontal: SPACING.lg,
+  },
+  aboutTitleContainer: {
+    alignItems: 'center',
+    marginBottom: SPACING.lg,
+  },
+  aboutLine: {
+    width: 60,
+    height: 2,
+    backgroundColor: COLORS.secondary,
+    marginVertical: SPACING.sm,
+  },
+  aboutMainTitle: {
+    fontSize: FONT_SIZES.lg,
+    color: COLORS.white,
+    fontWeight: '300',
+    letterSpacing: 1,
+  },
+  aboutAccentTitle: {
+    fontSize: FONT_SIZES.xxl,
+    color: COLORS.secondary,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  aboutTextNew: {
+    fontSize: FONT_SIZES.sm,
+    color: 'rgba(255,255,255,0.8)',
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: SPACING.lg,
+  },
+  aboutHighlightBox: {
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: BORDER_RADIUS.xl,
+    padding: SPACING.lg,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: SPACING.md,
+    borderLeftWidth: 4,
+    borderLeftColor: COLORS.secondary,
+  },
+  aboutHighlightNew: {
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.white,
+    fontWeight: '500',
+    flex: 1,
+    lineHeight: 20,
   },
 });
