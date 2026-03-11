@@ -12,21 +12,12 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS, SHADOWS } from '../../src/constants/theme';
+import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../../src/constants/theme';
 import { useTranslation } from '../../src/hooks/useTranslation';
 import { cruiseApi, Cruise } from '../../src/services/api';
 
 const { width } = Dimensions.get('window');
 
-// Boarding card images per destination (fallback for legacy cruises)
-const BOARDING_CARDS: { [key: string]: string } = {
-  corsica: 'https://static.wixstatic.com/media/ce6ce7_170fb96af2764aecb7eb7c526a48eb27~mv2.png/v1/fill/w_400,h_267,al_c,q_85,enc_avif,quality_auto/croisiere%20catamaran%20le%20tour%20de%20Corse%20sognudimare.png',
-  corsica_south: 'https://static.wixstatic.com/media/ce6ce7_2c02fe160efb49b6930f0c695a53e34f~mv2.png/v1/fill/w_400,h_267,al_c,q_85,enc_avif,quality_auto/croisiere%20catamaran%20la%20corse%20du%20sud%20sognudimare.png',
-  corsica_west: 'https://static.wixstatic.com/media/ce6ce7_bdc5406402ea4be3b94eeeb747d2da1a~mv2.png/v1/fill/w_400,h_267,al_c,q_85,enc_avif,quality_auto/croisiere%20catamaran%20ouest%20corse%20sognudimare.png',
-  sardinia: 'https://static.wixstatic.com/media/ce6ce7_68a8fb4c934c44cb909dfc0075f36d83~mv2.png/v1/fill/w_400,h_267,al_c,q_85,enc_avif,quality_auto/croisiere%20catamaran%20la%20sardaigne%20et%20la%20corse%20du%20sud%20sognudimare.png',
-};
-
-// What's included - base items (cruise duration is added dynamically)
 const getIncludedFR = (duration: string) => [
   `La croisière de ${duration}`,
   'Le logement en cabine double',
@@ -49,7 +40,6 @@ const getIncludedEN = (duration: string) => [
   'On-board water sports: paddle, snorkeling, fishing...',
 ];
 
-// What's not included
 const NOT_INCLUDED_FR = [
   'Les taxes éventuelles de séjour et de sortie du territoire',
   'Le petit déjeuner du jour 1 ainsi que le diner du jour du débarquement',
@@ -81,6 +71,8 @@ export default function CruiseDetailScreen() {
   const [cruise, setCruise] = useState<Cruise | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState<string>('');
+  const [showIncluded, setShowIncluded] = useState(false);
+  const [showNotIncluded, setShowNotIncluded] = useState(false);
 
   useEffect(() => {
     loadCruise();
@@ -91,9 +83,12 @@ export default function CruiseDetailScreen() {
     try {
       const data = await cruiseApi.getById(id);
       setCruise(data);
-      const firstAvailable = data.available_dates.find(d => d.status !== 'full');
-      if (firstAvailable) {
-        setSelectedDate(firstAvailable.date);
+      const firstAvail = data.availabilities?.find(a => a.status !== 'full');
+      if (firstAvail) {
+        setSelectedDate(firstAvail.date_range);
+      } else {
+        const firstDate = data.available_dates?.find(d => d.status !== 'full');
+        if (firstDate) setSelectedDate(firstDate.date);
       }
     } catch (error) {
       console.error('Error loading cruise:', error);
@@ -104,71 +99,54 @@ export default function CruiseDetailScreen() {
 
   const handleBooking = () => {
     if (cruise) {
-      // Redirect to booking page to select passengers, cards, etc.
       router.push({
         pathname: `/booking/${cruise.id}`,
-        params: { 
-          cruiseId: cruise.id, 
-          selectedDate: selectedDate || ''
-        }
+        params: { cruiseId: cruise.id, selectedDate: selectedDate || '' }
       });
     }
   };
 
-  const getAvailabilityColor = (status: string) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
-      case 'available': return COLORS.available;
-      case 'limited': return COLORS.limited;
-      case 'full': return COLORS.full;
+      case 'available': return '#34C759';
+      case 'limited': return '#FF9500';
+      case 'full': return '#FF3B30';
       default: return COLORS.textSecondary;
     }
   };
 
-  const getAvailabilityLabel = (status: string) => {
+  const getStatusLabel = (status: string) => {
+    if (language === 'fr') {
+      switch (status) {
+        case 'available': return 'Disponible';
+        case 'limited': return 'Places limitées';
+        case 'full': return 'Complet';
+        default: return status;
+      }
+    }
     switch (status) {
-      case 'available': return t('available');
-      case 'limited': return t('limited');
-      case 'full': return t('full');
+      case 'available': return 'Available';
+      case 'limited': return 'Limited';
+      case 'full': return 'Full';
       default: return status;
     }
   };
 
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-US', {
-      weekday: 'long',
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    });
-  };
-
-  const getBoardingCardImage = (cruiseData: Cruise) => {
-    // Use the boarding_pass_image from the database if available
-    if (cruiseData.boarding_pass_image) {
-      return cruiseData.boarding_pass_image;
-    }
-    // Fallback to static mapping based on destination
-    return BOARDING_CARDS[cruiseData.destination] || BOARDING_CARDS['corsica'];
-  };
-
   if (loading) {
     return (
-      <SafeAreaView style={styles.container} edges={['top']}>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={COLORS.primary} />
-        </View>
+      <SafeAreaView style={s.container} edges={['top']}>
+        <View style={s.center}><ActivityIndicator size="large" color={COLORS.primary} /></View>
       </SafeAreaView>
     );
   }
 
   if (!cruise) {
     return (
-      <SafeAreaView style={styles.container} edges={['top']}>
-        <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{t('error')}</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={() => router.back()}>
-            <Text style={styles.retryButtonText}>{t('retry')}</Text>
+      <SafeAreaView style={s.container} edges={['top']}>
+        <View style={s.center}>
+          <Text style={s.errorText}>{t('error')}</Text>
+          <TouchableOpacity style={s.retryBtn} onPress={() => router.back()}>
+            <Text style={s.retryBtnText}>{language === 'fr' ? 'Retour' : 'Back'}</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -176,705 +154,387 @@ export default function CruiseDetailScreen() {
   }
 
   const name = language === 'fr' ? cruise.name_fr : cruise.name_en;
-  const subtitle = language === 'fr' ? cruise.subtitle_fr : cruise.subtitle_en;
   const description = language === 'fr' ? cruise.description_fr : cruise.description_en;
   const highlights = language === 'fr' ? cruise.highlights_fr : cruise.highlights_en;
-  const program = language === 'fr' ? cruise.program_fr : cruise.program_en;
   const detailedProgram = language === 'fr' ? cruise.detailed_program_fr : cruise.detailed_program_en;
+  const program = language === 'fr' ? cruise.program_fr : cruise.program_en;
   const included = language === 'fr' ? getIncludedFR(cruise.duration) : getIncludedEN(cruise.duration);
   const notIncluded = language === 'fr' ? NOT_INCLUDED_FR : NOT_INCLUDED_EN;
-  
-  // Check if we have new detailed availabilities data
-  const hasDetailedAvailabilities = cruise.availabilities && cruise.availabilities.length > 0;
+  const hasDetailed = cruise.availabilities && cruise.availabilities.length > 0;
   const hasDetailedProgram = detailedProgram && detailedProgram.length > 0;
 
+  // Next departure = first non-full availability
+  const nextDeparture = cruise.availabilities?.find(a => a.status !== 'full');
+
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={s.container} edges={['top']}>
       {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color={COLORS.white} />
+      <View style={s.header}>
+        <TouchableOpacity style={s.backBtn} onPress={() => router.back()}>
+          <Ionicons name="arrow-back" size={22} color={COLORS.white} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle} numberOfLines={1}>{name}</Text>
+        <Text style={s.headerTitle} numberOfLines={1}>{name}</Text>
         <View style={{ width: 40 }} />
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Hero Image */}
-        <View style={styles.heroContainer}>
-          <Image source={{ uri: cruise.image_url }} style={styles.heroImage} />
-          <View style={styles.heroOverlay}>
-            <Text style={styles.heroSubtitle}>{subtitle}</Text>
-            <Text style={styles.heroTitle}>{name}</Text>
+        {/* Hero */}
+        <View style={s.hero}>
+          <Image source={{ uri: cruise.image_url }} style={s.heroImg} />
+          <View style={s.heroGradient}>
+            <View style={s.heroBadge}>
+              <Ionicons name="time-outline" size={14} color={COLORS.secondary} />
+              <Text style={s.heroBadgeText}>{cruise.duration}</Text>
+            </View>
+            <Text style={s.heroName}>{name}</Text>
+            <View style={s.heroMeta}>
+              <Ionicons name="location" size={14} color={COLORS.secondary} />
+              <Text style={s.heroMetaText}>
+                {language === 'fr' ? 'Départ' : 'From'} {cruise.departure_port}
+              </Text>
+            </View>
           </View>
         </View>
 
-        <View style={styles.content}>
-          {/* Boarding Card Image */}
-          <View style={styles.boardingCardContainer}>
-            <Image 
-              source={{ uri: getBoardingCardImage(cruise) }} 
-              style={styles.boardingCardImage} 
-              resizeMode="contain"
-            />
-          </View>
-
-          {/* Quick Info */}
-          <View style={styles.quickInfo}>
-            <View style={styles.quickInfoItem}>
-              <Ionicons name="time-outline" size={20} color={COLORS.accent} />
-              <Text style={styles.quickInfoLabel}>{t('duration')}</Text>
-              <Text style={styles.quickInfoValue}>{cruise.duration}</Text>
+        {/* Next Departure Card */}
+        {nextDeparture && (
+          <View style={s.nextDepartureCard}>
+            <View style={s.nextDepartureHeader}>
+              <Ionicons name="calendar" size={20} color={COLORS.primary} />
+              <Text style={s.nextDepartureTitle}>
+                {language === 'fr' ? 'PROCHAIN DÉPART' : 'NEXT DEPARTURE'}
+              </Text>
             </View>
-            <View style={styles.quickInfoItem}>
-              <Ionicons name="location-outline" size={20} color={COLORS.accent} />
-              <Text style={styles.quickInfoLabel}>{t('departure')}</Text>
-              <Text style={styles.quickInfoValue}>{cruise.departure_port}</Text>
+            <Text style={s.nextDepartureDate}>{nextDeparture.date_range}</Text>
+            <View style={s.nextDepartureFooter}>
+              <View>
+                <Text style={s.nextDeparturePrice}>{nextDeparture.price}€</Text>
+                <Text style={s.nextDeparturePriceLabel}>
+                  {language === 'fr' ? 'par personne' : 'per person'}
+                </Text>
+              </View>
+              <View style={[s.nextDepartureStatus, { backgroundColor: getStatusColor(nextDeparture.status) + '20' }]}>
+                <View style={[s.statusDot, { backgroundColor: getStatusColor(nextDeparture.status) }]} />
+                <Text style={[s.nextDepartureStatusText, { color: getStatusColor(nextDeparture.status) }]}>
+                  {nextDeparture.status_label || getStatusLabel(nextDeparture.status)}
+                </Text>
+              </View>
             </View>
+            <TouchableOpacity style={s.nextDepartureBtn} onPress={handleBooking}>
+              <Text style={s.nextDepartureBtnText}>
+                {language === 'fr' ? 'Réserver ce départ' : 'Book this departure'}
+              </Text>
+              <Ionicons name="arrow-forward" size={18} color={COLORS.white} />
+            </TouchableOpacity>
           </View>
+        )}
 
+        <View style={s.content}>
           {/* Description */}
-          <View style={styles.section}>
-            <Text style={styles.descriptionText}>{description}</Text>
-          </View>
+          <Text style={s.descText}>{description}</Text>
 
           {/* Pricing */}
-          <View style={styles.pricingSection}>
+          <View style={s.pricingRow}>
             {cruise.pricing.cabin_price && (
-              <View style={styles.priceCard}>
-                <View style={styles.priceHeader}>
-                  <Ionicons name="bed" size={24} color={COLORS.primary} />
-                  <Text style={styles.priceCardTitle}>{t('cabinReservation')}</Text>
-                </View>
-                <Text style={styles.priceAmount}>
-                  {cruise.pricing.cabin_price}€
-                  <Text style={styles.pricePer}>{t('perPerson')}</Text>
-                </Text>
+              <View style={s.priceCard}>
+                <Ionicons name="bed-outline" size={22} color={COLORS.primary} />
+                <Text style={s.priceLabel}>{t('cabinReservation')}</Text>
+                <Text style={s.priceVal}>{cruise.pricing.cabin_price}€</Text>
+                <Text style={s.pricePer}>{t('perPerson')}</Text>
               </View>
             )}
             {cruise.pricing.private_price && (
-              <View style={[styles.priceCard, styles.priceCardPrivate]}>
-                <View style={styles.priceHeader}>
-                  <Ionicons name="boat" size={24} color={COLORS.secondary} />
-                  <Text style={[styles.priceCardTitle, { color: COLORS.secondary }]}>
-                    {t('fullPrivatization')}
-                  </Text>
-                </View>
-                <Text style={[styles.priceAmount, { color: COLORS.secondary }]}>
-                  {cruise.pricing.private_price}€
-                </Text>
+              <View style={[s.priceCard, s.priceCardGold]}>
+                <Ionicons name="boat-outline" size={22} color={COLORS.secondary} />
+                <Text style={[s.priceLabel, { color: COLORS.secondary }]}>{t('fullPrivatization')}</Text>
+                <Text style={[s.priceVal, { color: COLORS.secondary }]}>{cruise.pricing.private_price}€</Text>
+                <Text style={[s.pricePer, { color: 'rgba(197,171,110,0.7)' }]}>{language === 'fr' ? 'le bateau' : 'the boat'}</Text>
               </View>
             )}
           </View>
 
-          {/* Ce tarif comprend */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>
-              {language === 'fr' ? 'Ce tarif comprend :' : 'This rate includes:'}
-            </Text>
-            <View style={styles.includedList}>
-              {included.map((item, index) => (
-                <View key={index} style={styles.includedItem}>
-                  <Ionicons name="checkmark-circle" size={18} color={COLORS.success} />
-                  <Text style={styles.includedText}>{item}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-
-          {/* Le tarif ne comprend pas */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitleRed}>
-              {language === 'fr' ? 'Le tarif ne comprend pas :' : 'This rate does not include:'}
-            </Text>
-            <View style={styles.notIncludedList}>
-              {notIncluded.map((item, index) => (
-                <View key={index} style={styles.notIncludedItem}>
-                  <Ionicons name="close-circle" size={18} color={COLORS.error} />
-                  <Text style={styles.notIncludedText}>{item}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-
           {/* Highlights */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('highlights')}</Text>
-            <View style={styles.highlightsList}>
-              {highlights.map((highlight, index) => (
-                <View key={index} style={styles.highlightItem}>
-                  <Ionicons name="star" size={18} color={COLORS.secondary} />
-                  <Text style={styles.highlightText}>{highlight}</Text>
-                </View>
-              ))}
-            </View>
+          <View style={s.section}>
+            <Text style={s.sectionTitle}>{t('highlights')}</Text>
+            {highlights.map((h, i) => (
+              <View key={i} style={s.highlightItem}>
+                <Ionicons name="star" size={16} color={COLORS.secondary} />
+                <Text style={s.highlightText}>{h}</Text>
+              </View>
+            ))}
           </View>
 
-          {/* Program - Use detailed if available */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('program')}</Text>
+          {/* Program */}
+          <View style={s.section}>
+            <Text style={s.sectionTitle}>{t('program')}</Text>
             {hasDetailedProgram ? (
-              // NEW: Detailed program with day, title, description
-              detailedProgram.map((dayInfo, index) => (
-                <View key={index} style={styles.programDetailedItem}>
-                  <View style={styles.programDayBadge}>
-                    <Text style={styles.programDayNumber}>{language === 'fr' ? 'J' : 'D'}{dayInfo.day}</Text>
+              detailedProgram.map((day, i) => (
+                <View key={i} style={s.programDay}>
+                  <View style={s.programBadge}>
+                    <Text style={s.programBadgeText}>{language === 'fr' ? 'J' : 'D'}{day.day}</Text>
                   </View>
-                  <View style={styles.programDetailContent}>
-                    <Text style={styles.programDetailTitle}>{dayInfo.title}</Text>
-                    <Text style={styles.programDetailDescription}>{dayInfo.description}</Text>
+                  <View style={s.programInfo}>
+                    <Text style={s.programTitle}>{day.title}</Text>
+                    <Text style={s.programDesc}>{day.description}</Text>
                   </View>
                 </View>
               ))
             ) : (
-              // Legacy: Simple program list
-              program.map((day, index) => (
-                <View key={index} style={styles.programItem}>
-                  <View style={styles.programDot} />
-                  <Text style={styles.programText}>{day}</Text>
+              program.map((p, i) => (
+                <View key={i} style={s.programSimple}>
+                  <View style={s.programDot} />
+                  <Text style={s.programSimpleText}>{p}</Text>
                 </View>
               ))
             )}
           </View>
 
-          {/* Available Dates - Use detailed availabilities if available */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>{t('availableDates')}</Text>
-            {hasDetailedAvailabilities ? (
-              // NEW: Detailed availabilities with date range, price, status
-              cruise.availabilities!.map((avail, index) => (
-                <TouchableOpacity 
-                  key={index} 
+          {/* All Dates */}
+          <View style={s.section}>
+            <Text style={s.sectionTitle}>{language === 'fr' ? 'Tous les départs' : 'All departures'}</Text>
+            {hasDetailed ? (
+              cruise.availabilities!.map((avail, i) => (
+                <TouchableOpacity
+                  key={i}
                   style={[
-                    styles.availabilityItem,
-                    selectedDate === avail.date_range && styles.dateItemSelected,
-                    avail.status === 'full' && styles.availabilityFull
+                    s.dateRow,
+                    selectedDate === avail.date_range && s.dateRowSelected,
+                    avail.status === 'full' && s.dateRowFull
                   ]}
                   onPress={() => avail.status !== 'full' && setSelectedDate(avail.date_range)}
                   disabled={avail.status === 'full'}
                 >
-                  <View style={styles.availabilityMain}>
-                    <View
-                      style={[
-                        styles.dateStatus,
-                        { backgroundColor: getAvailabilityColor(avail.status) },
-                      ]}
-                    />
-                    <View style={styles.availabilityInfo}>
-                      <Text style={[
-                        styles.availabilityDateText,
-                        selectedDate === avail.date_range && styles.dateTextSelected,
-                        avail.status === 'full' && styles.textFull
-                      ]}>
-                        {avail.date_range}
-                      </Text>
-                      <Text style={[
-                        styles.availabilityStatusLabel,
-                        avail.status === 'full' && styles.statusLabelFull,
-                        avail.status === 'limited' && styles.statusLabelLimited,
-                      ]}>
-                        {avail.status_label || getAvailabilityLabel(avail.status)}
-                      </Text>
-                    </View>
-                  </View>
-                  <View style={styles.availabilityPriceContainer}>
-                    <Text style={[
-                      styles.availabilityPrice,
-                      avail.status === 'full' && styles.textFull
-                    ]}>
-                      {avail.price}€
-                    </Text>
-                    <Text style={styles.availabilityPriceLabel}>
-                      {language === 'fr' ? '/passager' : '/passenger'}
+                  <View style={[s.statusDot, { backgroundColor: getStatusColor(avail.status) }]} />
+                  <View style={s.dateRowInfo}>
+                    <Text style={[s.dateRowText, avail.status === 'full' && s.textStrike]}>{avail.date_range}</Text>
+                    <Text style={[s.dateRowStatus, { color: getStatusColor(avail.status) }]}>
+                      {avail.status_label || getStatusLabel(avail.status)}
                     </Text>
                   </View>
+                  <Text style={[s.dateRowPrice, avail.status === 'full' && s.textStrike]}>{avail.price}€</Text>
                   {selectedDate === avail.date_range && (
-                    <Ionicons name="checkmark-circle" size={24} color={COLORS.accent} />
+                    <Ionicons name="checkmark-circle" size={22} color={COLORS.accent || COLORS.secondary} />
                   )}
                 </TouchableOpacity>
               ))
             ) : (
-              // Legacy: Old available_dates format
-              cruise.available_dates.map((dateInfo, index) => (
-                <TouchableOpacity 
-                  key={index} 
-                  style={[
-                    styles.dateItem,
-                    selectedDate === dateInfo.date && styles.dateItemSelected
-                  ]}
-                  onPress={() => dateInfo.status !== 'full' && setSelectedDate(dateInfo.date)}
+              cruise.available_dates.map((d, i) => (
+                <TouchableOpacity
+                  key={i}
+                  style={[s.dateRow, selectedDate === d.date && s.dateRowSelected]}
+                  onPress={() => d.status !== 'full' && setSelectedDate(d.date)}
                 >
-                  <View
-                    style={[
-                      styles.dateStatus,
-                      { backgroundColor: getAvailabilityColor(dateInfo.status) },
-                    ]}
-                  />
-                  <View style={styles.dateInfo}>
-                    <Text style={[
-                      styles.dateText,
-                      selectedDate === dateInfo.date && styles.dateTextSelected
-                    ]}>
-                      {formatDate(dateInfo.date)}
-                    </Text>
-                    <Text style={styles.dateStatusText}>
-                      {getAvailabilityLabel(dateInfo.status)}
-                      {dateInfo.status === 'limited' &&
-                        dateInfo.remaining_places &&
-                        ` - ${dateInfo.remaining_places} ${t('remainingPlaces')}`}
-                    </Text>
-                  </View>
-                  {selectedDate === dateInfo.date && (
-                    <Ionicons name="checkmark-circle" size={24} color={COLORS.accent} />
+                  <View style={[s.statusDot, { backgroundColor: getStatusColor(d.status) }]} />
+                  <Text style={s.dateRowText}>{d.date}</Text>
+                  {selectedDate === d.date && (
+                    <Ionicons name="checkmark-circle" size={22} color={COLORS.accent || COLORS.secondary} />
                   )}
                 </TouchableOpacity>
               ))
             )}
           </View>
+
+          {/* Included - Collapsible */}
+          <TouchableOpacity style={s.collapsibleHeader} onPress={() => setShowIncluded(!showIncluded)}>
+            <Text style={s.collapsibleTitle}>
+              {language === 'fr' ? 'Ce tarif comprend' : 'This rate includes'}
+            </Text>
+            <Ionicons name={showIncluded ? 'chevron-up' : 'chevron-down'} size={22} color={COLORS.primary} />
+          </TouchableOpacity>
+          {showIncluded && (
+            <View style={s.collapsibleContent}>
+              {included.map((item, i) => (
+                <View key={i} style={s.listItem}>
+                  <Ionicons name="checkmark-circle" size={16} color="#34C759" />
+                  <Text style={s.listItemText}>{item}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+
+          {/* Not Included - Collapsible */}
+          <TouchableOpacity style={s.collapsibleHeader} onPress={() => setShowNotIncluded(!showNotIncluded)}>
+            <Text style={[s.collapsibleTitle, { color: '#FF3B30' }]}>
+              {language === 'fr' ? 'Le tarif ne comprend pas' : 'This rate does not include'}
+            </Text>
+            <Ionicons name={showNotIncluded ? 'chevron-up' : 'chevron-down'} size={22} color="#FF3B30" />
+          </TouchableOpacity>
+          {showNotIncluded && (
+            <View style={s.collapsibleContent}>
+              {notIncluded.map((item, i) => (
+                <View key={i} style={s.listItem}>
+                  <Ionicons name="close-circle" size={16} color="#FF3B30" />
+                  <Text style={s.listItemText}>{item}</Text>
+                </View>
+              ))}
+            </View>
+          )}
 
           <View style={{ height: 100 }} />
         </View>
       </ScrollView>
 
       {/* Fixed Book Button */}
-      <View style={styles.bookButtonContainer}>
-        <TouchableOpacity style={styles.bookButton} onPress={handleBooking}>
-          <Text style={styles.bookButtonText}>{t('bookNow')}</Text>
-          <Ionicons name="arrow-forward" size={20} color={COLORS.primary} />
+      <View style={s.fixedBook}>
+        <View>
+          <Text style={s.fixedBookPrice}>
+            {language === 'fr' ? 'À partir de ' : 'From '}
+            {cruise.pricing.cabin_price}€
+          </Text>
+          <Text style={s.fixedBookPriceSub}>{t('perPerson')}</Text>
+        </View>
+        <TouchableOpacity style={s.fixedBookBtn} onPress={handleBooking}>
+          <Text style={s.fixedBookBtnText}>{t('bookNow')}</Text>
+          <Ionicons name="arrow-forward" size={18} color={COLORS.white} />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
+const s = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#F8F6F3' },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: SPACING.xl },
+  errorText: { fontSize: 16, color: COLORS.textSecondary, marginBottom: 16 },
+  retryBtn: { backgroundColor: COLORS.primary, paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 },
+  retryBtnText: { color: COLORS.white, fontWeight: '600' },
+
+  // Header
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
-    backgroundColor: COLORS.primary,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: SPACING.md, paddingVertical: SPACING.sm, backgroundColor: COLORS.primary,
   },
-  backButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerTitle: {
-    flex: 1,
-    fontSize: FONT_SIZES.lg,
-    fontWeight: '600',
-    color: COLORS.secondary,
-    textAlign: 'center',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: SPACING.xl,
-  },
-  errorText: {
-    fontSize: FONT_SIZES.lg,
-    color: COLORS.textSecondary,
-    marginBottom: SPACING.lg,
-  },
-  retryButton: {
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
-    borderRadius: BORDER_RADIUS.lg,
-  },
-  retryButtonText: {
-    color: COLORS.white,
-    fontWeight: '600',
-  },
-  heroContainer: {
-    height: 250,
-    position: 'relative',
-  },
-  heroImage: {
-    width: '100%',
-    height: '100%',
-  },
-  heroOverlay: {
+  backBtn: { width: 40, height: 40, justifyContent: 'center', alignItems: 'center' },
+  headerTitle: { flex: 1, fontSize: 17, fontWeight: '600', color: COLORS.secondary, textAlign: 'center' },
+
+  // Hero
+  hero: { height: 300, position: 'relative' },
+  heroImg: { width: '100%', height: '100%' },
+  heroGradient: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: COLORS.overlayLight,
-    justifyContent: 'flex-end',
-    padding: SPACING.lg,
+    backgroundColor: 'rgba(14,28,64,0.45)',
+    justifyContent: 'flex-end', padding: SPACING.lg,
   },
-  heroSubtitle: {
-    fontSize: FONT_SIZES.md,
-    color: COLORS.secondary,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 2,
+  heroBadge: {
+    flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start',
+    backgroundColor: 'rgba(14,28,64,0.7)', paddingHorizontal: 12, paddingVertical: 6,
+    borderRadius: 20, marginBottom: 8,
   },
-  heroTitle: {
-    fontSize: FONT_SIZES.xxxl,
-    fontWeight: '700',
-    color: COLORS.white,
-    marginTop: SPACING.xs,
+  heroBadgeText: { color: COLORS.secondary, fontSize: 13, fontWeight: '600', marginLeft: 6 },
+  heroName: { fontSize: 28, fontWeight: '800', color: COLORS.white, letterSpacing: -0.5 },
+  heroMeta: { flexDirection: 'row', alignItems: 'center', marginTop: 6 },
+  heroMetaText: { color: 'rgba(255,255,255,0.85)', fontSize: 14, marginLeft: 6 },
+
+  // Next Departure Card
+  nextDepartureCard: {
+    marginHorizontal: SPACING.md, marginTop: -30,
+    backgroundColor: COLORS.white, borderRadius: 16, padding: SPACING.lg,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.12, shadowRadius: 12,
+    elevation: 8, borderLeftWidth: 4, borderLeftColor: COLORS.secondary,
   },
-  content: {
-    padding: SPACING.lg,
+  nextDepartureHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
+  nextDepartureTitle: {
+    fontSize: 12, fontWeight: '800', color: COLORS.primary,
+    letterSpacing: 2, marginLeft: 8,
   },
-  boardingCardContainer: {
-    marginBottom: SPACING.lg,
-    alignItems: 'center',
+  nextDepartureDate: { fontSize: 18, fontWeight: '700', color: COLORS.primary, marginBottom: 12 },
+  nextDepartureFooter: {
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16,
   },
-  boardingCardImage: {
-    width: width - SPACING.lg * 2,
-    height: 180,
-    borderRadius: BORDER_RADIUS.lg,
+  nextDeparturePrice: { fontSize: 26, fontWeight: '800', color: COLORS.primary },
+  nextDeparturePriceLabel: { fontSize: 12, color: COLORS.textSecondary },
+  nextDepartureStatus: {
+    flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20,
   },
-  quickInfo: {
-    flexDirection: 'row',
-    backgroundColor: COLORS.white,
-    borderRadius: BORDER_RADIUS.xl,
-    padding: SPACING.lg,
-    borderWidth: 2,
-    borderColor: COLORS.secondary,
+  nextDepartureStatusText: { fontSize: 12, fontWeight: '700', marginLeft: 6 },
+  nextDepartureBtn: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: COLORS.primary, paddingVertical: 14, borderRadius: 12,
   },
-  quickInfoItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  quickInfoLabel: {
-    fontSize: FONT_SIZES.xs,
-    color: COLORS.textSecondary,
-    marginTop: SPACING.xs,
-  },
-  quickInfoValue: {
-    fontSize: FONT_SIZES.sm,
-    fontWeight: '600',
-    color: COLORS.primary,
-    marginTop: 2,
-    textAlign: 'center',
-  },
-  section: {
-    marginTop: SPACING.xl,
-  },
-  sectionTitle: {
-    fontSize: FONT_SIZES.lg,
-    fontWeight: '700',
-    color: COLORS.primary,
-    marginBottom: SPACING.md,
-  },
-  sectionTitleRed: {
-    fontSize: FONT_SIZES.lg,
-    fontWeight: '700',
-    color: COLORS.error,
-    marginBottom: SPACING.md,
-  },
-  descriptionText: {
-    fontSize: FONT_SIZES.md,
-    color: COLORS.textSecondary,
-    lineHeight: 24,
-  },
-  pricingSection: {
-    flexDirection: 'row',
-    marginTop: SPACING.xl,
-    gap: SPACING.md,
-  },
+  nextDepartureBtnText: { color: COLORS.white, fontSize: 15, fontWeight: '700', marginRight: 8 },
+
+  // Content
+  content: { padding: SPACING.lg },
+  descText: { fontSize: 15, color: COLORS.textSecondary, lineHeight: 24, marginBottom: SPACING.lg },
+
+  // Pricing
+  pricingRow: { flexDirection: 'row', gap: 12, marginBottom: SPACING.lg },
   priceCard: {
-    flex: 1,
-    backgroundColor: COLORS.white,
-    borderRadius: BORDER_RADIUS.xl,
-    padding: SPACING.lg,
-    borderWidth: 2,
-    borderColor: COLORS.primary,
+    flex: 1, backgroundColor: COLORS.white, borderRadius: 14, padding: SPACING.md,
+    alignItems: 'center', borderWidth: 2, borderColor: COLORS.primary,
   },
-  priceCardPrivate: {
-    borderColor: COLORS.secondary,
-    backgroundColor: COLORS.primary,
+  priceCardGold: { backgroundColor: COLORS.primary, borderColor: COLORS.secondary },
+  priceLabel: { fontSize: 11, fontWeight: '600', color: COLORS.primary, textAlign: 'center', marginTop: 8 },
+  priceVal: { fontSize: 24, fontWeight: '800', color: COLORS.primary, marginTop: 4 },
+  pricePer: { fontSize: 11, color: COLORS.textSecondary, marginTop: 2 },
+
+  // Sections
+  section: { marginBottom: SPACING.xl },
+  sectionTitle: {
+    fontSize: 18, fontWeight: '700', color: COLORS.primary, marginBottom: SPACING.md,
+    letterSpacing: -0.3,
   },
-  priceCardPrivateFull: {
-    borderColor: COLORS.secondary,
-    backgroundColor: COLORS.primary,
-    flex: 1,
+
+  // Highlights
+  highlightItem: { flexDirection: 'row', alignItems: 'center', marginBottom: 10 },
+  highlightText: { marginLeft: 10, fontSize: 14, color: COLORS.primary, fontWeight: '500', flex: 1 },
+
+  // Program
+  programDay: {
+    flexDirection: 'row', marginBottom: 14, backgroundColor: COLORS.white,
+    borderRadius: 12, padding: 14, borderLeftWidth: 3, borderLeftColor: COLORS.secondary,
   },
-  privateOnlyNotice: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.surfaceLight,
-    padding: SPACING.md,
-    borderRadius: BORDER_RADIUS.lg,
-    marginTop: SPACING.lg,
-    borderLeftWidth: 4,
-    borderLeftColor: COLORS.secondary,
+  programBadge: {
+    width: 34, height: 34, borderRadius: 17, backgroundColor: COLORS.primary,
+    justifyContent: 'center', alignItems: 'center', marginRight: 12,
   },
-  privateOnlyText: {
-    flex: 1,
-    marginLeft: SPACING.sm,
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.primary,
-    fontWeight: '500',
+  programBadgeText: { color: COLORS.secondary, fontSize: 13, fontWeight: '700' },
+  programInfo: { flex: 1 },
+  programTitle: { fontSize: 15, fontWeight: '700', color: COLORS.primary, marginBottom: 4 },
+  programDesc: { fontSize: 13, color: COLORS.textSecondary, lineHeight: 19 },
+  programSimple: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12 },
+  programDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: COLORS.secondary, marginTop: 6, marginRight: 12 },
+  programSimpleText: { flex: 1, fontSize: 14, color: COLORS.text, lineHeight: 21 },
+
+  // Dates
+  statusDot: { width: 10, height: 10, borderRadius: 5, marginRight: 12 },
+  dateRow: {
+    flexDirection: 'row', alignItems: 'center', backgroundColor: COLORS.white,
+    padding: 14, borderRadius: 12, marginBottom: 8, borderWidth: 2, borderColor: 'transparent',
   },
-  privatePriceNote: {
-    fontSize: FONT_SIZES.xs,
-    color: COLORS.secondary,
-    marginTop: SPACING.xs,
-    opacity: 0.9,
+  dateRowSelected: { borderColor: COLORS.secondary, backgroundColor: '#FBF8F2' },
+  dateRowFull: { opacity: 0.5 },
+  dateRowInfo: { flex: 1 },
+  dateRowText: { fontSize: 14, fontWeight: '600', color: COLORS.text },
+  dateRowStatus: { fontSize: 11, fontWeight: '600', marginTop: 2 },
+  dateRowPrice: { fontSize: 16, fontWeight: '700', color: COLORS.primary, marginRight: 10 },
+  textStrike: { textDecorationLine: 'line-through', color: COLORS.textSecondary },
+
+  // Collapsible
+  collapsibleHeader: {
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    backgroundColor: COLORS.white, padding: 16, borderRadius: 12, marginBottom: 8,
   },
-  priceHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: SPACING.sm,
+  collapsibleTitle: { fontSize: 15, fontWeight: '700', color: COLORS.primary },
+  collapsibleContent: {
+    backgroundColor: COLORS.white, borderRadius: 12, padding: 14, marginBottom: 12,
+    marginTop: -4,
   },
-  priceCardTitle: {
-    fontSize: FONT_SIZES.sm,
-    fontWeight: '600',
-    color: COLORS.primary,
-    marginLeft: SPACING.sm,
-    flex: 1,
+  listItem: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 10 },
+  listItemText: { flex: 1, marginLeft: 10, fontSize: 13, color: COLORS.text, lineHeight: 19 },
+
+  // Fixed Book
+  fixedBook: {
+    position: 'absolute', bottom: 0, left: 0, right: 0,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    backgroundColor: COLORS.white, padding: SPACING.md,
+    borderTopWidth: 1, borderTopColor: '#E8E4DF',
   },
-  priceAmount: {
-    fontSize: FONT_SIZES.xxl,
-    fontWeight: '700',
-    color: COLORS.primary,
+  fixedBookPrice: { fontSize: 16, fontWeight: '700', color: COLORS.primary },
+  fixedBookPriceSub: { fontSize: 11, color: COLORS.textSecondary },
+  fixedBookBtn: {
+    flexDirection: 'row', alignItems: 'center',
+    backgroundColor: COLORS.primary, paddingHorizontal: 24, paddingVertical: 14, borderRadius: 12,
   },
-  pricePer: {
-    fontSize: FONT_SIZES.sm,
-    fontWeight: '400',
-  },
-  includedList: {
-    backgroundColor: COLORS.white,
-    borderRadius: BORDER_RADIUS.lg,
-    padding: SPACING.md,
-    borderLeftWidth: 4,
-    borderLeftColor: COLORS.success,
-  },
-  includedItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: SPACING.sm,
-  },
-  includedText: {
-    flex: 1,
-    marginLeft: SPACING.sm,
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.text,
-    lineHeight: 20,
-  },
-  notIncludedList: {
-    backgroundColor: COLORS.white,
-    borderRadius: BORDER_RADIUS.lg,
-    padding: SPACING.md,
-    borderLeftWidth: 4,
-    borderLeftColor: COLORS.error,
-  },
-  notIncludedItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: SPACING.sm,
-  },
-  notIncludedText: {
-    flex: 1,
-    marginLeft: SPACING.sm,
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.text,
-    lineHeight: 20,
-  },
-  highlightsList: {
-    gap: SPACING.sm,
-  },
-  highlightItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.white,
-    padding: SPACING.md,
-    borderRadius: BORDER_RADIUS.lg,
-  },
-  highlightText: {
-    marginLeft: SPACING.sm,
-    fontSize: FONT_SIZES.md,
-    color: COLORS.primary,
-    fontWeight: '500',
-  },
-  programItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: SPACING.md,
-  },
-  programDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: COLORS.accent,
-    marginTop: 6,
-    marginRight: SPACING.md,
-  },
-  programText: {
-    flex: 1,
-    fontSize: FONT_SIZES.md,
-    color: COLORS.text,
-    lineHeight: 22,
-  },
-  dateItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.white,
-    padding: SPACING.md,
-    borderRadius: BORDER_RADIUS.lg,
-    marginBottom: SPACING.sm,
-    borderWidth: 2,
-    borderColor: COLORS.border,
-  },
-  dateItemSelected: {
-    borderColor: COLORS.accent,
-    backgroundColor: COLORS.surfaceLight,
-  },
-  dateStatus: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    marginRight: SPACING.md,
-  },
-  dateInfo: {
-    flex: 1,
-  },
-  dateText: {
-    fontSize: FONT_SIZES.md,
-    fontWeight: '500',
-    color: COLORS.text,
-  },
-  dateTextSelected: {
-    color: COLORS.primary,
-    fontWeight: '700',
-  },
-  dateStatusText: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.textSecondary,
-    marginTop: 2,
-  },
-  bookButtonContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: COLORS.white,
-    padding: SPACING.lg,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-  },
-  bookButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: COLORS.secondary,
-    padding: SPACING.md,
-    borderRadius: BORDER_RADIUS.xl,
-  },
-  bookButtonText: {
-    color: COLORS.primary,
-    fontSize: FONT_SIZES.lg,
-    fontWeight: '700',
-    marginRight: SPACING.sm,
-  },
-  // NEW: Detailed Program Styles
-  programDetailedItem: {
-    flexDirection: 'row',
-    marginBottom: SPACING.lg,
-    backgroundColor: COLORS.white,
-    borderRadius: BORDER_RADIUS.lg,
-    padding: SPACING.md,
-    borderLeftWidth: 4,
-    borderLeftColor: COLORS.accent,
-  },
-  programDayBadge: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: COLORS.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: SPACING.md,
-  },
-  programDayNumber: {
-    color: COLORS.secondary,
-    fontSize: FONT_SIZES.sm,
-    fontWeight: '700',
-  },
-  programDetailContent: {
-    flex: 1,
-  },
-  programDetailTitle: {
-    fontSize: FONT_SIZES.md,
-    fontWeight: '700',
-    color: COLORS.primary,
-    marginBottom: SPACING.xs,
-  },
-  programDetailDescription: {
-    fontSize: FONT_SIZES.sm,
-    color: COLORS.textSecondary,
-    lineHeight: 20,
-  },
-  // NEW: Detailed Availability Styles
-  availabilityItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.white,
-    padding: SPACING.md,
-    borderRadius: BORDER_RADIUS.lg,
-    marginBottom: SPACING.sm,
-    borderWidth: 2,
-    borderColor: COLORS.border,
-  },
-  availabilityFull: {
-    backgroundColor: COLORS.surfaceLight,
-    opacity: 0.7,
-  },
-  availabilityMain: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  availabilityInfo: {
-    flex: 1,
-  },
-  availabilityDateText: {
-    fontSize: FONT_SIZES.md,
-    fontWeight: '600',
-    color: COLORS.text,
-  },
-  availabilityStatusLabel: {
-    fontSize: FONT_SIZES.xs,
-    fontWeight: '600',
-    color: COLORS.available,
-    marginTop: 2,
-  },
-  statusLabelFull: {
-    color: COLORS.full,
-  },
-  statusLabelLimited: {
-    color: COLORS.limited,
-  },
-  textFull: {
-    color: COLORS.textSecondary,
-    textDecorationLine: 'line-through',
-  },
-  availabilityPriceContainer: {
-    alignItems: 'flex-end',
-    marginRight: SPACING.md,
-  },
-  availabilityPrice: {
-    fontSize: FONT_SIZES.lg,
-    fontWeight: '700',
-    color: COLORS.primary,
-  },
-  availabilityPriceLabel: {
-    fontSize: FONT_SIZES.xs,
-    color: COLORS.textSecondary,
-  },
+  fixedBookBtnText: { color: COLORS.white, fontSize: 15, fontWeight: '700', marginRight: 8 },
 });

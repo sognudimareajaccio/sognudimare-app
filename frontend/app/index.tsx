@@ -582,11 +582,9 @@ export default function HomeScreen() {
         {/* About Section - Elegant */}
         <View style={styles.aboutSectionNew}>
           <View style={styles.aboutTitleContainer}>
-            <View style={styles.aboutLine} />
             <Text style={styles.aboutMainTitle}>
               {language === 'fr' ? 'À propos de' : 'About'}
             </Text>
-            <View style={styles.aboutLine} />
           </View>
           <Image source={{ uri: LOGO_FULL_URL }} style={styles.aboutLogoImage} resizeMode="contain" />
           <Text style={styles.aboutTextNew}>{t('aboutText')}</Text>
