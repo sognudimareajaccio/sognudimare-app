@@ -8,7 +8,8 @@ import {
   TextInput,
   ActivityIndicator,
   Alert,
-  Platform
+  Platform,
+  Linking,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -283,9 +284,18 @@ export default function PaymentScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Top bar - website link */}
+      {Platform.OS === 'web' && (
+        <TouchableOpacity style={styles.topBar} onPress={() => Linking.openURL('https://www.sognudimare.com/')}>
+          <Ionicons name="home-outline" size={14} color={COLORS.secondary} />
+          <Text style={styles.topBarText}>ACCUEIL</Text>
+          <Text style={styles.topBarSep}>|</Text>
+          <Text style={styles.topBarSite}>www.sognudimare.com</Text>
+        </TouchableOpacity>
+      )}
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <TouchableOpacity onPress={() => router.push('/cruises')} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Paiement Sécurisé</Text>
@@ -714,4 +724,9 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.lg,
     fontWeight: '700',
   },
+  // Top bar
+  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0A1628', paddingVertical: 8, gap: 8 },
+  topBarText: { fontSize: 11, color: COLORS.secondary, fontWeight: '700', letterSpacing: 2 },
+  topBarSep: { fontSize: 11, color: 'rgba(255,255,255,0.2)' },
+  topBarSite: { fontSize: 11, color: 'rgba(255,255,255,0.5)' },
 });

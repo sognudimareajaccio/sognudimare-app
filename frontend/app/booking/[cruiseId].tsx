@@ -8,7 +8,9 @@ import {
   Image,
   ActivityIndicator,
   Modal,
-  Alert
+  Alert,
+  Platform,
+  Linking,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -278,7 +280,7 @@ export default function BookingScreen() {
         <View style={styles.errorContainer}>
           <Ionicons name="alert-circle" size={48} color={COLORS.error} />
           <Text style={styles.errorText}>Croisière non trouvée</Text>
-          <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+          <TouchableOpacity style={styles.backButton} onPress={() => router.push('/cruises')}>
             <Text style={styles.backButtonText}>Retour</Text>
           </TouchableOpacity>
         </View>
@@ -290,9 +292,18 @@ export default function BookingScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Top bar - website link */}
+      {Platform.OS === 'web' && (
+        <TouchableOpacity style={styles.topBar} onPress={() => Linking.openURL('https://www.sognudimare.com/')}>
+          <Ionicons name="home-outline" size={14} color={COLORS.secondary} />
+          <Text style={styles.topBarText}>ACCUEIL</Text>
+          <Text style={styles.topBarSep}>|</Text>
+          <Text style={styles.topBarSite}>www.sognudimare.com</Text>
+        </TouchableOpacity>
+      )}
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.headerBackButton}>
+        <TouchableOpacity onPress={() => router.push('/cruises')} style={styles.headerBackButton}>
           <Ionicons name="arrow-back" size={24} color={COLORS.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Réservation</Text>
@@ -1187,4 +1198,9 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     padding: SPACING.xl,
   },
+  // Top bar
+  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0A1628', paddingVertical: 8, gap: 8 },
+  topBarText: { fontSize: 11, color: COLORS.secondary, fontWeight: '700', letterSpacing: 2 },
+  topBarSep: { fontSize: 11, color: 'rgba(255,255,255,0.2)' },
+  topBarSite: { fontSize: 11, color: 'rgba(255,255,255,0.5)' },
 });

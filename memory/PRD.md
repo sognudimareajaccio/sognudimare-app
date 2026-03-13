@@ -1,74 +1,61 @@
 # Sognudimare - Product Requirements Document
 
 ## Original Problem Statement
-Application mobile de croisieres en catamaran (Corse, Sardaigne, Grece, Caraibes). L'objectif initial etait de corriger un bug critique de paiement sur l'app iOS live, puis de construire un panneau d'administration et redesigner l'ensemble du frontend.
+Application mobile de croisieres en catamaran (Corse, Sardaigne, Grece, Caraibes). L'objectif initial etait de corriger un bug critique de paiement sur l'app iOS live, puis de construire un panneau d'administration et redesigner l'ensemble du frontend. L'app a ete deployee sur App Store Connect (v1.9.0) et une version web a ete deployee sur Netlify pour les reservations.
 
 ## Architecture
-- **Frontend**: React Native / Expo / TypeScript / expo-router
+- **Frontend**: React Native / Expo (SDK 54) / TypeScript / expo-router
 - **Backend**: Python / FastAPI / MongoDB
 - **Paiement**: Square (production)
 - **Hebergement backend**: Railway
 - **Build & Deploy mobile**: EAS (Expo Application Services)
 - **Distribution**: Apple App Store + Google Play Console
+- **Web**: Netlify (sognudimare-reservations.netlify.app)
 
 ## Core Files
-- `frontend/app/index.tsx` - Homepage (redesign complet)
-- `frontend/app/engagements.tsx` - Page engagements (redesign complet)
-- `frontend/app/catamarans.tsx` - Page flotte (avec Lucy Sunreef 50)
-- `frontend/app/admin.tsx` - Panneau d'administration
-- `frontend/app.json` - Configuration Expo (v1.8.0)
-- `frontend/eas.json` - Configuration EAS build
-- `backend/server.py` - API FastAPI (cruises, admin, paiement)
+- `frontend/app/index.tsx` - Homepage
+- `frontend/app/cruises.tsx` - Page destinations (responsive desktop)
+- `frontend/app/cruise/[id].tsx` - Detail croisiere
+- `frontend/app/booking/[cruiseId].tsx` - Page reservation
+- `frontend/app/payment/[cruiseId].tsx` - Page paiement
+- `frontend/app/_layout.tsx` - Layout avec navigation
+- `frontend/app/engagements.tsx` - Page engagements
+- `frontend/app/contact.tsx` - Page contact
+- `frontend/app/admin.tsx` - Panneau admin
+- `frontend/app/catamarans.tsx` - Page flotte
+- `backend/server.py` - API FastAPI
 
 ## What's Been Implemented
 
-### Completed (All sessions)
-- [x] Fix du bug de paiement (code corrige dans `payment/[cruiseId].tsx`)
-- [x] Panneau d'administration complet (CRUD croisieres, dates, prix)
-- [x] Redesign complet de la homepage avec carousel anime, sections elegantes
-- [x] Page croisiere redesignee : hero moderne, carte "PROCHAIN DEPART", barre fixe reservation
-- [x] Page Destinations redesignee : cards premium avec prochain depart et prix
-- [x] Page La Flotte redesignee : catamarans Lagoon 38/43/46 + Lucy Sunreef 50 (flagship)
-- [x] Page L'Equipage redesignee : hero, section "Reve de mer", fiches equipage, valeurs
-- [x] Page Club modernisee : header marine, tabs dores, style coherent
-- [x] `app.json` corrige: projectId invalide supprime, version 1.8.0, buildNumber 9
-
-### Completed (11 Mars 2026)
-- [x] Correction lien Maddalena : la photo "Archipel la Maddalena" redirige maintenant vers la croisiere "Sardaigne & Corse du Sud"
-- [x] Page Engagements redesignee : design premium avec hero navy, carte donation 1%, liste d'engagements numerotee, section equipage engage, cartes d'associations avec bordure doree, citation et CTA elegant
-- [x] Lucy (Sunreef 50) deja ajoutee a la page flotte (flagship avec badge PRESTIGE)
-- [x] Lucy mise a jour : 4 cabines (1 proprietaire 2PAX, 2 invites 4PAX, 1 VIP 2PAX = 8 passagers), detail affiche dans le modal
-- [x] Icone voilier (sail-boat) pour "Des catamarans recents" dans la section "Ce qui fait vraiment notre difference" en homepage
-- [x] Page Admin redesignee : theme navy/or premium avec barre de stats, tabs dores, cartes croisieres avec image/badge/prix, modals elegants, login premium
-- [x] Boutons de la page Flotte renvoient en haut de page avant navigation
-- [x] Upload d'images dans l'admin : endpoint backend `/api/admin/upload-image` + bouton "Uploader une image" dans le modal d'edition avec apercu
-- [x] Icones du menu du bas plus elegantes : ancre (Accueil), rose des vents (Croisieres), voilier (Club), marqueur (Contact)
-- [x] Page Contact redesignee : hero avec photo Nicolas & Maud, mot de remerciement de l'equipage, cartes contact (tel/email/adresse), reseaux sociaux, lien admin, footer avec logo et infos legales
+### Completed
+- [x] Fix du bug de paiement
+- [x] Panneau d'administration complet (CRUD, upload images)
+- [x] Redesign complet de toutes les pages (theme navy/or premium)
+- [x] Page Contact creee
+- [x] Page Engagements redesignee
+- [x] Lucy (Sunreef 50) ajoutee a la flotte
+- [x] Build iOS v1.9.0 uploade sur App Store Connect
+- [x] Backend deploye sur Railway (stable)
+- [x] Version web deployee sur Netlify
+- [x] Layout responsive desktop pour la page croisieres
+- [x] Navigation web: bouton retour -> /cruises sur toutes les pages
+- [x] Barre "ACCUEIL" (lien sognudimare.com) sur toutes les pages web (cruises, cruise detail, booking, payment)
+- [x] Styles topBar corriges sur cruises.tsx (manquants auparavant)
 
 ## Pending / Next Steps
 
-### P0 - EAS Build (User Action Required)
-L'utilisateur doit executer sur sa machine locale:
-```bash
-cd frontend
-npx eas login          # Se connecter au compte Expo
-npx eas init           # Regenerer un projectId UUID valide
-npx eas build --platform ios --profile preview   # Tester le build
-```
+### P0 - Deploiement Netlify (User Action Required)
+L'utilisateur doit deployer les dernieres corrections de navigation sur Netlify:
+1. Sauvegarder le code via "Save to Github"
+2. Localement: `git pull`, `npx expo export --platform web`, copier vers le dossier client, `netlify deploy`
 
 ### P1 - Soumission App Store (User Action Required)
-```bash
-npx eas build --platform ios --profile production
-npx eas submit --platform ios --latest
-```
+L'app v1.9.0 est sur App Store Connect - l'utilisateur doit la soumettre pour review.
 
 ### P2 - Backlog
-- Guide utilisateur pour le panneau admin
-- Publication production Google Play (apres test ferme)
 - Integration API MisterBooking (synchro prix/disponibilites)
-
-### Refactoring suggere
-- Deplacer le contenu hardcode (details flotte, equipage, textes) vers des fichiers JSON ou endpoints backend
+- Publication production Google Play
+- Guide utilisateur pour le panneau admin
 
 ## Credentials
 - Admin Panel: `admin` / `Capitaine2026!`

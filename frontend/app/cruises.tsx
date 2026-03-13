@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, Image, TouchableOpacity,
-  ActivityIndicator, RefreshControl, Dimensions, Platform, useWindowDimensions,
+  ActivityIndicator, RefreshControl, Dimensions, Platform, useWindowDimensions, Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -41,12 +41,23 @@ export default function CruisesScreen() {
 
   return (
     <SafeAreaView style={s.container} edges={['top']}>
+      {/* Top bar - website link (all web) */}
+      {Platform.OS === 'web' && (
+        <TouchableOpacity style={s.topBar} onPress={() => Linking.openURL('https://www.sognudimare.com/')}>
+          <Ionicons name="home-outline" size={14} color={COLORS.secondary} />
+          <Text style={s.topBarText}>ACCUEIL</Text>
+          <Text style={s.topBarSep}>|</Text>
+          <Text style={s.topBarSite}>www.sognudimare.com</Text>
+        </TouchableOpacity>
+      )}
       {/* Desktop header with logo */}
       {isDesktop ? (
-        <View style={s.desktopHeader}>
-          <Image source={{ uri: LOGO_URL }} style={s.desktopLogo} resizeMode="contain" />
-          <View style={s.desktopNav}>
-            <Text style={s.desktopNavItem}>{language === 'fr' ? 'Nos destinations' : 'Our destinations'}</Text>
+        <View>
+          <View style={s.desktopHeader}>
+            <Image source={{ uri: LOGO_URL }} style={s.desktopLogo} resizeMode="contain" />
+            <View style={s.desktopNav}>
+              <Text style={s.desktopNavItem}>{language === 'fr' ? 'Nos destinations' : 'Our destinations'}</Text>
+            </View>
           </View>
         </View>
       ) : (
@@ -247,4 +258,10 @@ const s = StyleSheet.create({
   footerText: { fontSize: 14, color: 'rgba(255,255,255,0.7)', textAlign: 'center', marginTop: 4 },
   footerDivider: { width: 60, height: 1, backgroundColor: 'rgba(235,208,169,0.3)', marginVertical: 16 },
   footerLegal: { fontSize: 12, color: 'rgba(255,255,255,0.5)', textAlign: 'center' },
+
+  // Top bar
+  topBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0A1628', paddingVertical: 8, gap: 8 },
+  topBarText: { fontSize: 11, color: COLORS.secondary, fontWeight: '700', letterSpacing: 2 },
+  topBarSep: { fontSize: 11, color: 'rgba(255,255,255,0.2)' },
+  topBarSite: { fontSize: 11, color: 'rgba(255,255,255,0.5)' },
 });
