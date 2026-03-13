@@ -40,14 +40,27 @@ Application mobile de croisieres en catamaran (Corse, Sardaigne, Grece, Caraibes
 - [x] Layout responsive desktop pour la page croisieres
 - [x] Navigation web: bouton retour -> /cruises sur toutes les pages
 - [x] Barre "ACCUEIL" (lien sognudimare.com) sur toutes les pages web (cruises, cruise detail, booking, payment)
-- [x] Styles topBar corriges sur cruises.tsx (manquants auparavant)
+- [x] Styles topBar corriges sur cruises.tsx
+- [x] Redirection / -> /cruises via _redirects
+- [x] Dossier deploy prepare avec structure correcte (client + server HTML fusionnes)
+
+## Deployment Netlify - Procedure
+Le dossier `deploy` est pret sur la machine de l'utilisateur. Pour deployer:
+```bash
+cd /Users/nicolasllorens/sognudimare-app/frontend/dist
+netlify deploy --prod --dir=deploy
+```
+Note: Credits Netlify epuises (mars 2026). Attendre le renouvellement ou upgrader le plan.
+
+Structure du deploy:
+1. `npx expo export --platform web` genere `dist/client/` (JS) et `dist/server/` (HTML)
+2. Fusionner: `mkdir deploy && cp -r client/* deploy/ && cp server/*.html deploy/ && cp -r server/cruise deploy/ && cp -r server/booking deploy/ && cp -r server/payment deploy/`
+3. Ajouter `_redirects` avec redirection `/` -> `/cruises`
 
 ## Pending / Next Steps
 
-### P0 - Deploiement Netlify (User Action Required)
-L'utilisateur doit deployer les dernieres corrections de navigation sur Netlify:
-1. Sauvegarder le code via "Save to Github"
-2. Localement: `git pull`, `npx expo export --platform web`, copier vers le dossier client, `netlify deploy`
+### P0 - Deploiement Netlify (En attente de credits)
+Relancer `netlify deploy --prod --dir=deploy` quand les credits sont restaures.
 
 ### P1 - Soumission App Store (User Action Required)
 L'app v1.9.0 est sur App Store Connect - l'utilisateur doit la soumettre pour review.
@@ -62,3 +75,4 @@ L'app v1.9.0 est sur App Store Connect - l'utilisateur doit la soumettre pour re
 - Backend Railway: `https://sognudimare-app-production.up.railway.app`
 - Apple Team ID: `LA5WFU7RW5`
 - ASC App ID: `6758972863`
+- Netlify Site ID: `9e28ee40-c8de-412a-bc03-d5d5f87e5e35`
